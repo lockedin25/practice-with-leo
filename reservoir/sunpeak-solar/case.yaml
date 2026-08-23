@@ -1,0 +1,19 @@
+schema_version: reservoir-v1
+case_id: sunpeak-solar-v1
+title: SunPeak Solar
+status: draft
+rights_status: original
+category: pricing
+industry: distributed_energy
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, pricing, unit economics, customer insight, synthesis]
+candidate_opening:
+  context: >-
+    SunPeak Solar sells rooftop solar systems to small businesses. Lead volume is
+    strong, but only 9 percent of qualified leads convert, well below management's 18 percent target.
+  objective: Diagnose the conversion gap and recommend a pricing and offer redesign.
+objective_function:
+  primary_metric: profitable installation conversion
+  decision_question: How should SunPeak change its offer to raise profitable conversion?
+  time_horizon: twelve months

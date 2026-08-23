@@ -1,0 +1,19 @@
+schema_version: reservoir-v1
+case_id: terrabuild-materials-v1
+title: TerraBuild Materials
+status: draft
+rights_status: original
+category: sustainability_strategy
+industry: construction_materials
+difficulty: advanced
+supported_durations: [30]
+skills_tested: [clarification, sustainability economics, portfolio strategy, implementation, synthesis]
+candidate_opening:
+  context: >-
+    TerraBuild is a regional cement and building-materials producer. Its largest
+    customers have announced lower-carbon procurement targets, while carbon costs are expected to rise.
+  objective: Create a credible decarbonisation strategy that protects earnings.
+objective_function:
+  primary_metric: EBITDA resilience and emissions intensity
+  decision_question: Which decarbonisation investments should TerraBuild prioritise first?
+  time_horizon: five years

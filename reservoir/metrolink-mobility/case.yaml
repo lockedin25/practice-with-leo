@@ -1,0 +1,19 @@
+schema_version: reservoir-v1
+case_id: metrolink-mobility-v1
+title: MetroLink Mobility
+status: draft
+rights_status: original
+category: operations
+industry: urban_transit
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, operations, capacity analysis, stakeholder judgement, synthesis]
+candidate_opening:
+  context: >-
+    MetroLink operates city buses under a public service contract. Ridership has
+    fallen 12 percent while operating subsidies have risen, and the city wants an improvement plan.
+  objective: Identify the main operational cause and recommend service changes without reducing access.
+objective_function:
+  primary_metric: reliable passenger trips per subsidy rupee
+  decision_question: How can MetroLink improve reliability and ridership within its current fleet budget?
+  time_horizon: eighteen months

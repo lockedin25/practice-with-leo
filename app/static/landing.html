@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leo · Your case interviewer</title>
+    <meta name="description" content="Practise consulting cases with Leo, an AI case interviewer who follows your reasoning and releases evidence when you earn it." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/landing.css" />
+  </head>
+  <body>
+    <header class="nav shell">
+      <a class="brand" href="/" aria-label="Leo home"><span class="brand-mark" aria-hidden="true"></span><span>Leo</span><small>Your case interviewer</small></a>
+      <nav aria-label="Primary navigation"><a href="#how-it-works">How it works</a><a href="#case-library">Case library</a></nav>
+      <a class="button button-small" href="#case-library">Start practising <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main>
+      <section class="hero shell">
+        <div class="hero-copy">
+          <p class="eyebrow"><span></span> Meet Leo, your case interviewer</p>
+          <h1>Practise with <em>Leo.</em> Think sharper in the room.</h1>
+          <p class="hero-body">Leo runs a live case interview around your logic. Test a hypothesis, make the call, and get only the evidence your reasoning has earned.</p>
+          <div class="hero-actions"><a class="button" href="#case-library">Choose a case <span aria-hidden="true">↓</span></a><a class="text-link" href="#how-it-works">See how it works <span aria-hidden="true">→</span></a></div>
+          <dl class="hero-proof"><div><dt>12</dt><dd>Original case worlds</dd></div><div><dt>30 min</dt><dd>Focused practice sessions</dd></div><div><dt>0</dt><dd>Prewritten interviewer scripts</dd></div></dl>
+        </div>
+        <div class="hero-composition" aria-label="A sample case interview flow">
+          <div class="signal signal-one"></div><div class="signal signal-two"></div>
+          <div class="case-window">
+            <div class="window-top"><span class="live-dot"></span><span>LIVE CASE INTERVIEW</span><span class="window-clock">18:42</span></div>
+            <p class="window-title">Meridian Cold Chain</p>
+            <div class="window-message"><span>LEO</span><p>Revenue is stable. The more useful question is how the economics differ across the work Meridian performs.</p></div>
+            <div class="window-candidate"><span>YOU</span><p>I would test whether the customer mix has changed, then compare contribution by segment.</p></div>
+            <div class="window-evidence"><span>01</span><p>Evidence released: segment mix</p><i></i></div>
+          </div>
+          <p class="composition-note"><span>LEO 01</span> Evidence, released at the right time.</p>
+        </div>
+      </section>
+
+      <section class="principles shell" id="how-it-works">
+        <div class="section-intro"><p class="eyebrow"><span></span> How it works</p><h2>One conversation. <em>Real consequences.</em></h2></div>
+        <div class="principle-grid">
+          <article><p class="step-number">01</p><h3>Choose a business problem</h3><p>Pick a 30-minute case across profitability, growth, operations, M&amp;A, public sector, and sustainability.</p></article>
+          <article><p class="step-number">02</p><h3>Lead the analysis</h3><p>Leo follows your reasoning. He answers directly when you earn facts and challenges unsupported assumptions.</p></article>
+          <article><p class="step-number">03</p><h3>Land the recommendation</h3><p>Finish with a decision, evidence, risk, and next step. The feedback system is designed to focus on what you actually did.</p></article>
+        </div>
+      </section>
+
+      <section class="difference">
+        <div class="shell difference-grid">
+          <div><p class="eyebrow"><span></span> Leo's interview style</p><h2>He follows your analysis, not just your <em>keywords.</em></h2></div>
+          <div class="difference-list"><p><b>Candidate-led paths</b><span>Take a valid alternate route without being forced back into a fixed script.</span></p><p><b>Protected case facts</b><span>The runtime decides which information may be released. Leo cannot jump to the answer.</span></p><p><b>Useful challenge</b><span>Leo is concise and direct. When you are stuck, he gives the next useful answer instead of repeating a prompt.</span></p></div>
+        </div>
+      </section>
+
+      <section class="library shell" id="case-library">
+        <div class="library-heading"><div><p class="eyebrow"><span></span> Case library</p><h2>Find a case that makes you <em>think.</em></h2></div><p id="library-count" class="library-count">Loading cases…</p></div>
+        <div class="filters" aria-label="Filter cases"><button class="filter is-active" data-filter="all" type="button">All cases</button><button class="filter" data-filter="profitability" type="button">Profitability</button><button class="filter" data-filter="growth_strategy" type="button">Growth</button><button class="filter" data-filter="operations" type="button">Operations</button><button class="filter" data-filter="strategy" type="button">Strategy</button></div>
+        <div class="case-grid" id="case-grid" aria-live="polite"><p class="loading">Building your case library…</p></div>
+      </section>
+
+      <section class="closing shell"><p class="eyebrow"><span></span> Your next interview</p><h2>Make a clear call<br />under <em>pressure.</em></h2><a class="button button-light" href="#case-library">Start a case <span aria-hidden="true">↗</span></a></section>
+    </main>
+    <footer class="footer shell"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true"></span><span>Leo</span></a><p>Your calm, incisive case interviewer.</p><a href="#case-library">Browse all cases ↑</a></footer>
+    <script src="/static/landing.js"></script>
+  </body>
+</html>

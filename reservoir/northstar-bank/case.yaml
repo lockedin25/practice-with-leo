@@ -1,0 +1,19 @@
+schema_version: reservoir-v1
+case_id: northstar-bank-v1
+title: Northstar Bank
+status: draft
+rights_status: original
+category: growth_strategy
+industry: retail_banking
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, market sizing, segmentation, business judgement, synthesis]
+candidate_opening:
+  context: >-
+    Northstar Bank is a profitable Indian retail bank with a strong presence in
+    large cities. Its board wants a growth plan that can add 25 percent more retail income in three years.
+  objective: Recommend where Northstar should focus its next growth investment.
+objective_function:
+  primary_metric: incremental retail income
+  decision_question: Which customer and distribution opportunity should Northstar prioritise?
+  time_horizon: three years

@@ -1,0 +1,14 @@
+schema_version: reservoir-facts-v1
+facts:
+  - {id: company.model, domain: company, release_level: broad_context, content: "ClearCart connects customers with third-party sellers of home, furniture, and lifestyle products and earns commission plus fulfilment fees."}
+  - {id: cohort.problem, domain: customers, release_level: sharp_question, content: "New-customer orders grew 30 percent, but the 90-day repeat rate fell from 26 to 17 percent over the last four acquisition cohorts."}
+  - {id: economics, domain: economics, release_level: hypothesis_backed, content: "Paid acquisition remains contribution-positive on the first order for some categories, but low repeat purchase makes lifetime value fall below customer-acquisition cost overall."}
+  - {id: category, domain: customers, release_level: sharp_question, content: "The repeat-rate decline is concentrated in furniture and décor customers; consumable home-care customers continue to repurchase at prior levels."}
+  - {id: service, domain: operations, release_level: hypothesis_backed, content: "Furniture customers experience the highest delivery-delay and damage-contact rates, especially when orders move through sellers using their own logistics."}
+  - {id: seller_mix, domain: operations, release_level: broad_context, content: "ClearCart expanded lower-cost marketplace fulfilment to support acquisition growth, increasing the share of orders fulfilled directly by sellers."}
+  - {id: research, domain: customers, release_level: hypothesis_backed, content: "Customer surveys show that product inspiration and discounting attract the first purchase, but reliable delivery and issue resolution determine whether customers return."}
+  - {id: alternatives, domain: market, release_level: sharp_question, content: "Competitors offer similar promotions, but their high-value furniture sellers have stricter delivery-service standards and clearer installation support."}
+  - {id: tradeoff, domain: risk, release_level: hypothesis_backed, content: "Subsidising every repeat purchase would raise orders but would not solve the service failure that drives high-value customers away."}
+  - {id: recommendation.service, domain: recommendation, release_level: synthesis_support, content: "Prioritise service-quality standards, tracked delivery, and proactive issue resolution for high-value furniture cohorts."}
+  - {id: recommendation.seller, domain: recommendation, release_level: synthesis_support, content: "Reward compliant sellers with demand placement and restrict fulfilment privileges when damage or delay metrics fail."}
+  - {id: recommendation.measure, domain: recommendation, release_level: synthesis_support, content: "Measure repeat rate and contribution by category, fulfilment path, and incident experience rather than applying one retention programme to every customer."}

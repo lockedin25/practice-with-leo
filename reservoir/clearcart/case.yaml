@@ -1,0 +1,19 @@
+schema_version: reservoir-v1
+case_id: clearcart-v1
+title: ClearCart
+status: draft
+rights_status: original
+category: growth_strategy
+industry: ecommerce_marketplace
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, cohort analysis, growth strategy, prioritisation, synthesis]
+candidate_opening:
+  context: >-
+    ClearCart is an online marketplace for home and lifestyle products. New
+    customer acquisition is growing, but repeat purchase has fallen and marketing efficiency is deteriorating.
+  objective: Find the highest-value retention intervention for the next year.
+objective_function:
+  primary_metric: contribution-margin lifetime value
+  decision_question: Which retention lever should ClearCart prioritise, and why?
+  time_horizon: twelve months

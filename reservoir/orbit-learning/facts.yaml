@@ -1,0 +1,14 @@
+schema_version: reservoir-facts-v1
+facts:
+  - {id: company.model, domain: company, release_level: broad_context, content: "Orbit operates vocational colleges that combine classroom teaching, practical labs, and employer placement support."}
+  - {id: pilot.result, domain: customers, release_level: sharp_question, content: "Only 38 percent of students complete assigned digital modules, and faculty usage varies from near zero to daily use across pilot campuses."}
+  - {id: learning_outcome, domain: outcomes, release_level: hypothesis_backed, content: "Students who complete the blended modules perform as well as or better than peers in practical assessments, so the core learning content is not the main problem."}
+  - {id: faculty, domain: operations, release_level: sharp_question, content: "Faculty report that the platform adds preparation work and does not fit their current timetable or performance incentives."}
+  - {id: student_access, domain: customers, release_level: hypothesis_backed, content: "Many students have smartphones but inconsistent data access and prefer short mobile modules that can be completed between work or commute commitments."}
+  - {id: product_design, domain: operations, release_level: hypothesis_backed, content: "The pilot primarily mirrors long classroom lectures online, with limited feedback, practice, or connection to the next in-person lab session."}
+  - {id: employer, domain: market, release_level: broad_context, content: "Employers value demonstrable technical skills and reliable completion records more than the delivery format of the course."}
+  - {id: economics, domain: financials, release_level: sharp_question, content: "The platform has already been built; the next investment decision is about adoption support, content redesign, and campus rollout capacity."}
+  - {id: rollout_risk, domain: risk, release_level: hypothesis_backed, content: "Scaling the existing experience to every campus would make low adoption harder to reverse and could reduce faculty trust in future changes."}
+  - {id: recommendation.workflow, domain: recommendation, release_level: synthesis_support, content: "Redesign modules around short practice-based activities linked to the next classroom or lab session, with offline-friendly access where needed."}
+  - {id: recommendation.faculty, domain: recommendation, release_level: synthesis_support, content: "Give faculty protected preparation time, campus champions, and adoption measures tied to learner outcomes rather than raw logins alone."}
+  - {id: recommendation_scale, domain: recommendation, release_level: synthesis_support, content: "Run a second pilot across different campus types, prove completion and skill outcomes, then scale in waves with support capacity."}

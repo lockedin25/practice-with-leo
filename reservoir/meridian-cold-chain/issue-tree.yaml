@@ -1,0 +1,135 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+
+root:
+  id: objective.restore-margin
+  label: Explain the EBITDA-margin decline and recommend a twelve-month action plan.
+
+# The graph is causal, not a mandatory interview script. The interviewer follows
+# a candidate's chosen branch and uses the recovery prompts only after one or two
+# unproductive follow-ups.
+nodes:
+  - id: revenue
+    type: branch
+    label: Revenue and commercial drivers
+    status: valid_branch
+    evidence:
+      - revenue.scope
+    conclusion: Revenue growth and broadly stable pricing do not explain the decline.
+
+  - id: mix
+    type: branch
+    label: Customer and segment mix
+    status: valid_branch
+    evidence:
+      - customers.segment-mix
+    conclusion: The business mix shifted materially toward pharma.
+
+  - id: market
+    type: branch
+    label: Market and competitor context
+    status: valid_branch
+    evidence:
+      - market.food-benchmark
+    conclusion: The decline is not a broad food-market margin collapse.
+
+  - id: geography
+    type: branch
+    label: Geography and network footprint
+    status: bounded_branch
+    evidence:
+      - geography.network
+      - geography.role
+    conclusion: Geography affects route density but no region is the primary explanation.
+
+  - id: segment-economics
+    type: evidence
+    label: Compare contribution economics by segment
+    status: pivotal_test
+    evidence:
+      - economics.segment-comparison
+    conclusion: Pharma earns no contribution despite a higher selling price.
+
+  - id: utilisation
+    type: mechanism
+    label: Test route utilisation
+    status: pivotal_test
+    evidence:
+      - operations.food-utilisation
+      - operations.pharma-utilisation
+    conclusion: Lower pharma utilisation creates an adverse cost base.
+
+  - id: service-constraint
+    type: mechanism
+    label: Explain why utilisation differs
+    status: pivotal_test
+    evidence:
+      - operations.pharma-constraint
+      - commercial.service-tradeoff
+    conclusion: Service requirements restrict consolidation and simple efficiency fixes.
+
+  - id: pricing
+    type: mechanism
+    label: Test pricing and cost-to-serve
+    status: pivotal_test
+    evidence:
+      - commercial.pricing-basis
+    conclusion: Pharma was priced using an inappropriate food cost base.
+
+  - id: diagnosis
+    type: diagnosis
+    label: Diagnose the margin decline
+    status: hidden_target
+    evidence:
+      - mix
+      - segment-economics
+      - utilisation
+      - pricing
+    conclusion: >-
+      Growth shifted into pharma, whose lower-utilisation cost to serve was not
+      reflected in contract prices.
+
+  - id: actions
+    type: recommendation
+    label: Build the twelve-month response
+    status: synthesis
+    evidence:
+      - commercial.contract-flexibility
+      - recommendation.reprice
+      - recommendation.utilisation
+      - recommendation.quote-discipline
+    conclusion: Re-cost and reprice first, improve viable pharma-only route density second, and fix future quoting discipline.
+
+edges:
+  - { from: objective.restore-margin, to: revenue, relation: investigate }
+  - { from: objective.restore-margin, to: mix, relation: investigate }
+  - { from: objective.restore-margin, to: market, relation: investigate }
+  - { from: objective.restore-margin, to: geography, relation: investigate }
+  - { from: mix, to: segment-economics, relation: motivates }
+  - { from: segment-economics, to: utilisation, relation: explains }
+  - { from: utilisation, to: service-constraint, relation: requires_explanation }
+  - { from: utilisation, to: pricing, relation: exposes_cost_to_serve }
+  - { from: pricing, to: diagnosis, relation: supports }
+  - { from: segment-economics, to: diagnosis, relation: supports }
+  - { from: service-constraint, to: actions, relation: constrains }
+  - { from: diagnosis, to: actions, relation: determines }
+
+acceptable_routes:
+  - id: segment-first
+    sequence: [mix, segment-economics, utilisation, pricing, diagnosis, actions]
+    interviewer_behaviour: Follow the logic; ask for the mechanism behind low pharma economics.
+
+  - id: utilisation-first
+    sequence: [geography, utilisation, service-constraint, pricing, diagnosis, actions]
+    interviewer_behaviour: Confirm that no region is solely responsible, then let the candidate trace route economics.
+
+  - id: benchmark-first
+    sequence: [market, mix, segment-economics, pricing, diagnosis, actions]
+    interviewer_behaviour: Use the food-only benchmark to sharpen the candidate's focus on what changed inside Meridian.
+
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+    - Ask the candidate to state the hypothesis behind the branch.
+    - Say neutrally why the branch is unlikely to explain the magnitude of the margin decline.
+    - Redirect with one focused question toward segment economics, utilisation, or pricing.

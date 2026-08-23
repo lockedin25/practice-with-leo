@@ -1,0 +1,281 @@
+schema_version: reservoir-facts-v1
+
+# Facts are atomic business-context records. `release_level` describes the
+# sharpness of inquiry needed, not a mandatory question order or response script.
+
+facts:
+  - id: company.identity
+    domain: company
+    release_level: opening
+    provenance: source
+    content: >-
+      Meridian Cold Chain is an Indian temperature-controlled logistics
+      operator serving manufacturers across the country.
+    candidate_purpose: Establish the business and client scope.
+
+  - id: company.offerings
+    domain: company
+    release_level: opening
+    provenance: source
+    content: Meridian transports packaged food and pharmaceutical products.
+    candidate_purpose: Establish that the business has two economically distinct segments.
+
+  - id: company.business-model
+    domain: business_model
+    release_level: broad_context
+    provenance: synthetic
+    content: >-
+      Meridian earns its revenue by moving customers' temperature-sensitive
+      consignments under contracted transport arrangements. The economics of a
+      route depend on what can travel together, how reliably it must arrive,
+      and how much of a vehicle's capacity is used.
+    candidate_purpose: Answer a broad "how does the company make money?" question without exposing the diagnosis.
+    rationale: >-
+      Adds a natural business-model explanation consistent with the source's
+      per-kilogram economics, load-factor mechanism, and contract discussion.
+
+  - id: objective.margin-decline
+    domain: objective
+    release_level: opening
+    provenance: source
+    content: >-
+      Revenue has grown steadily, but EBITDA margin has fallen from about 18
+      percent to about 11 percent over two years.
+    candidate_purpose: State the performance problem.
+
+  - id: objective.decision
+    domain: objective
+    release_level: opening
+    provenance: source
+    content: >-
+      The CEO wants a practical plan to restore economics over the next twelve
+      months, not a long-term market-entry strategy.
+    candidate_purpose: Establish the decision, metric, and time horizon.
+
+  - id: revenue.scope
+    domain: financials
+    release_level: sharp_question
+    provenance: source
+    content: >-
+      Revenue has grown by about 20 percent and prices per kilogram have been
+      broadly stable. The deterioration is on the cost side relative to what
+      Meridian charges.
+    question_examples:
+      - Is the margin decline driven by revenue or cost?
+      - Have price or volume changed materially?
+    candidate_purpose: Narrow a sensible profitability structure without naming the driver.
+
+  - id: financials.cost-view
+    domain: financials
+    release_level: sharp_question
+    provenance: source_derived
+    content: >-
+      The case does not provide a fixed-versus-variable cost ledger. It does
+      establish that revenue and price are broadly stable, while the margin
+      decline is on the cost side. The useful next cut is by customer segment
+      and service model, rather than accounting classification.
+    question_examples:
+      - Can I see the cost distribution or cost breakdown?
+      - Do we have a fixed-versus-variable cost split?
+      - What information do we have on the cost structure?
+    candidate_purpose: Answer a direct request for cost data without fabricating an accounting split.
+
+  - id: finance.one-offs
+    domain: financials
+    release_level: sharp_question
+    provenance: source
+    content: There were no acquisitions, impairments, or one-off charges in either year.
+    question_examples:
+      - Is there an accounting or exceptional-item explanation?
+    candidate_purpose: Close a valid but low-value branch quickly.
+
+  - id: customers.food-profile
+    domain: customers
+    release_level: broad_context
+    provenance: synthetic
+    content: >-
+      The packaged-food book consists largely of recurring replenishment flows.
+      Demand is comparatively predictable, and compatible consignments can
+      usually be planned together on regular routes.
+    candidate_purpose: Explain the operating character of the legacy business.
+    rationale: >-
+      Supports, but does not replace, the source fact that food routes have
+      materially better load factors than pharma routes.
+
+  - id: customers.pharma-profile
+    domain: customers
+    release_level: broad_context
+    provenance: synthetic
+    content: >-
+      The pharmaceutical book is operationally less standardised: customers
+      care strongly about handling reliability, temperature control, and
+      delivery timing. A shipment can be commercially attractive at first
+      glance while still be difficult to serve efficiently.
+    candidate_purpose: Give context for a broad customer or service-model question.
+    rationale: >-
+      Makes the source's time-critical and narrow-temperature requirements
+      understandable without saying that pharma is the cause of the problem.
+
+  - id: customers.segment-mix
+    domain: customers
+    release_level: sharp_question
+    provenance: source
+    content: >-
+      Packaged food represented about 95 percent of volume two years ago and
+      about 70 percent today. Pharmaceutical volume grew from about 5 percent
+      to about 30 percent.
+    question_examples:
+      - Has the customer or product mix changed?
+      - Which segments drive the business?
+    candidate_purpose: Reveal a pivotal scope change only when the candidate asks about mix or segments.
+
+  - id: geography.network
+    domain: geography
+    release_level: broad_context
+    provenance: source
+    content: Meridian operates across India; no single region explains the margin decline.
+    candidate_purpose: Answer a geography question while preventing an unproductive regional hunt.
+
+  - id: geography.role
+    domain: geography
+    release_level: broad_context
+    provenance: synthetic
+    content: >-
+      Geography matters operationally because route density affects how easily
+      compatible consignments can be combined. It is not, in this case, the
+      primary explanation for the board's margin problem.
+    candidate_purpose: Redirect a broad geography discussion toward route economics rather than regional market share.
+    rationale: >-
+      Clarifies the purpose of geography without introducing a regional split
+      that would distract from the authored diagnosis.
+
+  - id: market.food-benchmark
+    domain: market
+    release_level: hypothesis_backed
+    provenance: source
+    content: Competitors carrying only packaged food have held their margins over the same period.
+    question_examples:
+      - Is this an industry-wide problem?
+      - How are peers performing?
+    candidate_purpose: Support a candidate testing whether the issue is company-specific.
+
+  - id: operations.food-utilisation
+    domain: operations
+    release_level: hypothesis_backed
+    provenance: source
+    content: Food routes run at about 88 percent load factor.
+    dependencies:
+      - customers.segment-mix
+    candidate_purpose: Provide the legacy segment comparison when testing route economics.
+
+  - id: operations.pharma-utilisation
+    domain: operations
+    release_level: hypothesis_backed
+    provenance: source
+    content: Pharma routes run at about 55 percent load factor.
+    dependencies:
+      - customers.segment-mix
+    candidate_purpose: Give the operational mechanism after the candidate has reached segment economics.
+
+  - id: operations.pharma-constraint
+    domain: operations
+    release_level: sharp_question
+    provenance: source
+    content: >-
+      Pharma consignments are smaller, time-critical, and require a 2 to 8
+      degree temperature band. They generally cannot be consolidated with food
+      loads on the same vehicle.
+    dependencies:
+      - operations.pharma-utilisation
+    question_examples:
+      - Why is pharma utilisation lower?
+      - Can Meridian consolidate food and pharma shipments?
+    candidate_purpose: Test whether the candidate recognises the operational constraint behind a low load factor.
+
+  - id: commercial.pricing-basis
+    domain: commercial
+    release_level: hypothesis_backed
+    provenance: source
+    content: >-
+      Pharma contracts were priced using the food cost base plus a premium. The
+      company did not re-cost the work for the lower pharma load factor.
+    dependencies:
+      - operations.pharma-utilisation
+    candidate_purpose: Reveal the commercial cause after the candidate tests a pricing or cost-base hypothesis.
+
+  - id: commercial.contract-flexibility
+    domain: commercial
+    release_level: sharp_question
+    provenance: source
+    content: >-
+      Pharma contracts permit annual price revision with 90 days' notice. Two
+      of the four largest contracts reopen within six months.
+    question_examples:
+      - Can the company reprice or renegotiate?
+      - Are the contracts locked in?
+    candidate_purpose: Make a practical recommendation possible inside the objective horizon.
+
+  - id: commercial.service-tradeoff
+    domain: commercial
+    release_level: hypothesis_backed
+    provenance: synthetic
+    content: >-
+      The operational features customers value most in pharma also limit some
+      efficiency levers. A recommendation that improves utilisation but weakens
+      temperature integrity or delivery reliability would not be credible.
+    dependencies:
+      - operations.pharma-constraint
+    candidate_purpose: Challenge an overly simple "fill every truck" recommendation.
+    rationale: >-
+      Makes the service-level trade-off explicit while remaining consistent
+      with the source's time-critical and temperature-band constraints.
+
+  - id: economics.segment-comparison
+    domain: economics
+    release_level: hypothesis_backed
+    provenance: source
+    content: >-
+      Per kilogram, packaged food generates revenue of 8.0, cost of 6.4, and
+      contribution of 1.6. Pharma generates revenue of 14.0, cost of 14.0, and
+      contribution of zero.
+    dependencies:
+      - customers.segment-mix
+    candidate_purpose: Confirm or refute a segment-profitability hypothesis.
+    note: Retained as source truth but excluded from the qualitative V1 drill.
+
+  - id: diagnosis.hidden
+    domain: diagnosis
+    release_level: interviewer_only
+    provenance: source_derived
+    content: >-
+      Margin fell because growth shifted into a pharma book that was priced off
+      the food cost base despite lower load factors, producing no contribution
+      per kilogram.
+    candidate_purpose: Never disclose directly. Use only to assess coherence and drive recovery.
+
+  - id: recommendation.reprice
+    domain: recommendation
+    release_level: synthesis_support
+    provenance: source_derived
+    content: >-
+      Re-cost each pharma lane and seek price revision on contracts that reopen
+      within the twelve-month window.
+    candidate_purpose: Validate a commercially actionable synthesis without dictating it.
+
+  - id: recommendation.utilisation
+    domain: recommendation
+    release_level: synthesis_support
+    provenance: source_derived
+    content: >-
+      Improve pharma-only route density where service requirements permit, but
+      do not combine incompatible food and pharma loads merely to raise fill.
+    candidate_purpose: Support a balanced operating recommendation.
+
+  - id: recommendation.quote-discipline
+    domain: recommendation
+    release_level: synthesis_support
+    provenance: source_derived
+    content: >-
+      Future pharma quotes should include a minimum-consignment charge and a
+      premium reflecting temperature and service requirements.
+    candidate_purpose: Test whether the candidate prevents recurrence, not only repairs current contracts.

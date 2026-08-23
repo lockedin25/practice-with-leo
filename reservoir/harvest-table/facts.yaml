@@ -1,0 +1,14 @@
+schema_version: reservoir-facts-v1
+facts:
+  - {id: company.model, domain: company, release_level: broad_context, content: "Harvest Table earns revenue from dine-in, takeaway, and delivery orders across 180 company-operated stores."}
+  - {id: financials.scope, domain: financials, release_level: sharp_question, content: "Comparable-store sales grew 5 percent, so the margin decline is not explained by a broad fall in demand."}
+  - {id: channels.mix, domain: customers, release_level: sharp_question, content: "Delivery grew from 20 to 46 percent of sales over two years; dine-in and takeaway sales were broadly stable."}
+  - {id: channels.economics, domain: economics, release_level: hypothesis_backed, content: "A 500-rupee dine-in order contributes about 110 rupees after food, labour, and occupancy. The same basket through an aggregator contributes about 35 rupees after commission, packaging, and promotions."}
+  - {id: commercial.promotions, domain: commercial, release_level: hypothesis_backed, content: "Harvest Table funds roughly two thirds of delivery discounts, even when the promotion is initiated by the aggregator."}
+  - {id: operations.kitchen, domain: operations, release_level: broad_context, content: "Stores kept peak-hour staffing designed for dine-in service, while delivery orders now arrive in shorter, less predictable bursts."}
+  - {id: operations.utilisation, domain: operations, release_level: hypothesis_backed, content: "Kitchen utilisation is acceptable at lunch and dinner peaks but falls below 45 percent during most of the afternoon."}
+  - {id: benchmark, domain: market, release_level: sharp_question, content: "Peer chains with similar food concepts held margins where delivery represents less than one third of sales or where delivery prices cover commission."}
+  - {id: pricing.flexibility, domain: commercial, release_level: sharp_question, content: "Harvest Table can set channel-specific menu prices and can change its own-app loyalty offers within eight weeks."}
+  - {id: recommendation.channel-price, domain: recommendation, release_level: synthesis_support, content: "Reprice selected delivery items or redesign bundles so contribution covers aggregator commission and packaging without raising every headline price."}
+  - {id: recommendation.loyalty, domain: recommendation, release_level: synthesis_support, content: "Use the owned app for repeat customers and target promotions to incremental demand rather than funding blanket discounts."}
+  - {id: recommendation.labour, domain: recommendation, release_level: synthesis_support, content: "Adjust off-peak staffing and production routines only after protecting peak-time food quality and delivery reliability."}

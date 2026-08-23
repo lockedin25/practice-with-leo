@@ -1,0 +1,14 @@
+schema_version: reservoir-facts-v1
+facts:
+  - {id: company.network, domain: company, release_level: broad_context, content: "MetroLink runs 1,100 buses across dense trunk corridors and lower-frequency neighbourhood routes under a city service contract."}
+  - {id: ridership.pattern, domain: customers, release_level: sharp_question, content: "Ridership losses are concentrated among commuters on two high-volume corridors, while access-dependent neighbourhood routes have held demand."}
+  - {id: reliability, domain: operations, release_level: hypothesis_backed, content: "On the affected corridors, only 58 percent of buses arrive within five minutes of schedule, down from 81 percent a year ago."}
+  - {id: cause.congestion, domain: operations, release_level: hypothesis_backed, content: "New construction created variable travel times, but schedules and vehicle dispatch rules were not redesigned to reflect the changed corridor conditions."}
+  - {id: capacity, domain: operations, release_level: sharp_question, content: "Peak buses on the affected corridors are overcrowded, while off-peak service on the same routes often operates below 30 percent load."}
+  - {id: fleet, domain: operations, release_level: broad_context, content: "The total fleet budget is fixed, so MetroLink cannot solve the problem by simply buying more buses."}
+  - {id: customer.behaviour, domain: customers, release_level: hypothesis_backed, content: "Commuters report switching to motorcycles and shared rides when waiting time becomes unpredictable, even when the bus fare remains lower."}
+  - {id: stakeholder, domain: public_policy, release_level: sharp_question, content: "The city will support bus-priority measures on the two corridors but will not approve blanket cuts to low-income neighbourhood access."}
+  - {id: risk, domain: risk, release_level: hypothesis_backed, content: "Reducing off-peak trips without a minimum-service rule could improve utilisation while creating unacceptable access gaps for shift workers."}
+  - {id: recommendation.dispatch, domain: recommendation, release_level: synthesis_support, content: "Redesign corridor schedules and dispatch using actual travel-time variability, with active control at major terminals during peaks."}
+  - {id: recommendation.capacity, domain: recommendation, release_level: synthesis_support, content: "Reallocate selected off-peak vehicles to peak service after testing neighbourhood minimum-service protections."}
+  - {id: recommendation.priority, domain: recommendation, release_level: synthesis_support, content: "Pair the operating plan with targeted bus-priority lanes and measure on-time performance, crowding, and access before scaling."}

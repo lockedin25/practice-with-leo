@@ -1,0 +1,61 @@
+schema_version: reservoir-v1
+case_id: meridian-cold-chain-v1
+title: Meridian Cold Chain
+status: draft
+rights_status: original
+category: profitability
+industry: temperature_controlled_logistics
+difficulty: foundation
+supported_durations: [30]
+skills_tested: [clarification, tailored structure, unit economics, synthesis]
+scope: qualitative-conversation-prototype
+source_case:
+  package: ../../corpus/cases/meridian-cold-chain.case.md
+  rights_status: original
+  preservation_rule: The supplied diagnosis and source facts are immutable.
+
+candidate_opening:
+  context: >-
+    Your client is Meridian Cold Chain, an Indian temperature-controlled
+    logistics operator. It moves packaged food and pharmaceutical products for
+    manufacturers across the country. Revenue has grown steadily for two years,
+    but EBITDA margin has fallen from about 18 percent to about 11 percent.
+  objective: >-
+    Determine why the margin has declined and recommend what the CEO should do
+    over the next twelve months.
+  opening_requirements:
+    - Name the client and its business.
+    - State the performance problem.
+    - State the decision and time horizon.
+    - Invite clarifying questions before requesting a structure.
+
+objective_function:
+  primary_metric: EBITDA margin
+  decision_question: Why has EBITDA margin fallen, and what should the CEO do?
+  time_horizon: twelve months
+  expected_candidate_output:
+    - Clear diagnosis supported by evidence.
+    - Prioritised recommendation.
+    - Main implementation risk.
+    - Concrete next step.
+  design_principle: >-
+    Reward a well-structured, hypothesis-driven path over memorising a single
+    final answer.
+
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+    - clarification
+    - drill_down
+    - synthesis
+
+reservoir_files:
+  - facts.yaml
+  - issue-tree.yaml
+  - conversation-policy.yaml
+  - validation.md

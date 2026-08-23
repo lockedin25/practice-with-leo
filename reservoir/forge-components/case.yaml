@@ -1,0 +1,19 @@
+schema_version: reservoir-v1
+case_id: forge-components-v1
+title: Forge Components
+status: draft
+rights_status: original
+category: mergers_and_acquisitions
+industry: industrial_manufacturing
+difficulty: advanced
+supported_durations: [30]
+skills_tested: [clarification, deal logic, synergy analysis, valuation judgement, synthesis]
+candidate_opening:
+  context: >-
+    Forge Components manufactures precision parts for industrial equipment. It
+    can acquire a smaller supplier, AlloyWorks, and the board needs a recommendation before exclusivity expires.
+  objective: Assess whether Forge should acquire AlloyWorks and under what conditions.
+objective_function:
+  primary_metric: value creation versus standalone plan
+  decision_question: Should Forge acquire AlloyWorks, and what must be true for the deal to work?
+  time_horizon: three years

@@ -1,0 +1,19 @@
+schema_version: reservoir-v1
+case_id: aster-diagnostics-v1
+title: Aster Diagnostics
+status: draft
+rights_status: original
+category: market_entry
+industry: healthcare_services
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, market sizing, entry strategy, operations, synthesis]
+candidate_opening:
+  context: >-
+    Aster Diagnostics operates high-quality diagnostic centres in six Indian
+    metros. It is considering entry into tier-two cities, where organised testing is underpenetrated.
+  objective: Decide whether and how Aster should enter the tier-two-city market.
+objective_function:
+  primary_metric: risk-adjusted return on invested capital
+  decision_question: Should Aster enter tier-two cities, and with what model?
+  time_horizon: three years

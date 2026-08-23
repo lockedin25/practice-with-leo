@@ -1,0 +1,19 @@
+schema_version: reservoir-v1
+case_id: orbit-learning-v1
+title: Orbit Learning
+status: draft
+rights_status: original
+category: digital_transformation
+industry: education
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, digital strategy, adoption, implementation, synthesis]
+candidate_opening:
+  context: >-
+    Orbit Learning runs vocational colleges across India. It invested in a
+    digital learning platform, but student completion and faculty adoption remain low after the pilot.
+  objective: Recommend how Orbit should redesign and scale the programme.
+objective_function:
+  primary_metric: course completion and employability outcomes
+  decision_question: What should Orbit change before scaling its digital learning platform?
+  time_horizon: twelve months

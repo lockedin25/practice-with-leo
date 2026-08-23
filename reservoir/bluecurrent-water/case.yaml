@@ -1,0 +1,19 @@
+schema_version: reservoir-v1
+case_id: bluecurrent-water-v1
+title: BlueCurrent Water
+status: draft
+rights_status: original
+category: public_sector_strategy
+industry: water_utility
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, operations, stakeholder management, implementation, synthesis]
+candidate_opening:
+  context: >-
+    BlueCurrent supplies water to a rapidly growing Indian city. Non-revenue
+    water has reached 42 percent, service complaints are rising, and the city cannot raise tariffs this year.
+  objective: Recommend a practical programme to improve service and financial sustainability.
+objective_function:
+  primary_metric: non-revenue water reduction and service reliability
+  decision_question: Where should BlueCurrent focus first to reduce water loss without a tariff increase?
+  time_horizon: eighteen months

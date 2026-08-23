@@ -1,0 +1,19 @@
+schema_version: reservoir-v1
+case_id: harvest-table-v1
+title: Harvest Table
+status: draft
+rights_status: original
+category: profitability
+industry: quick_service_restaurants
+difficulty: foundation
+supported_durations: [30]
+skills_tested: [clarification, tailored structure, unit economics, synthesis]
+candidate_opening:
+  context: >-
+    Harvest Table is a 180-store fast-casual restaurant chain in India. Sales
+    have grown for two years, but EBITDA margin has declined from 14 to 7 percent.
+  objective: Determine the driver of the decline and recommend a twelve-month recovery plan.
+objective_function:
+  primary_metric: EBITDA margin
+  decision_question: Why has Harvest Table's margin fallen, and what should management do next?
+  time_horizon: twelve months

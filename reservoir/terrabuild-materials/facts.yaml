@@ -1,0 +1,14 @@
+schema_version: reservoir-facts-v1
+facts:
+  - {id: company.model, domain: company, release_level: broad_context, content: "TerraBuild produces cement, aggregates, and ready-mix concrete for infrastructure and commercial construction customers."}
+  - {id: emissions_profile, domain: operations, release_level: sharp_question, content: "Cement clinker production creates most of TerraBuild's emissions; purchased electricity and logistics are smaller but material sources."}
+  - {id: customer_demand, domain: customers, release_level: sharp_question, content: "Large infrastructure and commercial customers increasingly request verified lower-carbon materials, but most will not accept a large price premium without performance assurance."}
+  - {id: carbon_cost, domain: financials, release_level: hypothesis_backed, content: "Expected carbon costs would materially reduce EBITDA at the most clinker-intensive plants if TerraBuild makes no changes over five years."}
+  - {id: levers, domain: strategy, release_level: hypothesis_backed, content: "Blended cement using supplementary materials can reduce emissions at attractive cost where reliable slag or fly-ash supply exists; deep kiln upgrades take longer and require more capital."}
+  - {id: plant_variation, domain: operations, release_level: sharp_question, content: "Plants differ in fuel efficiency, access to supplementary materials, customer mix, and remaining equipment life, so one investment sequence would be inefficient."}
+  - {id: economics, domain: economics, release_level: hypothesis_backed, content: "Energy-efficiency projects and selected blended products clear TerraBuild's return threshold before carbon-price upside; carbon capture does not yet clear the same threshold at current scale."}
+  - {id: quality, domain: risk, release_level: sharp_question, content: "Engineers and customers require product certification and reliable strength performance before changing specifications on major projects."}
+  - {id: capital, domain: financials, release_level: broad_context, content: "TerraBuild has a constrained capital envelope and cannot fund every plant upgrade, alternative-fuel project, and capture pilot simultaneously."}
+  - {id: recommendation.sequence, domain: recommendation, release_level: synthesis_support, content: "Prioritise energy efficiency and blended products at plants with strong material access, customer demand, and near-term economic return."}
+  - {id: recommendation_commercial, domain: recommendation, release_level: synthesis_support, content: "Co-develop certified lower-carbon specifications with anchor customers, linking any premium to verified performance and emissions reduction."}
+  - {id: recommendation_options, domain: recommendation, release_level: synthesis_support, content: "Preserve options for deeper kiln upgrades and carbon capture through pilots and site readiness, but do not make them the first portfolio-wide spend."}

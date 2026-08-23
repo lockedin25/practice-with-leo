@@ -1,0 +1,14 @@
+schema_version: reservoir-facts-v1
+facts:
+  - {id: company.offer, domain: company, release_level: broad_context, content: "SunPeak designs, installs, and maintains rooftop solar systems for small factories, warehouses, and retail sites."}
+  - {id: funnel, domain: financials, release_level: sharp_question, content: "Lead qualification is strong and installation capacity is available; the sharpest drop occurs after customers receive a final cash quote."}
+  - {id: customer.cashflow, domain: customers, release_level: hypothesis_backed, content: "Most prospects agree that solar lowers lifetime energy cost, but owners compare the upfront payment with near-term working-capital needs."}
+  - {id: price.position, domain: commercial, release_level: sharp_question, content: "SunPeak's upfront price is close to competitors, but its quote presents equipment, installation, and maintenance as one large capital amount."}
+  - {id: economics.loan, domain: economics, release_level: hypothesis_backed, content: "With a five-year financing product, monthly loan payments can be lower than expected electricity savings for many high-usage customers, while SunPeak's gross margin remains positive."}
+  - {id: economics.segment, domain: economics, release_level: hypothesis_backed, content: "Low-usage retail sites have longer payback periods and are less attractive financing candidates than factories and cold-storage warehouses."}
+  - {id: operations.install, domain: operations, release_level: broad_context, content: "Installation crews have spare capacity, but site surveys and credit documentation currently create a two-week handoff delay."}
+  - {id: competition, domain: market, release_level: sharp_question, content: "A fast-growing competitor wins more factory accounts by quoting a monthly energy plan, though its contracts transfer some performance risk to the provider."}
+  - {id: risk.credit, domain: risk, release_level: hypothesis_backed, content: "SunPeak should not finance every prospect itself because small-business defaults can erase installation margin without disciplined underwriting and lender partnership."}
+  - {id: recommendation.offer, domain: recommendation, release_level: synthesis_support, content: "Offer a financed monthly-payment option beside the cash quote, showing expected savings, payback, and service terms in a simple comparison."}
+  - {id: recommendation.focus, domain: recommendation, release_level: synthesis_support, content: "Prioritise high-usage segments where savings and repayment capacity are strongest, rather than subsidising low-value installations."}
+  - {id: recommendation.process, domain: recommendation, release_level: synthesis_support, content: "Integrate lender pre-approval into the site-survey flow so qualified prospects do not lose momentum after the quote."}

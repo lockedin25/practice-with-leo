@@ -1,0 +1,14 @@
+schema_version: reservoir-facts-v1
+facts:
+  - {id: company.model, domain: company, release_level: broad_context, content: "Aster operates premium diagnostic hubs with in-house pathology, specialist radiology, and strong doctor referral relationships in six metros."}
+  - {id: market.size, domain: market, release_level: sharp_question, content: "The target tier-two-city testing market is about 1,200 crore rupees annually and is growing near 12 percent, with organised chains holding only a quarter of spend."}
+  - {id: demand.mix, domain: customers, release_level: sharp_question, content: "Routine blood tests represent most volume, while imaging and specialised pathology drive a disproportionate share of profit."}
+  - {id: competition, domain: market, release_level: sharp_question, content: "Local labs are trusted for convenience and price but have inconsistent quality systems; national chains have limited physical coverage outside the largest cities."}
+  - {id: economics.hub, domain: economics, release_level: hypothesis_backed, content: "A full diagnostic hub needs high imaging utilisation to earn its cost of capital. Most target cities alone cannot fill a metro-style hub in the first two years."}
+  - {id: economics.network, domain: economics, release_level: hypothesis_backed, content: "A collection-centre network linked to a regional processing hub reaches positive contribution at much lower volume, but samples must meet transport-time requirements."}
+  - {id: operations.logistics, domain: operations, release_level: broad_context, content: "Several target cities are within four hours of a proposed regional hub, allowing routine pathology samples to be transported twice daily."}
+  - {id: customer.trust, domain: customers, release_level: hypothesis_backed, content: "Patients and referring doctors value reliable reports and specialist consultation more than the lowest price for complex tests."}
+  - {id: risk.regulation, domain: risk, release_level: sharp_question, content: "Radiology licensing and specialist staffing are city-specific constraints, making a broad simultaneous imaging rollout high risk."}
+  - {id: recommendation.entry, domain: recommendation, release_level: synthesis_support, content: "Enter first through branded collection centres and doctor partnerships in cities within the hub transport radius."}
+  - {id: recommendation.expand, domain: recommendation, release_level: synthesis_support, content: "Add imaging only in cities that demonstrate sufficient referral density and utilisation, rather than copying the metro hub model."}
+  - {id: recommendation.metrics, domain: recommendation, release_level: synthesis_support, content: "Monitor sample quality, turnaround time, repeat-referrer share, test mix, and hub utilisation before expanding the network."}

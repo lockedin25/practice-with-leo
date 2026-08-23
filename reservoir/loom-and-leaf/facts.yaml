@@ -1,0 +1,14 @@
+schema_version: reservoir-facts-v1
+facts:
+  - {id: company.model, domain: company, release_level: broad_context, content: "Loom & Leaf sells own-brand apparel through 95 stores and an online channel, positioned between value fashion and premium labels."}
+  - {id: financials.scope, domain: financials, release_level: sharp_question, content: "Revenue is flat, but the six-point gross-margin decline is driven by higher markdowns and inventory write-downs rather than a broad rise in fabric cost."}
+  - {id: inventory.age, domain: operations, release_level: hypothesis_backed, content: "Inventory older than 180 days rose from 12 to 29 percent of stock, concentrated in seasonal womenswear and online-only styles."}
+  - {id: assortment, domain: commercial, release_level: sharp_question, content: "The buying team expanded the number of styles by 35 percent to appear more trend-led, while units per style and repeat demand fell."}
+  - {id: planning, domain: operations, release_level: hypothesis_backed, content: "Initial buys are locked before reliable sell-through data is available, and store replenishment does not distinguish fast sellers from slow sellers early enough."}
+  - {id: channel, domain: customers, release_level: broad_context, content: "Online demand is growing, but online returns are higher for poorly described fit and colour, which further reduces contribution on selected styles."}
+  - {id: economics, domain: economics, release_level: hypothesis_backed, content: "Core basics maintain full-price sell-through and higher contribution, while trend capsules account for most markdown cost but only a minority of revenue."}
+  - {id: brand_risk, domain: risk, release_level: sharp_question, content: "Repeated broad discounting trains customers to wait for sales and would weaken the mid-market brand position."}
+  - {id: liquidity, domain: financials, release_level: sharp_question, content: "Working capital is under pressure because suppliers are paid before slow-moving stock is cleared, but the company has enough liquidity for a phased reset."}
+  - {id: recommendation.assortment, domain: recommendation, release_level: synthesis_support, content: "Reduce low-confidence trend buys, protect core basics, and use smaller test orders before committing to seasonal volume."}
+  - {id: recommendation.inventory, domain: recommendation, release_level: synthesis_support, content: "Create early sell-through triggers for reallocation, replenishment, and targeted markdowns instead of waiting for end-of-season clearance."}
+  - {id: recommendation.digital, domain: recommendation, release_level: synthesis_support, content: "Improve fit information and merchandising for high-return online styles while using controlled clearance channels to release aged inventory."}

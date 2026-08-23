@@ -1,0 +1,14 @@
+schema_version: reservoir-facts-v1
+facts:
+  - {id: company.model, domain: company, release_level: broad_context, content: "Forge supplies precision machined components to industrial-equipment makers and buys specialised castings from external suppliers."}
+  - {id: target.profile, domain: company, release_level: sharp_question, content: "AlloyWorks is a smaller casting supplier with spare capacity, strong process know-how, and a customer base overlapping Forge by about 20 percent."}
+  - {id: standalone, domain: financials, release_level: sharp_question, content: "AlloyWorks is profitable but has grown slowly because it lacks Forge's sales reach and is exposed to volatile raw-material purchasing."}
+  - {id: cost_synergy, domain: economics, release_level: hypothesis_backed, content: "Combining procurement could lower metal-input cost by 4 percent, and internal sourcing could remove supplier margin on a defined set of parts."}
+  - {id: revenue_synergy, domain: economics, release_level: hypothesis_backed, content: "Forge's sales team could cross-sell AlloyWorks capabilities to selected customers, but revenue synergy requires engineering qualification cycles that often take 12 to 18 months."}
+  - {id: capacity, domain: operations, release_level: sharp_question, content: "AlloyWorks has spare capacity today, but the plant needs targeted automation investment to meet Forge's quality and delivery standards at scale."}
+  - {id: valuation, domain: financials, release_level: hypothesis_backed, content: "The seller's price assumes much of the procurement synergy, leaving limited value creation if Forge pays the full asking multiple."}
+  - {id: integration, domain: risk, release_level: sharp_question, content: "AlloyWorks' founder is central to customer relationships and process decisions; immediate full integration could create retention and execution risk."}
+  - {id: alternatives, domain: strategy, release_level: broad_context, content: "Forge can pursue a long-term supply agreement and minority investment, but that would capture less procurement benefit and limit operational control."}
+  - {id: recommendation.price, domain: recommendation, release_level: synthesis_support, content: "Proceed only at a price that leaves Forge value after realistic, risk-adjusted procurement and phased revenue synergies."}
+  - {id: recommendation.integration, domain: recommendation, release_level: synthesis_support, content: "Use a staged integration plan that protects AlloyWorks' technical leadership while installing quality and procurement controls."}
+  - {id: recommendation.diligence, domain: recommendation, release_level: synthesis_support, content: "Confirm customer retention, automation capex, qualification timing, and the founder's post-deal role before signing."}

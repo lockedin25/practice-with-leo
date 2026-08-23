@@ -1,0 +1,14 @@
+schema_version: reservoir-facts-v1
+facts:
+  - {id: company.network, domain: company, release_level: broad_context, content: "BlueCurrent operates treatment plants, trunk mains, distribution zones, and customer metering for a city of four million residents."}
+  - {id: loss.profile, domain: operations, release_level: sharp_question, content: "Non-revenue water is 42 percent: roughly half is physical leakage and half is apparent loss from meter error, illegal connections, and billing gaps."}
+  - {id: zone_variation, domain: operations, release_level: hypothesis_backed, content: "A small set of older pressure zones account for a disproportionate share of night-flow leakage and emergency repair calls."}
+  - {id: metering, domain: operations, release_level: sharp_question, content: "Large commercial meters are often uncalibrated, while household meter replacement across the whole city would consume most of the capital budget."}
+  - {id: service, domain: customers, release_level: broad_context, content: "Intermittent supply and unannounced repairs drive complaints; residents value predictable service as much as marginal improvements in water quality."}
+  - {id: economics, domain: financials, release_level: hypothesis_backed, content: "Every percentage-point reduction in non-revenue water improves cash flow through lower treatment cost and higher billable volume, even without changing tariffs."}
+  - {id: governance, domain: public_policy, release_level: sharp_question, content: "The city will support targeted enforcement and district metering, but political leaders require visible service improvements in low-income wards."}
+  - {id: capability, domain: operations, release_level: hypothesis_backed, content: "BlueCurrent has repair crews but lacks reliable district-level flow data, so crews respond to complaints rather than systematically finding the largest losses."}
+  - {id: risk, domain: risk, release_level: hypothesis_backed, content: "Aggressive enforcement without regularisation options could push informal connections further underground and damage trust."}
+  - {id: recommendation.dma, domain: recommendation, release_level: synthesis_support, content: "Create district-metered areas in the highest-loss pressure zones, using night-flow data to prioritise leak detection and repairs."}
+  - {id: recommendation.revenue, domain: recommendation, release_level: synthesis_support, content: "Calibrate large commercial meters and regularise high-volume unbilled connections before pursuing citywide household replacement."}
+  - {id: recommendation.service, domain: recommendation, release_level: synthesis_support, content: "Publish repair and supply schedules, reinvesting early savings into the most affected wards to maintain public support."}
