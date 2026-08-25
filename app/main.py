@@ -44,7 +44,12 @@ from app.voice_realtime import (
     speech_to_text_url,
     text_to_speech_url,
 )
-from app.spoken_interviewer import ControlBlockMissing, create_spoken_interviewer
+from app.spoken_interviewer import (
+    ControlBlockMissing,
+    audit_spoken_turn_in_background,
+    create_spoken_auditor,
+    create_spoken_interviewer,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -65,6 +70,9 @@ REALTIME_VOICE_PROVIDER = ElevenLabsRealtimeProvider()
 # typed chat. None when no key exists, in which case realtime voice reports
 # itself unready and the candidate keeps typed chat.
 SPOKEN_INTERVIEWER = create_spoken_interviewer()
+# Runs after the words are spoken, never before. Reports a reply that
+# under-delivered a fact the ledger has already marked released.
+SPOKEN_AUDITOR = create_spoken_auditor()
 # Built only when the candidate replies to Leo's welcome. Readiness is shared
 # by typed chat and voice, and remains LLM-led rather than keyword-driven.
 VOICE_ONBOARDING = None
@@ -867,8 +875,8 @@ def create_realtime_voice_session(
             status_code=503, detail="Leo voice is temporarily unavailable. Please use chat."
         )
     try:
-        scribe_token = REALTIME_VOICE_PROVIDER.mint_token(realtime, SCRIBE_TOKEN)
-        tts_token = REALTIME_VOICE_PROVIDER.mint_token(realtime, TTS_TOKEN)
+        tokens = REALTIME_VOICE_PROVIDER.mint_tokens(realtime, SCRIBE_TOKEN, TTS_TOKEN)
+        scribe_token, tts_token = tokens[SCRIBE_TOKEN], tokens[TTS_TOKEN]
     except VoiceConfigurationError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
     except VoiceProviderError as error:
@@ -948,6 +956,17 @@ def stream_turn(
                     yield _sse_event(
                         "done",
                         {"attempt": session.candidate_view(), "new_facts": new_facts},
+                    )
+                    # Started only after the reply has been fully delivered, so
+                    # it can never delay speech. It reports; it never rewrites.
+                    submission: TurnSubmission = payload  # type: ignore[assignment]
+                    released = {fact["id"] for fact in new_facts}
+                    audit_spoken_turn_in_background(
+                        SPOKEN_AUDITOR,
+                        session_id=session.id,
+                        candidate_turn=request.content,
+                        reply=submission.reply,
+                        facts=[fact for fact in session.case.facts if fact.id in released],
                     )
         except AttemptAlreadyEnded as error:
             yield _sse_event("error", {"detail": str(error)})

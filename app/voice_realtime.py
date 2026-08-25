@@ -14,6 +14,7 @@ Agent conversation token already established in ``app.voice``.
 from __future__ import annotations
 
 import os
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 
 import httpx
@@ -112,6 +113,23 @@ class ElevenLabsRealtimeProvider:
         if not isinstance(token, str) or not token:
             raise VoiceProviderError("ElevenLabs returned an empty speech token")
         return token
+
+    def mint_tokens(self, settings: RealtimeVoiceSettings, *token_types: str) -> dict[str, str]:
+        """Mint several tokens concurrently.
+
+        A session needs one token per socket, and minting them in sequence pays
+        two round trips to ElevenLabs before the candidate can say anything. The
+        calls are independent, so a small thread pool removes one of them from
+        the wait. Either failure still raises, so a half-issued session is never
+        handed to the browser.
+        """
+        settings.assert_configuration()
+        with ThreadPoolExecutor(max_workers=len(token_types) or 1) as pool:
+            futures = {
+                token_type: pool.submit(self.mint_token, settings, token_type)
+                for token_type in token_types
+            }
+            return {token_type: future.result() for token_type, future in futures.items()}
 
 
 def speech_to_text_url(settings: RealtimeVoiceSettings, token: str, *, keyterms: list[str]) -> str:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import threading
 from uuid import uuid4
 
 import httpx
@@ -138,10 +139,49 @@ def test_a_realtime_session_mints_two_tokens_and_returns_no_credentials(monkeypa
 
     body = client.post(f"/api/attempts/{attempt_id}/voice-realtime/session").json()
 
-    assert minted == ["realtime_scribe", "tts_websocket"]
+    assert sorted(minted) == ["realtime_scribe", "tts_websocket"]
     assert body["sample_rate"] == 16_000
     assert body["turn_stream_url"] == f"/api/attempts/{attempt_id}/turn/stream"
     assert "test-key" not in json.dumps(body)
+
+
+def test_the_two_tokens_are_minted_concurrently(monkeypatch) -> None:
+    """Two sequential round trips would be paid before a word can be said."""
+    _enable_realtime(monkeypatch)
+    settings = RealtimeVoiceSettings.from_environment()
+    barrier = threading.Barrier(2, timeout=5)
+
+    def mint(_self, _settings, token_type):
+        # Only passes if both calls are in flight at the same time.
+        barrier.wait()
+        return f"sutkn_{token_type}"
+
+    provider = voice_realtime.ElevenLabsRealtimeProvider()
+    monkeypatch.setattr(type(provider), "mint_token", mint)
+
+    tokens = provider.mint_tokens(settings, "realtime_scribe", "tts_websocket")
+
+    assert tokens == {
+        "realtime_scribe": "sutkn_realtime_scribe",
+        "tts_websocket": "sutkn_tts_websocket",
+    }
+
+
+def test_a_half_issued_session_is_never_returned(monkeypatch) -> None:
+    """One failed mint must fail the session, not hand over a usable half."""
+    _enable_realtime(monkeypatch)
+    settings = RealtimeVoiceSettings.from_environment()
+
+    def mint(_self, _settings, token_type):
+        if token_type == "tts_websocket":
+            raise voice_realtime.VoiceProviderError("no tts permission")
+        return "sutkn_ok"
+
+    provider = voice_realtime.ElevenLabsRealtimeProvider()
+    monkeypatch.setattr(type(provider), "mint_token", mint)
+
+    with pytest.raises(voice_realtime.VoiceProviderError):
+        provider.mint_tokens(settings, "realtime_scribe", "tts_websocket")
 
 
 def test_a_provider_outage_degrades_to_chat_without_leaking_the_reason(monkeypatch) -> None:
@@ -390,3 +430,80 @@ def test_submit_stream_replays_a_cached_turn_without_the_interviewer() -> None:
     assert [name for name, _ in events] == ["control", "delta", "done"]
     assert events[1][1] == "Already said."
     assert events[-1][1].cached is True
+
+
+# --- The post-hoc audit ---------------------------------------------------
+
+
+def test_the_audit_runs_after_the_turn_and_never_blocks_it(monkeypatch, stub_interviewer) -> None:
+    """Speech must not wait on a verdict about speech already delivered."""
+    _enable_realtime(monkeypatch)
+    monkeypatch.setattr(main, "SPOKEN_INTERVIEWER", StubSpokenInterviewer())
+    seen: list[dict] = []
+    done = threading.Event()
+
+    class RecordingAuditor:
+        def audit(self, *, candidate_turn, reply, facts):
+            seen.append({"reply": reply, "facts": [f.id for f in facts]})
+            done.set()
+            return {"delivered": [f.id for f in facts], "complete": True, "undelivered": []}
+
+    monkeypatch.setattr(main, "SPOKEN_AUDITOR", RecordingAuditor())
+    client = _client()
+    attempt_id = _started_attempt(client)
+
+    response = client.post(
+        f"/api/attempts/{attempt_id}/turn/stream",
+        json={"content": "What is the segment mix?", "turn_id": "t-audit-1"},
+    )
+
+    # The turn completed on its own; the audit is a separate, later thread.
+    assert [name for name, _ in _events(response.text)][-1] == "done"
+    assert done.wait(timeout=5), "the audit thread should have run"
+    assert seen[0]["reply"] == "The mix shifted north."
+    assert seen[0]["facts"] == ["customers.segment-mix"]
+
+
+def test_a_failing_audit_cannot_break_the_turn(monkeypatch, stub_interviewer) -> None:
+    _enable_realtime(monkeypatch)
+    monkeypatch.setattr(main, "SPOKEN_INTERVIEWER", StubSpokenInterviewer())
+
+    class ExplodingAuditor:
+        def audit(self, **_kwargs):
+            raise RuntimeError("provider down")
+
+    monkeypatch.setattr(main, "SPOKEN_AUDITOR", ExplodingAuditor())
+    client = _client()
+    attempt_id = _started_attempt(client)
+
+    response = client.post(
+        f"/api/attempts/{attempt_id}/turn/stream",
+        json={"content": "What is the segment mix?", "turn_id": "t-audit-2"},
+    )
+
+    assert response.status_code == 200
+    spoken = "".join(p["text"] for n, p in _events(response.text) if n == "delta")
+    assert spoken.strip() == "The mix shifted north."
+
+
+def test_the_audit_is_skipped_when_no_fact_was_released(monkeypatch, stub_interviewer) -> None:
+    """Nothing to under-deliver, so nothing to spend a call checking."""
+    _enable_realtime(monkeypatch)
+    monkeypatch.setattr(main, "SPOKEN_INTERVIEWER", StubSpokenInterviewer(fact_ids=[]))
+    called = []
+
+    class Auditor:
+        def audit(self, **kwargs):
+            called.append(kwargs)
+            return {"delivered": [], "complete": True, "undelivered": []}
+
+    monkeypatch.setattr(main, "SPOKEN_AUDITOR", Auditor())
+    client = _client()
+    attempt_id = _started_attempt(client)
+
+    client.post(
+        f"/api/attempts/{attempt_id}/turn/stream",
+        json={"content": "Anything else?", "turn_id": "t-audit-3"},
+    )
+
+    assert called == []

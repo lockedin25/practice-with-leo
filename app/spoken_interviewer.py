@@ -17,7 +17,10 @@ Safety is unchanged and still lives in code, not in the prompt. The model only
 ever sees ``eligible_facts_for_director``, already filtered by phase and by
 dependency, and ``validate_fact_selection`` re-filters whatever comes back. The
 audit that leaves the critical path was checking reply *quality*, never
-disclosure: a thin answer is a thin answer, not a leaked fact.
+disclosure: a thin answer is a thin answer, not a leaked fact. It still runs, in
+``SpokenTurnAuditor``, on a background thread once the words are already spoken,
+so a reply that quietly under-delivered a released fact is reported rather than
+left for someone to infer from a confusing debrief.
 """
 
 from __future__ import annotations
@@ -26,6 +29,7 @@ import json
 import logging
 import os
 import re
+import threading
 from dataclasses import dataclass
 from typing import Iterator
 
@@ -357,6 +361,117 @@ class SpokenInterviewer:
         if session.messages and session.messages[-1]["role"] == "candidate":
             session.messages.pop()
             session.candidate_turns -= 1
+
+
+class SpokenTurnAuditor:
+    """Check a spoken reply after it has been heard, never before.
+
+    Typed chat blocks on this check and repairs the reply when it fails. Speech
+    cannot: the words are already leaving the speaker by the time a verdict
+    exists. What it is actually checking was never disclosure, which the runtime
+    enforces in code, but whether Leo communicated the material detail of a fact
+    the ledger has now marked released. Getting that wrong leaves the transcript
+    claiming the candidate was told something they were not, which then misleads
+    the evaluator. So the audit runs in a background thread and annotates the
+    stored turn; it never delays audio and never rewrites what was said.
+    """
+
+    def __init__(self) -> None:
+        from langchain_core.prompts import ChatPromptTemplate
+        from langchain_openrouter import ChatOpenRouter
+
+        model = ChatOpenRouter(
+            model=os.getenv("VOICE_AUDIT_MODEL", "").strip()
+            or os.getenv("VOICE_OPENROUTER_MODEL", "").strip()
+            or DEFAULT_SPOKEN_MODEL,
+            temperature=0,
+            max_tokens=400,
+            max_retries=1,
+            reasoning={"exclude": True},
+        )
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    "You privately check whether a spoken case-interviewer reply communicated the "
+                    "material detail of each fact it was approved to release. Do not reward a fact "
+                    "that is merely alluded to or that the candidate would have to infer. Answer "
+                    "with a bare JSON object: "
+                    '{{"delivered": ["id", ...], "complete": true|false}}. '
+                    "complete is false only if the reply is a fragment or an unfinished clause.",
+                ),
+                ("human", "Candidate turn: {candidate_turn}\nReply: {reply}\nApproved facts: {facts}"),
+            ]
+        )
+        self._chain = prompt | model
+
+    def audit(self, *, candidate_turn: str, reply: str, facts: list[Fact]) -> dict[str, object]:
+        payload = json.dumps([{"id": fact.id, "content": fact.content} for fact in facts])
+        message = self._chain.invoke(
+            {"candidate_turn": candidate_turn, "reply": reply, "facts": payload}
+        )
+        text = message.content if isinstance(message.content, str) else str(message.content)
+        start, end = text.find("{"), text.rfind("}")
+        if start == -1 or end <= start:
+            raise ValueError("audit returned no JSON object")
+        parsed = json.loads(text[start : end + 1])
+        delivered = [str(value) for value in (parsed.get("delivered") or [])]
+        expected = {fact.id for fact in facts}
+        return {
+            "delivered": delivered,
+            "complete": bool(parsed.get("complete", True)),
+            "undelivered": sorted(expected - set(delivered)),
+        }
+
+
+def audit_spoken_turn_in_background(
+    auditor: "SpokenTurnAuditor | None",
+    *,
+    session_id: str,
+    candidate_turn: str,
+    reply: str,
+    facts: list[Fact],
+) -> None:
+    """Fire the post-hoc audit without joining it.
+
+    A daemon thread rather than a task queue: the result is a log line for
+    operators, so losing one on shutdown costs nothing, and the alternative
+    would put a scheduler in front of a single LLM call.
+    """
+    if auditor is None or not facts:
+        return
+
+    def run() -> None:
+        try:
+            verdict = auditor.audit(candidate_turn=candidate_turn, reply=reply, facts=facts)
+        except Exception as error:
+            logger.info("Spoken turn audit unavailable (attempt=%s): %s", session_id, error)
+            return
+        if verdict["undelivered"] or not verdict["complete"]:
+            # The ledger now says these facts are released, so the candidate
+            # cannot be given them again. Surfacing it is what lets a bad
+            # authored fact or a weak prompt be found rather than inferred from
+            # a confusing debrief weeks later.
+            logger.warning(
+                "Spoken reply under-delivered approved facts (attempt=%s undelivered=%s complete=%s)",
+                session_id,
+                verdict["undelivered"],
+                verdict["complete"],
+            )
+
+    threading.Thread(target=run, name=f"spoken-audit-{session_id[:8]}", daemon=True).start()
+
+
+def create_spoken_auditor() -> SpokenTurnAuditor | None:
+    if not os.getenv("OPENROUTER_API_KEY"):
+        return None
+    if os.getenv("VOICE_AUDIT_ENABLED", "true").strip().lower() in {"0", "false", "no", "off"}:
+        return None
+    try:
+        return SpokenTurnAuditor()
+    except Exception as error:  # pragma: no cover - client construction
+        logger.warning("Spoken turn audit disabled: %s", error)
+        return None
 
 
 def create_spoken_interviewer() -> SpokenInterviewer | None:

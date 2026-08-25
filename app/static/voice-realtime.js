@@ -33,6 +33,15 @@ const state = {
   playHead: 0,
   sources: [],
   active: false,
+  // Set by the transcription socket so the turn is driven by events rather
+  // than by a polling interval.
+  transcriptWaiter: null,
+  transcriptError: null,
+  // Whether synthesis has produced anything this turn. Without this a silent
+  // but open socket would leave the HUD waiting on audio that never comes.
+  audioArrived: false,
+  speechBroken: false,
+  audioWatchdog: null,
 };
 
 function setPhase(phase, extra = {}) {
@@ -111,6 +120,7 @@ function openSynthesisSocket() {
   // Opened before Leo has any words so the handshake overlaps the candidate
   // still speaking. By the time a sentence exists the socket is warm.
   const socket = new WebSocket(state.config.tts_url);
+  state.speechBroken = false;
   socket.onopen = () => {
     socket.send(
       JSON.stringify({
@@ -127,12 +137,34 @@ function openSynthesisSocket() {
       return;
     }
     if (payload.audio) {
+      state.audioArrived = true;
       if (state.phase !== "speaking") setPhase("speaking");
       playChunk(payload.audio);
     }
   };
-  socket.onerror = () => console.error("Leo voice: synthesis socket error");
+  // Without these the HUD would sit on "Leo is thinking" forever whenever
+  // synthesis fails: no audio chunk ever arrives, so nothing moves the state
+  // machine on. The reply text still reached the transcript, so the turn is
+  // recoverable by reading rather than lost.
+  socket.onerror = () => {
+    console.error("Leo voice: synthesis socket error");
+    markSpeechBroken("Leo's voice could not be reached. His reply is in the transcript.");
+  };
+  socket.onclose = (event) => {
+    if (!event.wasClean && !state.audioArrived) {
+      markSpeechBroken("Leo's voice dropped out. His reply is in the transcript.");
+    }
+  };
   return socket;
+}
+
+function markSpeechBroken(message) {
+  if (state.speechBroken) return;
+  state.speechBroken = true;
+  state.tts = null;
+  if (["thinking", "speaking", "transcribing"].includes(state.phase)) {
+    setPhase("idle", { error: message });
+  }
 }
 
 function speak(text) {
@@ -145,6 +177,15 @@ function flushSynthesis() {
   if (state.tts?.readyState === WebSocket.OPEN) {
     state.tts.send(JSON.stringify({ text: " ", flush: true }));
   }
+  // An open socket that never answers is the one failure the error and close
+  // handlers cannot catch. The whole reply has been sent by this point, so if
+  // nothing has played shortly after the flush, speech is not coming.
+  window.clearTimeout(state.audioWatchdog);
+  state.audioWatchdog = window.setTimeout(() => {
+    if (!state.audioArrived) {
+      markSpeechBroken("Leo's voice did not respond. His reply is in the transcript.");
+    }
+  }, 6000);
 }
 
 function closeSynthesis() {
@@ -242,6 +283,17 @@ async function streamTurn(text) {
 
 /* --- Transcription ----------------------------------------------------- */
 
+/* Resolved by the socket the moment a commit lands, so the turn never waits on
+ * a polling interval, and settled on error or close so a dead socket cannot
+ * hold the turn open until a timeout. */
+function settleTranscript(reason) {
+  const waiter = state.transcriptWaiter;
+  if (!waiter) return;
+  state.transcriptWaiter = null;
+  window.clearTimeout(waiter.timer);
+  waiter.resolve({ text: state.transcript.trim(), reason });
+}
+
 function openScribeSocket() {
   const socket = new WebSocket(state.config.stt_url);
   socket.onmessage = (event) => {
@@ -255,14 +307,30 @@ function openScribeSocket() {
     if (type === "partial_transcript") {
       state.interim = payload.text || payload.transcript || "";
       dispatch("leo:voice-caption", { text: `${state.transcript} ${state.interim}`.trim() });
-    } else if (type === "committed_transcript" || type === "final_transcript") {
+      return;
+    }
+    if (type === "committed_transcript" || type === "final_transcript") {
       const text = payload.text || payload.transcript || "";
       if (text) state.transcript = `${state.transcript} ${text}`.trim();
       state.interim = "";
       dispatch("leo:voice-caption", { text: state.transcript });
+      settleTranscript("committed");
+      return;
+    }
+    if (typeof type === "string" && type.endsWith("_error")) {
+      console.error("Leo voice: transcription error", payload);
+      state.transcriptError = payload.message || "Transcription failed.";
+      settleTranscript("error");
     }
   };
-  socket.onerror = () => console.error("Leo voice: transcription socket error");
+  socket.onerror = () => {
+    console.error("Leo voice: transcription socket error");
+    state.transcriptError = "The transcription service could not be reached.";
+    settleTranscript("error");
+  };
+  // A close before the commit is acknowledged would otherwise leave the turn
+  // waiting on a timeout for a socket that is already gone.
+  socket.onclose = () => settleTranscript("closed");
   return socket;
 }
 
@@ -289,6 +357,9 @@ async function startRecording() {
   }
   state.transcript = "";
   state.interim = "";
+  state.transcriptError = null;
+  state.audioArrived = false;
+  window.clearTimeout(state.audioWatchdog);
   dispatch("leo:voice-caption", { text: "" });
 
   if (!state.audioContext) state.audioContext = new AudioContext();
@@ -345,13 +416,18 @@ async function stopRecording({ discard = false } = {}) {
   // transcribed, so only the final block is still in flight.
   sendAudio(new Int16Array(0), { commit: true });
 
-  const text = await waitForTranscript();
+  const { text, reason } = await waitForTranscript();
   state.scribe?.close();
   state.scribe = null;
 
   if (!text) {
-    setPhase("idle");
-    dispatch("leo:voice-status", { status: "idle", error: "Nothing was heard. Try again." });
+    // Distinguish a failure from genuine silence: telling someone "nothing was
+    // heard" when the socket was refused sends them looking at their mic.
+    const message =
+      reason === "error" || reason === "closed"
+        ? state.transcriptError || "Transcription was interrupted. Try again."
+        : "Nothing was heard. Try again.";
+    setPhase("idle", { error: message });
     return;
   }
 
@@ -364,19 +440,16 @@ async function stopRecording({ discard = false } = {}) {
   }
 }
 
-function waitForTranscript(timeoutMs = 4000) {
+function waitForTranscript(timeoutMs = 5000) {
   // The commit acknowledgement is the only thing still outstanding, so this
-  // resolves in roughly one round trip. The timeout exists so a dropped socket
-  // returns whatever was already heard rather than hanging the turn.
+  // normally settles in one round trip, driven by the socket rather than by a
+  // poll. The timeout is a backstop for a socket that goes silent without
+  // erroring or closing; it returns whatever was already heard.
   return new Promise((resolve) => {
-    const deadline = Date.now() + timeoutMs;
-    const settled = state.transcript;
-    const poll = () => {
-      if (state.transcript && state.transcript !== settled) return resolve(state.transcript.trim());
-      if (Date.now() > deadline) return resolve(state.transcript.trim());
-      window.setTimeout(poll, 60);
+    state.transcriptWaiter = {
+      resolve,
+      timer: window.setTimeout(() => settleTranscript("timeout"), timeoutMs),
     };
-    poll();
   });
 }
 
@@ -399,6 +472,8 @@ async function start(attemptId) {
 async function end() {
   if (!state.active) return;
   state.active = false;
+  window.clearTimeout(state.audioWatchdog);
+  settleTranscript("closed");
   teardownMicrophone();
   stopPlayback();
   state.scribe?.close();
