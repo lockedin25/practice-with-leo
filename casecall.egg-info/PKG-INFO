@@ -3,7 +3,6 @@ Name: casecall
 Version: 0.1.0
 Summary: A LangChain-powered case interview simulator.
 Requires-Python: >=3.11
-Requires-Dist: anthropic<2.0,>=1.0
 Requires-Dist: fastapi<1.0,>=0.115
 Requires-Dist: httpx<1.0,>=0.27
 Requires-Dist: jinja2<4.0,>=3.1

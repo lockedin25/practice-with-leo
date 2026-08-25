@@ -39,3 +39,4 @@ tests/test_practice_history.py
 tests/test_store.py
 tests/test_store_persistence.py
 tests/test_voice.py
+tests/test_voice_realtime.py

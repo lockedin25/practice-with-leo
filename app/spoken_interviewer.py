@@ -53,7 +53,7 @@ CONTROL_DEADLINE_CHARS = 400
 # reasoning model's private preamble, which is pure silence on this path.
 SPOKEN_COMPLETION_TOKENS = int(os.getenv("VOICE_COMPLETION_TOKENS", "700"))
 
-DEFAULT_SPOKEN_MODEL = "claude-sonnet-5"
+DEFAULT_SPOKEN_MODEL = "anthropic/claude-sonnet-4.6"
 
 
 SYSTEM_PROMPT = """You are Leo, a calm, incisive consulting case interviewer speaking aloud to a \
@@ -155,46 +155,62 @@ def sentence_chunks(text: str, *, minimum: int = 60) -> tuple[list[str], str]:
     return chunks, remainder
 
 
-class AnthropicSpokenInterviewer:
-    """Fused decide-and-speak turn on the Anthropic Messages API."""
+class SpokenInterviewer:
+    """Fused decide-and-speak turn, streamed over OpenRouter.
+
+    Deliberately the same provider typed chat already uses. The fused call and
+    the clause-at-a-time hand-off to speech are what buy the latency back; the
+    gateway hop is worth a fraction of that, and staying on one provider keeps
+    one credential and the model-fallback behaviour the rest of the app relies
+    on.
+    """
 
     def __init__(self) -> None:
-        import anthropic
+        from langchain_openrouter import ChatOpenRouter
 
-        self._client = anthropic.Anthropic()
-        self._model = os.getenv("VOICE_ANTHROPIC_MODEL", DEFAULT_SPOKEN_MODEL).strip() or (
-            DEFAULT_SPOKEN_MODEL
+        fallback_models = [
+            model.strip()
+            for model in os.getenv("OPENROUTER_FALLBACK_MODELS", "").split(",")
+            if model.strip()
+        ]
+        self._model_name = (
+            os.getenv("VOICE_OPENROUTER_MODEL", "").strip()
+            or os.getenv("OPENROUTER_MODEL", "").strip()
+            or DEFAULT_SPOKEN_MODEL
         )
-        # Opus-tier models think by default. Low effort keeps that useful while
-        # holding time-to-first-token down; disabling thinking outright can leak
-        # reasoning tags into visible text, which on this path is spoken aloud.
-        self._effort = os.getenv("VOICE_EFFORT", "low").strip() or "low"
+        # Measured on anthropic/claude-sonnet-4.6 through OpenRouter: with
+        # reasoning left on, a five-sentence reply arrives as ONE delta after
+        # 4.65s, which makes clause-by-clause speech impossible. Excluding
+        # reasoning gives 18 deltas with the first at 1.9s. This parameter is
+        # therefore not a cost tweak, it is what makes streamed speech work.
+        self._client = ChatOpenRouter(
+            model=self._model_name,
+            temperature=0.3,
+            max_tokens=SPOKEN_COMPLETION_TOKENS,
+            # A spoken retry turns an answer into a long silence.
+            max_retries=1,
+            reasoning={"exclude": True},
+            model_kwargs={"models": fallback_models} if fallback_models else {},
+        )
 
     # -- prompt assembly ---------------------------------------------------
 
-    def _cached_system(self, session: InterviewSession) -> list[dict[str, object]]:
+    def _system_text(self, session: InterviewSession) -> str:
         """The half of the prompt that never changes inside one attempt.
 
-        Prompt caching is a prefix match, so every volatile value has to live in
-        the messages that follow this block. Phase list, objective and the fact
-        index are stable for the whole case; the current phase and the eligible
-        fact contents are not, and belong in the turn message.
+        Kept first and byte-stable so a caching gateway can reuse it across the
+        turns of one case. Everything volatile, the current phase and the
+        eligible fact contents, goes in the turn message instead.
         """
         case = session.case
         phases = "\n".join(f"- {phase.id}: {phase.interviewer_goal}" for phase in case.phases)
-        return [
-            {"type": "text", "text": SYSTEM_PROMPT},
-            {
-                "type": "text",
-                "text": (
-                    f"Case: {case.title}\n"
-                    f"Category: {case.category.replace('-', ' ')}\n"
-                    f"Objective: {case.objective}\n"
-                    f"Authored phases, in order:\n{phases}"
-                ),
-                "cache_control": {"type": "ephemeral"},
-            },
-        ]
+        return (
+            f"{SYSTEM_PROMPT}\n\n"
+            f"Case: {case.title}\n"
+            f"Category: {case.category.replace('-', ' ')}\n"
+            f"Objective: {case.objective}\n"
+            f"Authored phases, in order:\n{phases}"
+        )
 
     def _turn_message(
         self,
@@ -214,12 +230,13 @@ class AnthropicSpokenInterviewer:
             f"Candidate's latest turn: {candidate_turn}"
         )
 
-    def _history(self, session: InterviewSession) -> list[dict[str, str]]:
+    def _history(self, session: InterviewSession) -> list[object]:
+        from langchain_core.messages import AIMessage, HumanMessage
+
         return [
-            {
-                "role": "user" if message["role"] == "candidate" else "assistant",
-                "content": message["content"],
-            }
+            HumanMessage(content=message["content"])
+            if message["role"] == "candidate"
+            else AIMessage(content=message["content"])
             for message in session.messages[-7:-1]
         ]
 
@@ -246,83 +263,73 @@ class AnthropicSpokenInterviewer:
         )
         eligible = session.case.eligible_facts_for_director(session.stage, session.disclosed_ids)
 
+        from langchain_core.messages import HumanMessage, SystemMessage
+
         accumulated = ""
         spoken = ""
         control: ControlDecision | None = None
         facts: list[Fact] = []
         try:
-            with self._client.messages.stream(
-                model=self._model,
-                max_tokens=SPOKEN_COMPLETION_TOKENS,
-                output_config={"effort": self._effort},
-                system=self._cached_system(session),
-                messages=[
+            stream = self._client.stream(
+                [
+                    SystemMessage(content=self._system_text(session)),
                     *self._history(session),
-                    {
-                        "role": "user",
-                        "content": self._turn_message(
+                    HumanMessage(
+                        content=self._turn_message(
                             session,
                             candidate_turn,
                             eligible=eligible,
                             pacing=pacing,
                             max_facts=max_facts,
-                        ),
-                    },
-                ],
-            ) as stream:
-                for delta in stream.text_stream:
-                    accumulated += delta
-                    if control is None:
-                        if CONTROL_CLOSE not in accumulated:
-                            if len(accumulated) > CONTROL_DEADLINE_CHARS:
-                                raise ControlBlockMissing(
-                                    "Control block never closed within its deadline"
-                                )
-                            continue
-                        control = parse_control_block(accumulated)
-                        # The runtime, not the model, decides what is released.
-                        # Truncating to the cap first keeps the model's own
-                        # priority order, so the facts it narrates are the facts
-                        # the ledger records.
-                        facts = session.case.validate_fact_selection(
-                            control.fact_ids[:max_facts],
-                            session.stage,
-                            session.disclosed_ids,
-                            max_facts=max_facts,
                         )
-                        next_phase = (
-                            session.stage
-                            if is_early
-                            else session.case.validate_phase_transition(
-                                session.stage, control.next_phase
+                    ),
+                ]
+            )
+            for chunk in stream:
+                delta = chunk.content if isinstance(chunk.content, str) else ""
+                if not delta:
+                    continue
+                accumulated += delta
+                if control is None:
+                    if CONTROL_CLOSE not in accumulated:
+                        if len(accumulated) > CONTROL_DEADLINE_CHARS:
+                            raise ControlBlockMissing(
+                                "Control block never closed within its deadline"
                             )
-                        )
-                        session.apply_director_decision(next_phase, facts)
-                        yield ("control", facts)
-                        tail = spoken_text_after_control(accumulated)
-                        if tail:
-                            spoken = tail
-                            yield ("delta", tail)
                         continue
-                    spoken += delta
-                    yield ("delta", delta)
-
-                final = stream.get_final_message()
+                    control = parse_control_block(accumulated)
+                    # The runtime, not the model, decides what is released.
+                    # Truncating to the cap first keeps the model's own priority
+                    # order, so the facts it narrates are the facts the ledger
+                    # records.
+                    facts = session.case.validate_fact_selection(
+                        control.fact_ids[:max_facts],
+                        session.stage,
+                        session.disclosed_ids,
+                        max_facts=max_facts,
+                    )
+                    next_phase = (
+                        session.stage
+                        if is_early
+                        else session.case.validate_phase_transition(
+                            session.stage, control.next_phase
+                        )
+                    )
+                    session.apply_director_decision(next_phase, facts)
+                    yield ("control", facts)
+                    tail = spoken_text_after_control(accumulated)
+                    if tail:
+                        spoken = tail
+                        yield ("delta", tail)
+                    continue
+                spoken += delta
+                yield ("delta", delta)
 
             if control is None:
                 raise ControlBlockMissing("The spoken completion contained no control block")
-            if getattr(final, "stop_reason", None) == "max_tokens":
-                logger.warning(
-                    "Spoken turn filled its %s token budget (case=%s, turn=%s)",
-                    SPOKEN_COMPLETION_TOKENS,
-                    session.case.id,
-                    session.candidate_turns,
-                )
-            usage = getattr(final, "usage", None)
             logger.info(
-                "Spoken turn: model=%s cache_read=%s facts=%s",
-                self._model,
-                getattr(usage, "cache_read_input_tokens", None),
+                "Spoken turn: model=%s facts=%s",
+                self._model_name,
                 [fact.id for fact in facts],
             )
         except ControlBlockMissing:
@@ -352,18 +359,18 @@ class AnthropicSpokenInterviewer:
             session.candidate_turns -= 1
 
 
-def create_spoken_interviewer() -> AnthropicSpokenInterviewer | None:
+def create_spoken_interviewer() -> SpokenInterviewer | None:
     """Build the fused spoken path, or None when it is not configured.
 
     A missing key disables low-latency voice rather than the product: callers
     fall back to the existing chat pipeline, which is the same way voice already
     degrades elsewhere.
     """
-    if not (os.getenv("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_AUTH_TOKEN")):
-        logger.info("Spoken interviewer disabled: no Anthropic credentials configured")
+    if not os.getenv("OPENROUTER_API_KEY"):
+        logger.info("Spoken interviewer disabled: OPENROUTER_API_KEY is not set")
         return None
     try:
-        return AnthropicSpokenInterviewer()
+        return SpokenInterviewer()
     except Exception as error:  # pragma: no cover - import or client construction
         logger.warning("Spoken interviewer disabled: %s", error)
         return None

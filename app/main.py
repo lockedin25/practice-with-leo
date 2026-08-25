@@ -61,9 +61,9 @@ STORE.backfill_attempt_users()
 ATTEMPT_TURNS = AttemptTurnService()
 VOICE_PROVIDER = ElevenLabsProvider()
 REALTIME_VOICE_PROVIDER = ElevenLabsRealtimeProvider()
-# One fused streaming call per spoken turn. None when no Anthropic
-# credentials exist, in which case realtime voice reports itself unready
-# and the candidate keeps typed chat.
+# One fused streaming call per spoken turn, on the same OpenRouter key as
+# typed chat. None when no key exists, in which case realtime voice reports
+# itself unready and the candidate keeps typed chat.
 SPOKEN_INTERVIEWER = create_spoken_interviewer()
 # Built only when the candidate replies to Leo's welcome. Readiness is shared
 # by typed chat and voice, and remains LLM-led rather than keyword-driven.
