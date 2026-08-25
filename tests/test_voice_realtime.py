@@ -25,7 +25,7 @@ from app.voice import VoiceConfigurationError
 from app.voice_realtime import (
     RealtimeVoiceSettings,
     case_keyterms,
-    speech_to_text_url,
+    speech_to_text_upload,
     text_to_speech_url,
 )
 from conftest import sign_in
@@ -119,21 +119,21 @@ def test_realtime_settings_require_a_voice_because_the_agent_no_longer_supplies_
     assert "ELEVENLABS_VOICE_ID" in str(error.value)
 
 
-def test_socket_urls_carry_the_single_use_token_and_never_the_api_key(monkeypatch) -> None:
+def test_the_upload_carries_the_single_use_token_and_never_the_api_key(monkeypatch) -> None:
     _enable_realtime(monkeypatch)
     settings = RealtimeVoiceSettings.from_environment()
 
-    stt = speech_to_text_url(settings, "sutkn_stt", keyterms=["EBITDA", "4.2"])
+    stt = speech_to_text_upload(settings, "sutkn_stt", keyterms=["EBITDA", "4.2"])
     tts = text_to_speech_url(settings, "sutkn_tts")
 
-    assert "token=sutkn_stt" in stt
-    # Manual commit is what makes the spacebar, not provider silence detection,
-    # the authority on when a candidate's turn ends.
-    assert "commit_strategy=manual" in stt
-    assert "keyterms=EBITDA" in stt and "keyterms=4.2" in stt
+    assert "token=sutkn_stt" in stt["url"]
+    assert stt["model_id"] == settings.stt_model
+    # Recognition is biased toward this case's own figures; a misheard number is
+    # worse than a misheard word in a quantitative interview.
+    assert stt["keyterms"] == ["EBITDA", "4.2"]
     assert "single_use_token=sutkn_tts" in tts
     assert "voice_leo_test" in tts and "auto_mode=true" in tts
-    assert "test-key" not in stt and "test-key" not in tts
+    assert "test-key" not in stt["url"] and "test-key" not in tts
 
 
 def test_the_session_route_describes_the_transport_without_issuing_anything(monkeypatch) -> None:
@@ -153,8 +153,9 @@ def test_the_session_route_describes_the_transport_without_issuing_anything(monk
     assert body["sample_rate"] == 16_000
     assert body["sockets_url"] == f"/api/attempts/{attempt_id}/voice-realtime/sockets"
     assert body["turn_stream_url"] == f"/api/attempts/{attempt_id}/turn/stream"
+    assert body["max_utterance_seconds"] >= 5
     # Nothing spendable, so nothing to go stale between utterances.
-    assert "stt_url" not in body and "tts_url" not in body
+    assert "stt" not in body and "tts_url" not in body
 
 
 def test_every_utterance_gets_a_freshly_minted_socket_pair(monkeypatch) -> None:
@@ -181,7 +182,7 @@ def test_every_utterance_gets_a_freshly_minted_socket_pair(monkeypatch) -> None:
     second = client.post(url).json()
 
     assert len(issued) == 4, "two utterances need two pairs, not one reused pair"
-    assert first["stt_url"] != second["stt_url"]
+    assert first["stt"]["url"] != second["stt"]["url"]
     assert first["tts_url"] != second["tts_url"]
     assert "test-key" not in json.dumps([first, second])
 
@@ -199,7 +200,7 @@ def test_socket_urls_never_carry_the_workspace_key(monkeypatch) -> None:
 
     body = client.post(f"/api/attempts/{attempt_id}/voice-realtime/sockets").json()
 
-    assert "commit_strategy=manual" in body["stt_url"]
+    assert body["stt"]["url"].startswith("https://api.elevenlabs.io/v1/speech-to-text?token=")
     assert "auto_mode=true" in body["tts_url"]
     assert "test-key" not in json.dumps(body)
 
@@ -218,10 +219,10 @@ def test_the_two_tokens_are_minted_concurrently(monkeypatch) -> None:
     provider = voice_realtime.ElevenLabsRealtimeProvider()
     monkeypatch.setattr(type(provider), "mint_token", mint)
 
-    tokens = provider.mint_tokens(settings, "realtime_scribe", "tts_websocket")
+    tokens = provider.mint_tokens(settings, "batch_scribe", "tts_websocket")
 
     assert tokens == {
-        "realtime_scribe": "sutkn_realtime_scribe",
+        "batch_scribe": "sutkn_batch_scribe",
         "tts_websocket": "sutkn_tts_websocket",
     }
 
@@ -240,7 +241,7 @@ def test_a_half_issued_session_is_never_returned(monkeypatch) -> None:
     monkeypatch.setattr(type(provider), "mint_token", mint)
 
     with pytest.raises(voice_realtime.VoiceProviderError):
-        provider.mint_tokens(settings, "realtime_scribe", "tts_websocket")
+        provider.mint_tokens(settings, "batch_scribe", "tts_websocket")
 
 
 def test_a_provider_outage_degrades_to_chat_without_leaking_the_reason(monkeypatch) -> None:
@@ -568,14 +569,11 @@ def test_the_audit_is_skipped_when_no_fact_was_released(monkeypatch, stub_interv
     assert called == []
 
 
-# --- Capture ordering in the browser island -------------------------------
+# --- Recording invariants in the browser island ---------------------------
 #
-# There is no JavaScript test runner in this project, and the bug these guard
-# against was silent and severe: capture used to begin only after the credential
-# mint and the socket handshake had been awaited, which measured 1675ms cold and
-# 903ms with a prefetched token. Every turn threw away that much speech, so a
-# short question vanished entirely and a longer one arrived clipped. A
-# source-level invariant is crude but it is a real guard.
+# There is no JavaScript test runner here, and these failure modes were all
+# silent: the candidate saw "nothing was heard" and could not tell which stage
+# dropped the turn. Source-level invariants are crude but real.
 
 
 def _island_source() -> str:
@@ -584,24 +582,45 @@ def _island_source() -> str:
     return (Path(__file__).resolve().parents[1] / "app/static/voice-realtime.js").read_text()
 
 
-def test_capture_starts_before_the_socket_is_awaited() -> None:
+def test_recognition_is_batch_with_no_streaming_socket() -> None:
+    """Streaming recognition put a handshake, a consumed credential, a readiness
+    race and commit semantics on the critical path of every turn, and each of
+    those lost a turn at least once."""
+    source = _island_source()
+
+    assert "function encodeWav(" in source
+    assert "async function transcribe(blob, stt)" in source
+    # None of the streaming machinery may come back.
+    for gone in (
+        "speech-to-text/realtime",
+        "input_audio_chunk",
+        "commit_strategy",
+        "settleTranscript",
+        "waitForTranscript",
+        "session_started",
+    ):
+        assert gone not in source, f"streaming recognition leftover: {gone}"
+
+
+def test_capture_begins_without_waiting_on_anything() -> None:
     source = _island_source()
     gate_opened = source.index("state.capturing = true;")
     recording_announced = source.index('setPhase("recording")')
-    socket_awaited = source.index("state.scribeReadyPromise = (async () =>")
+    # The only await before capture is the microphone itself, which is already
+    # open from session start in the normal case.
+    prelude = source[source.index("async function startRecording()") : gate_opened]
 
-    assert socket_awaited > gate_opened, (
-        "frames must be forwarded before the transcription socket is awaited"
+    assert recording_announced > gate_opened
+    assert "takeCredentials" not in prelude, (
+        "a credential fetch before capture is what discarded the opening words"
     )
-    assert socket_awaited > recording_announced, (
-        "the candidate must be told to speak before the socket handshake, not after"
-    )
+    assert "openSynthesisSocket" not in prelude
 
 
 def test_the_microphone_is_held_open_across_turns() -> None:
     """Re-acquiring the device per turn restarted echo cancellation, noise
     suppression and auto gain, and their convergence ramp landed on the
-    candidate's opening words. Only leaving voice mode releases it."""
+    candidate's opening words."""
     source = _island_source()
 
     assert source.count("teardownMicrophone();") == 1, (
@@ -609,18 +628,13 @@ def test_the_microphone_is_held_open_across_turns() -> None:
     )
     assert "async function ensureMicrophone()" in source
     # Recording toggles a gate, never the device.
-    assert "if (state.capturing) sendAudio(event.data)" in source
+    assert "if (!state.capturing) return;" in source
 
 
-def test_audio_captured_before_the_socket_is_buffered_not_dropped() -> None:
+def test_a_recording_is_capped_and_cannot_grow_without_bound() -> None:
     source = _island_source()
 
-    assert "state.pendingFrames.push(frame)" in source, (
-        "frames arriving before the socket is ready must be held, not discarded"
-    )
-    assert "function flushPendingFrames()" in source
-    # A short utterance can end before the handshake completes; committing then
-    # would lose the whole turn.
-    assert "await state.scribeReadyPromise" in source, (
-        "the commit must wait for the socket rather than fire into a dead one"
-    )
+    assert "state.maxSamples" in source
+    assert "max_utterance_seconds" in source
+    # Reaching the cap yields the floor and keeps what was said.
+    assert "stopRecording();" in source

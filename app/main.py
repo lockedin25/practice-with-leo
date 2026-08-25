@@ -41,7 +41,7 @@ from app.voice_realtime import (
     ElevenLabsRealtimeProvider,
     RealtimeVoiceSettings,
     case_keyterms,
-    speech_to_text_url,
+    speech_to_text_upload,
     text_to_speech_url,
 )
 from app.spoken_interviewer import (
@@ -869,7 +869,7 @@ def _realtime_socket_urls(
     """
     tokens = REALTIME_VOICE_PROVIDER.mint_tokens(realtime, SCRIBE_TOKEN, TTS_TOKEN)
     return {
-        "stt_url": speech_to_text_url(
+        "stt": speech_to_text_upload(
             realtime, tokens[SCRIBE_TOKEN], keyterms=case_keyterms(session.case)
         ),
         "tts_url": text_to_speech_url(realtime, tokens[TTS_TOKEN]),
@@ -904,6 +904,7 @@ def create_realtime_voice_session(
         "transport": "realtime",
         "sample_rate": realtime.sample_rate,
         "tts_output_format": realtime.tts_output_format,
+        "max_utterance_seconds": realtime.max_utterance_seconds,
         "sockets_url": f"/api/attempts/{session.id}/voice-realtime/sockets",
         "turn_stream_url": f"/api/attempts/{session.id}/turn/stream",
         "voice_intro": _voice_intro(session),

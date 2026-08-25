@@ -1,14 +1,25 @@
-"""Realtime speech transport: browser-held Scribe and TTS sockets.
+"""Speech transport for push-to-talk: batch recognition in, streamed speech out.
 
-The ``realtime`` voice mode replaces the ElevenLabs Agent product with the two
-raw streaming endpoints, driven by a push-to-talk control in the browser. The
-agent's ASR, turn detection, LLM callback and hosted prompt all disappear; Leo
-keeps its own runtime and only borrows speech recognition and speech synthesis.
+The ``realtime`` voice mode replaces the ElevenLabs Agent product. The agent's
+ASR, turn detection, LLM callback and hosted prompt all disappear; Leo keeps its
+own runtime and borrows only recognition and synthesis.
 
-Only this module talks to ElevenLabs' token endpoint. The workspace API key
-stays on the server: the browser receives single-use tokens that expire in
-fifteen minutes and are consumed on use, which is the same trust boundary the
-Agent conversation token already established in ``app.voice``.
+The two directions are deliberately asymmetric. Recognition is **batch**: the
+browser records the whole utterance while the candidate holds the floor and
+uploads it once, in one request, when they yield. Synthesis stays **streamed**,
+because there the candidate is waiting and a clause can be spoken while the next
+is still being written.
+
+Streaming recognition was tried first and removed. It produced interim captions
+that were never useful during a case, and it put a socket handshake, a
+consumed-on-connect credential, a readiness race and commit semantics on the
+critical path of every single turn. Each of those cost a lost turn at least once.
+Batch recognition has one failure mode, a failed upload, and it is visible.
+
+Only this module talks to ElevenLabs' token endpoint. The workspace API key stays
+on the server; the browser gets single-use tokens that expire in fifteen minutes,
+the same trust boundary the Agent conversation token already established in
+``app.voice``.
 """
 
 from __future__ import annotations
@@ -25,12 +36,16 @@ from app.voice import VoiceConfigurationError, VoiceProviderError
 # ElevenLabs mints a distinct token type per streaming endpoint. Requesting the
 # wrong one authenticates nowhere, so the names are pinned here rather than
 # spelled out at each call site.
-SCRIBE_TOKEN = "realtime_scribe"
+# Batch, not realtime. The whole utterance is uploaded once the candidate yields
+# the floor. Streaming recognition bought interim captions nobody needed and cost
+# a socket handshake, a single-use credential, a readiness race and commit
+# semantics on the critical path of every turn.
+SCRIBE_TOKEN = "batch_scribe"
 TTS_TOKEN = "tts_websocket"
 
 TOKEN_URL = "https://api.elevenlabs.io/v1/single-use-token/{token_type}"
 
-STT_URL = "wss://api.elevenlabs.io/v1/speech-to-text/realtime"
+STT_UPLOAD_URL = "https://api.elevenlabs.io/v1/speech-to-text"
 TTS_URL = "wss://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream-input"
 
 
@@ -48,20 +63,26 @@ class RealtimeVoiceSettings:
     # Only pcm_44100 is gated behind a paid tier, so 24 kHz is a safe default
     # that still plays through a plain AudioContext queue without a decoder.
     tts_output_format: str
+    # A spoken answer to a case question is rarely over a minute, but thinking
+    # aloud through a structure can be. The cap exists so a stuck recording ends
+    # by itself rather than growing without bound.
+    max_utterance_seconds: int
 
     @classmethod
     def from_environment(cls) -> "RealtimeVoiceSettings":
         return cls(
             api_key=os.getenv("ELEVENLABS_API_KEY", "").strip(),
             voice_id=os.getenv("ELEVENLABS_VOICE_ID", "").strip(),
-            stt_model=os.getenv("ELEVENLABS_STT_MODEL", "scribe_v2_realtime").strip()
-            or "scribe_v2_realtime",
+            stt_model=os.getenv("ELEVENLABS_STT_MODEL", "scribe_v1").strip() or "scribe_v1",
             tts_model=os.getenv("ELEVENLABS_TTS_MODEL", "eleven_flash_v2_5").strip()
             or "eleven_flash_v2_5",
             stt_audio_format=os.getenv("ELEVENLABS_STT_AUDIO_FORMAT", "pcm_16000").strip()
             or "pcm_16000",
             tts_output_format=os.getenv("ELEVENLABS_TTS_OUTPUT_FORMAT", "pcm_24000").strip()
             or "pcm_24000",
+            max_utterance_seconds=max(
+                5, int(os.getenv("VOICE_MAX_UTTERANCE_SECONDS", "120") or 120)
+            ),
         )
 
     @property
@@ -132,25 +153,22 @@ class ElevenLabsRealtimeProvider:
             return {token_type: future.result() for token_type, future in futures.items()}
 
 
-def speech_to_text_url(settings: RealtimeVoiceSettings, token: str, *, keyterms: list[str]) -> str:
-    """Build the Scribe socket URL for one candidate utterance.
+def speech_to_text_upload(
+    settings: RealtimeVoiceSettings, token: str, *, keyterms: list[str]
+) -> dict[str, object]:
+    """Describe the one-shot upload the browser makes when the floor is yielded.
 
-    ``commit_strategy=manual`` is what makes the spacebar authoritative: Scribe
-    streams interim transcripts while the candidate speaks but only finalises a
-    turn when the browser marks a chunk committed. Provider-side silence
-    detection would end turns on its own and take that control away.
+    The candidate's audio goes straight from the browser to ElevenLabs on a
+    short-lived token, so it never passes through this process. Keyterms bias
+    recognition toward this case's own figures and proper nouns: case arithmetic
+    dies on a misheard number, and these are authored strings the candidate never
+    receives, so sending them to the recogniser leaks nothing.
     """
-    query = [
-        f"model_id={settings.stt_model}",
-        f"audio_format={settings.stt_audio_format}",
-        "commit_strategy=manual",
-        f"token={token}",
-    ]
-    # Case arithmetic dies on a misheard figure, so bias recognition toward the
-    # numbers and proper nouns this specific case is going to use.
-    for term in keyterms[:100]:
-        query.append(f"keyterms={httpx.QueryParams({'k': term})['k']}")
-    return f"{STT_URL}?{'&'.join(query)}"
+    return {
+        "url": f"{STT_UPLOAD_URL}?token={token}",
+        "model_id": settings.stt_model,
+        "keyterms": keyterms[:100],
+    }
 
 
 def text_to_speech_url(settings: RealtimeVoiceSettings, token: str) -> str:
