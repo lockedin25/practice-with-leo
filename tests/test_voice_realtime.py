@@ -586,16 +586,30 @@ def _island_source() -> str:
 
 def test_capture_starts_before_the_socket_is_awaited() -> None:
     source = _island_source()
-    mic_connected = source.index("state.micSource.connect(state.workletNode)")
+    gate_opened = source.index("state.capturing = true;")
     recording_announced = source.index('setPhase("recording")')
     socket_awaited = source.index("state.scribeReadyPromise = (async () =>")
 
-    assert socket_awaited > mic_connected, (
-        "the microphone must be capturing before the transcription socket is awaited"
+    assert socket_awaited > gate_opened, (
+        "frames must be forwarded before the transcription socket is awaited"
     )
     assert socket_awaited > recording_announced, (
         "the candidate must be told to speak before the socket handshake, not after"
     )
+
+
+def test_the_microphone_is_held_open_across_turns() -> None:
+    """Re-acquiring the device per turn restarted echo cancellation, noise
+    suppression and auto gain, and their convergence ramp landed on the
+    candidate's opening words. Only leaving voice mode releases it."""
+    source = _island_source()
+
+    assert source.count("teardownMicrophone();") == 1, (
+        "the microphone must be released only when voice mode ends"
+    )
+    assert "async function ensureMicrophone()" in source
+    # Recording toggles a gate, never the device.
+    assert "if (state.capturing) sendAudio(event.data)" in source
 
 
 def test_audio_captured_before_the_socket_is_buffered_not_dropped() -> None:

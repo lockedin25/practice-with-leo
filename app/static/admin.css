@@ -53,12 +53,6 @@
   gap: 8px;
 }
 
-/* The nav slot shows who is looking. The e-mail is redundant beside the name
-   in a 64px bar, so only the name rides along. */
-.navbar .person-email {
-  display: none;
-}
-
 /* --- Metric tiles ------------------------------------------------------- */
 /* Six tiles in one row. The label reserves two lines and the note is pinned
    to the bottom, so the numbers share a baseline even when one label wraps. */

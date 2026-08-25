@@ -1,6 +1,4 @@
 {% extends "base.html" %}
-{% set context_badge = "Admin console" %}
-{% set show_viewer = true %}
 {% block title %}Admin Console · Leo{% endblock %}
 {% block body_class %}console-body{% endblock %}
 {% block stylesheets %}
@@ -8,14 +6,13 @@
 {% endblock %}
 {% block content %}
 <main class="console shell" aria-label="Admin console">
-  {# The nav badge already says "Admin console", so this head carries the
-     headline and the one thing it cannot: how fresh the numbers are. #}
   <header class="console-head">
     <div>
       <h1>Every candidate, every transcript</h1>
       <p class="muted" id="freshness">Loading…</p>
     </div>
     <div class="console-head-actions">
+      <div class="person" id="viewer" aria-label="Signed-in administrator"></div>
       <button class="btn btn-secondary btn-sm" id="refresh" type="button">Refresh</button>
     </div>
   </header>

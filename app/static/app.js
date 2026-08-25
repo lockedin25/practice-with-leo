@@ -44,6 +44,7 @@ const state = {
   elapsedMs: 0,
   timeUpAnnounced: false,
   endArmedTimer: null,
+  endRedirectTimer: null,
   // A practice room is pinned to its chosen case, including after a reload.
   selectedCaseId: null,
 };
@@ -287,18 +288,18 @@ function setPhaseState(attempt) {
       ? "Practice complete"
       : readyToEnd
         ? "Interview complete"
-      : preCase
-        ? "Before we start"
-        : "Live interview";
+        : preCase
+          ? "Before we start"
+          : "Live interview";
   }
   if (el.sessionStatus) {
     el.sessionStatus.textContent = attempt.ended
       ? "Practice ended"
       : readyToEnd
         ? "Ready to finish"
-      : preCase
-        ? "Waiting for you"
-        : "Case in progress";
+        : preCase
+          ? "Waiting for you"
+          : "Case in progress";
   }
   el.input.placeholder = preCase
     ? "Reply to Leo, or start the case when you are ready…"
@@ -688,6 +689,17 @@ function setReadyToEndState(attempt) {
   if (el.endButton && !state.endArmedTimer) {
     el.endButton.textContent = ready ? "End case" : "End practice";
   }
+  if (ready && !state.endRedirectTimer && !state.ending) {
+    // Let Leo's final message paint before replacing the room with the debrief.
+    // The visible action remains available as an immediate fallback.
+    state.endRedirectTimer = window.setTimeout(() => {
+      state.endRedirectTimer = null;
+      void finishAttempt();
+    }, 700);
+  } else if (!ready && state.endRedirectTimer) {
+    window.clearTimeout(state.endRedirectTimer);
+    state.endRedirectTimer = null;
+  }
   syncSendState();
 }
 
@@ -955,6 +967,8 @@ function disarmEndButton() {
 async function finishAttempt() {
   if (!state.attempt || state.attempt.ended || state.ending) return;
 
+  window.clearTimeout(state.endRedirectTimer);
+  state.endRedirectTimer = null;
   state.ending = true;
   disarmEndButton();
   el.endButton.disabled = true;
@@ -962,7 +976,7 @@ async function finishAttempt() {
     el.completeAttempt.disabled = true;
     el.completeAttempt.classList.add("is-loading");
     const label = el.completeAttempt.querySelector(".case-close-action-label");
-    if (label) label.textContent = "Generating your debrief";
+    if (label) label.textContent = "Opening your debrief";
   }
   try {
     await returnToChat();
@@ -975,7 +989,7 @@ async function finishAttempt() {
       el.completeAttempt.disabled = false;
       el.completeAttempt.classList.remove("is-loading");
       const label = el.completeAttempt.querySelector(".case-close-action-label");
-      if (label) label.textContent = "End case and view debrief";
+      if (label) label.textContent = "Try opening debrief again";
     }
   } finally {
     state.ending = false;

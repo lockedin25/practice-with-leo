@@ -1,19 +1,8 @@
-{# The practice room toolbar. Deliberately not the site header: this is a
-   session HUD (timer, voice, end practice), built from the same primitives. #}
-<header class="topbar">
+{# Page-level live-session controls. Global navigation remains in
+   _site_header.html so the practice route has the same app shell as every
+   other signed-in page. #}
+<section class="topbar" aria-label="Live interview controls">
   <div class="topbar-inner">
-    {% with grad_id = "room", show_badge = false %}{% include "_brand.html" %}{% endwith %}
-
-    <a class="nav-cases-link" href="/cases">
-      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="3" y="3" width="7" height="7"></rect>
-        <rect x="14" y="3" width="7" height="7"></rect>
-        <rect x="14" y="14" width="7" height="7"></rect>
-        <rect x="3" y="14" width="7" height="7"></rect>
-      </svg>
-      <span>Cases</span>
-    </a>
-
     <p class="session-label">
       <span class="pulse-dot" aria-hidden="true"></span>
       <span id="session-status-text">Leo is listening</span>
@@ -42,11 +31,7 @@
         </button>
       </div>
 
-      {% include "_theme_toggle.html" %}
-
       <button class="button button-ghost" id="end-attempt" type="button">End practice</button>
-
-      {% include "_user_menu.html" %}
     </div>
   </div>
-</header>
+</section>

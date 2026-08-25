@@ -16,8 +16,7 @@
     {% block stylesheets %}{% endblock %}
   </head>
   <body class="{% block body_class %}{% endblock %}">
-    {% set header_template = header_partial if header_partial is defined else "_site_header.html" %}
-    {% if header_template %}{% include header_template %}{% endif %}
+    {% if not hide_global_header|default(false) %}{% include "_site_header.html" %}{% endif %}
 
 {% block content %}{% endblock %}
 

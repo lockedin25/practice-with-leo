@@ -27,8 +27,8 @@ body.room {
   height: 100dvh;
   overflow-y: hidden;
 
-  /* Toolbar height, used by the toast rail. Kept in sync with .topbar below. */
-  --room-bar-h: var(--topbar-h);
+  /* Global navigation plus the page-level session toolbar. */
+  --room-bar-h: calc(64px + var(--topbar-h));
   /* One measure for the whole room: roughly 70 characters of body copy. */
   --room-measure: 33em;
 }
@@ -37,6 +37,12 @@ body.room *,
 body.room *::before,
 body.room *::after {
   box-sizing: border-box;
+}
+
+body.room > .navbar {
+  position: relative;
+  flex: none;
+  width: 100%;
 }
 
 /* Toasts must never sit over the conversation or the composer, so in the room
@@ -51,7 +57,8 @@ body.room .toasts {
 
 /* --------------------------------------------------------------------------
    2. Session toolbar
-   The markup comes from _room_header.html; only the styling lives here.
+   The markup comes from _practice_toolbar.html; global navigation remains in
+   the shared site header.
    -------------------------------------------------------------------------- */
 
 .topbar {
@@ -73,8 +80,9 @@ body.room .toasts {
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 12px;
-  width: 100%;
+  width: min(1340px, 100%);
   min-width: 0;
+  margin-inline: auto;
 }
 
 .topbar-actions {
@@ -88,16 +96,12 @@ body.room .toasts {
 }
 
 /* Compact chrome, full 44px hit area, following the tokens.css pattern. */
-.nav-cases-link,
 body.room .button,
-body.room .user-chip,
 .btn-voice-action {
   position: relative;
 }
 
-.nav-cases-link::before,
 body.room .button::after,
-body.room .user-chip::after,
 .btn-voice-action::after {
   content: "";
   position: absolute;
@@ -105,27 +109,6 @@ body.room .user-chip::after,
   height: 100%;
   min-height: 44px;
   transform: translateY(-50%);
-}
-
-.nav-cases-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 11px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-pill);
-  background: var(--sunken);
-  color: var(--ink-2);
-  font-size: 0.75rem;
-  font-weight: 650;
-  text-decoration: none;
-  transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
-}
-
-.nav-cases-link:hover {
-  background: var(--brand-tint);
-  border-color: var(--brand-ring);
-  color: var(--brand);
 }
 
 .session-label {
@@ -1570,7 +1553,7 @@ body.room.is-ready-to-end .voice-controls {
 
   .topbar {
     position: sticky;
-    top: 0;
+    top: 64px;
   }
 
   .session-mode,
@@ -1616,11 +1599,11 @@ body.room.is-ready-to-end .voice-controls {
 
 @media (max-width: 640px) {
   body.room {
-    /* Two toolbar rows, so the toast rail clears both. */
-    --room-bar-h: 108px;
+    --room-bar-h: 118px;
   }
 
   .topbar {
+    top: 58px;
     padding: 6px 14px;
   }
 
@@ -1631,17 +1614,8 @@ body.room.is-ready-to-end .voice-controls {
     justify-content: space-between;
   }
 
-  .session-label,
-  .brand-name {
+  .session-label {
     display: none;
-  }
-
-  .nav-cases-link span {
-    display: none;
-  }
-
-  .nav-cases-link {
-    padding: 6px 9px;
   }
 
   .timer {

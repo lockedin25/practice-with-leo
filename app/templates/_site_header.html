@@ -1,5 +1,5 @@
-{# The one site header. Pages set nav_active, and optionally context_badge,
-   show_transcript_link (debrief) or show_viewer (admin). #}
+{# The one invariant site header. Page context and task-specific actions belong
+   inside page content or a secondary toolbar, never in global navigation. #}
 {% set nav = [
   ("/", "home", "Home"),
   ("/cases", "cases", "Case library"),
@@ -10,10 +10,6 @@
   <div class="nav-inner shell">
     {% with grad_id = "nav" %}{% include "_brand.html" %}{% endwith %}
 
-    {% if context_badge is defined and context_badge %}
-      <span class="context-badge">{{ context_badge }}</span>
-    {% endif %}
-
     <nav class="nav-links" aria-label="Primary">
       {% for href, key, label in nav %}
         <a href="{{ href }}" class="nav-link{% if nav_active|default('') == key %} active{% endif %}"
@@ -22,22 +18,10 @@
     </nav>
 
     <div class="nav-actions">
-      {% if show_transcript_link|default(false) %}
-        <a class="btn btn-ghost btn-sm" id="transcript-link" href="/practice">View transcript</a>
-      {% endif %}
-      {% if show_viewer|default(false) %}
-        <div class="person" id="viewer"></div>
-      {% endif %}
-
       {% include "_theme_toggle.html" %}
       {% include "_user_menu.html" %}
 
       <a class="btn btn-secondary btn-sm{% if user %} hidden{% endif %}" id="auth-signin-link" href="/login?next={{ signin_next|default('/practice') }}">Sign in</a>
-      {# On the library itself, this CTA only repeats the current destination
-         and crowds the account controls. The page content is the chooser. #}
-      {% if nav_active|default('') != 'cases' %}
-        <a href="/cases" class="btn btn-primary btn-sm nav-cta">Browse cases <span class="arrow">→</span></a>
-      {% endif %}
 
       {# Phone navigation. Without this, Practice room and Your progress
          vanish below the tablet breakpoint. #}

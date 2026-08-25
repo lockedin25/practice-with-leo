@@ -503,15 +503,6 @@
   font-size: 0.8125rem;
 }
 
-/* The persistent header action is navigation, not a page-level CTA. */
-.nav-cta {
-  min-height: 34px;
-  height: 34px;
-  padding: 0 13px;
-  font-size: 0.8125rem;
-  line-height: 1;
-}
-
 .btn-primary {
   background: var(--brand-primary);
   color: #ffffff;
@@ -1203,21 +1194,6 @@ ol {
   border-radius: inherit;
 }
 
-/* --- Context badge (Admin console, Case debrief) -------------------------- */
-.context-badge {
-  flex: none;
-  padding: 4px 10px;
-  border: 1px solid var(--line-base);
-  border-radius: var(--r-pill);
-  background: var(--brand-tint);
-  color: var(--brand-primary);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
 /* --- Account chip -------------------------------------------------------- */
 .user-name-label {
   max-width: 140px;
@@ -1324,9 +1300,6 @@ ol {
     gap: 12px;
   }
 
-  .nav-cta {
-    display: none;
-  }
 }
 
 @media (max-width: 640px) {
@@ -1339,8 +1312,7 @@ ol {
     gap: 8px;
   }
 
-  .brand-badge,
-  .context-badge {
+  .brand-badge {
     display: none;
   }
 
@@ -1352,8 +1324,7 @@ ol {
      toggle off screen. On a phone the header carries the wordmark, the account
      chip and the menu; the theme control and sign-in live in the menu sheet. */
   .nav-actions #theme-toggle,
-  .nav-actions #auth-signin-link,
-  .nav-actions #transcript-link {
+  .nav-actions #auth-signin-link {
     display: none;
   }
 

@@ -47,6 +47,15 @@ const state = {
   // a few hundred milliseconds to mint a credential and shake hands. Buffering
   // is what stops those opening words being lost.
   pendingFrames: [],
+  // The microphone graph is built once per session and left running; this gate
+  // decides whether its frames are forwarded. Re-acquiring the device per turn
+  // restarted echo cancellation, noise suppression and auto gain each time, and
+  // their convergence ramp landed exactly on the candidate's opening words.
+  capturing: false,
+  // Per-turn counters. A lost turn is otherwise invisible: the candidate only
+  // sees "nothing was heard" and cannot tell whether the microphone, the socket
+  // or the recogniser dropped it.
+  stats: null,
   scribeReady: false,
   scribeReadyPromise: null,
   // Credentials for the NEXT utterance, fetched while Leo is still speaking so
@@ -366,9 +375,11 @@ function sendAudio(frame, { commit = false } = {}) {
     // utterance arrived clipped, or empty and reported as "nothing was heard".
     if (!commit && state.pendingFrames.length < MAX_PENDING_FRAMES) {
       state.pendingFrames.push(frame);
+      if (state.stats) state.stats.buffered += 1;
     }
     return;
   }
+  if (state.stats && !commit) state.stats.sent += 1;
   let binary = "";
   const bytes = new Uint8Array(frame.buffer, frame.byteOffset, frame.byteLength);
   for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]);
@@ -440,6 +451,33 @@ function connectScribe(url) {
   });
 }
 
+/* Build the capture graph once and leave it running for the session.
+ *
+ * Pressing space then costs nothing: no device acquisition, no worklet load, and
+ * no audio-processing warm-up. Frames are produced continuously and simply
+ * dropped on the floor while the gate is closed, so the stream the socket
+ * receives is already converged rather than starting from cold. */
+async function ensureMicrophone() {
+  if (state.workletNode) return;
+  if (!state.audioContext) state.audioContext = new AudioContext();
+  if (state.audioContext.state === "suspended") await state.audioContext.resume();
+  const [micStream] = await Promise.all([
+    navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+    }),
+    state.audioContext.audioWorklet.addModule("/static/pcm-recorder.worklet.js"),
+  ]);
+  state.micStream = micStream;
+  state.micSource = state.audioContext.createMediaStreamSource(micStream);
+  state.workletNode = new AudioWorkletNode(state.audioContext, "pcm-recorder", {
+    processorOptions: { targetSampleRate: state.config.sample_rate },
+  });
+  state.workletNode.port.onmessage = (event) => {
+    if (state.capturing) sendAudio(event.data);
+  };
+  state.micSource.connect(state.workletNode);
+}
+
 async function startRecording() {
   // Barge-in: the candidate speaking over Leo ends Leo's turn immediately.
   if (state.phase === "speaking") {
@@ -456,33 +494,20 @@ async function startRecording() {
   dispatch("leo:voice-caption", { text: "" });
 
   try {
-    if (!state.audioContext) state.audioContext = new AudioContext();
-    if (state.audioContext.state === "suspended") await state.audioContext.resume();
-    const [micStream] = await Promise.all([
-      navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-      }),
-      state.audioContext.audioWorklet.addModule("/static/pcm-recorder.worklet.js"),
-    ]);
-    state.micStream = micStream;
-
-    // Capture starts HERE, before the socket exists. Everything spoken from now
-    // is buffered by sendAudio and flushed the moment the socket confirms. The
-    // previous order awaited the credential mint and the handshake first, so a
-    // few hundred milliseconds of speech was discarded on every single turn.
-    state.micSource = state.audioContext.createMediaStreamSource(state.micStream);
-    state.workletNode = new AudioWorkletNode(state.audioContext, "pcm-recorder", {
-      processorOptions: { targetSampleRate: state.config.sample_rate },
-    });
-    state.workletNode.port.onmessage = (event) => sendAudio(event.data);
-    state.micSource.connect(state.workletNode);
-    setPhase("recording");
+    await ensureMicrophone();
   } catch (error) {
     console.error("Leo voice: microphone unavailable", error);
-    teardownMicrophone();
     setPhase("idle", { error: "The microphone could not be opened." });
     return;
   }
+
+  // Capture starts HERE, before the socket exists. Everything spoken from now is
+  // buffered by sendAudio and flushed the moment the socket confirms. Awaiting
+  // the credential mint and the handshake first discarded roughly 1.7s of every
+  // turn.
+  state.capturing = true;
+  state.stats = { startedAt: Date.now(), buffered: 0, sent: 0, socketReadyMs: null };
+  setPhase("recording");
 
   // Kept as a promise so a short utterance can wait for it before committing
   // rather than committing into a socket that is not up yet.
@@ -491,6 +516,7 @@ async function startRecording() {
     const socket = await connectScribe(sockets.stt_url);
     state.scribe = socket;
     state.scribeReady = true;
+    if (state.stats) state.stats.socketReadyMs = Date.now() - state.stats.startedAt;
     flushPendingFrames();
     // Warmed now so its handshake overlaps the rest of this utterance and Leo's
     // first sentence never waits on it.
@@ -501,7 +527,7 @@ async function startRecording() {
   state.scribeReadyPromise.catch((error) => {
     console.error("Leo voice: transcription could not start", error);
     state.pendingFrames = [];
-    teardownMicrophone();
+    state.capturing = false;
     state.scribe?.close();
     state.scribe = null;
     setPhase("idle", { error: error.message || "Voice could not start. Try again." });
@@ -524,7 +550,10 @@ function teardownMicrophone() {
 
 async function stopRecording({ discard = false } = {}) {
   if (state.phase !== "recording") return;
-  teardownMicrophone();
+  // Close the gate but leave the microphone graph running. Tearing the device
+  // down here is what forced a cold restart, and its audio-processing ramp, on
+  // every single turn.
+  state.capturing = false;
 
   if (discard) {
     state.pendingFrames = [];
@@ -557,6 +586,15 @@ async function stopRecording({ discard = false } = {}) {
   const { text, reason } = await waitForTranscript();
   state.scribe?.close();
   state.scribe = null;
+
+  const stats = state.stats || {};
+  console.info(
+    "[leo voice] turn:",
+    `spoke ${((Date.now() - (stats.startedAt || Date.now())) / 1000).toFixed(1)}s`,
+    `| socket ready ${stats.socketReadyMs ?? "?"}ms`,
+    `| frames buffered ${stats.buffered ?? 0} sent ${stats.sent ?? 0}`,
+    `| ${reason} -> ${text ? `${text.split(/\s+/).length} words` : "EMPTY"}`,
+  );
 
   if (!text) {
     // Distinguish a failure from genuine silence: telling someone "nothing was
@@ -599,14 +637,21 @@ function waitForTranscript(timeoutMs = 5000) {
 async function start(attemptId) {
   if (state.active) return;
   setPhase("connecting");
-  // Ask for the microphone before minting provider credentials, so a declined
-  // permission prompt costs nothing.
-  const probe = await navigator.mediaDevices.getUserMedia({ audio: true });
-  probe.getTracks().forEach((track) => track.stop());
-
   state.config = await api(`/api/attempts/${attemptId}/voice-realtime/session`, { method: "POST" });
   state.attemptId = attemptId;
   state.active = true;
+  // Open the microphone now rather than on the first press. This is also where
+  // a declined permission prompt surfaces, before any provider credential has
+  // been spent, and it leaves the audio-processing chain converged well before
+  // the candidate says anything.
+  try {
+    await ensureMicrophone();
+  } catch (error) {
+    state.active = false;
+    state.config = null;
+    setPhase("disconnected");
+    throw new Error("Leo needs microphone access to run a spoken case.");
+  }
   // Cover the first press as well as later ones.
   prefetchSockets();
   setPhase("idle");
@@ -618,8 +663,10 @@ async function end() {
   state.pendingFrames = [];
   state.scribeReady = false;
   state.nextSockets = null;
+  state.capturing = false;
   window.clearTimeout(state.audioWatchdog);
   settleTranscript("closed");
+  // Leaving voice mode is the only point the microphone is released.
   teardownMicrophone();
   stopPlayback();
   state.scribe?.close();

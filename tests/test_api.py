@@ -111,7 +111,8 @@ def test_practice_room_contains_the_conclusion_handoff() -> None:
     assert response.status_code == 200
     assert 'id="case-close-prompt"' in response.text
     assert 'id="complete-attempt"' in response.text
-    assert "End case and view debrief" in response.text
+    assert "Preparing your debrief" in response.text
+    assert "Open debrief now" in response.text
 
 
 def test_duplicate_turn_id_is_processed_once() -> None:

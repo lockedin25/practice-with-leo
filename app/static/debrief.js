@@ -177,13 +177,6 @@ function renderHeader(attempt) {
     caseInfo.difficulty ? `${titleCase(caseInfo.difficulty)} difficulty` : null,
   ].filter(Boolean);
   el.subtitle.textContent = parts.join(" \u00b7 ");
-  /* "View transcript" used to point at the live practice room, which is a
-   * different conversation. The profile drawer is where this attempt's
-   * transcript actually lives. */
-  const transcriptLink = document.querySelector("#transcript-link");
-  if (transcriptLink && caseInfo.id) {
-    transcriptLink.href = `/profile?case=${encodeURIComponent(caseInfo.id)}`;
-  }
 }
 
 /* The five dimension names are listed in full immediately below, so the
