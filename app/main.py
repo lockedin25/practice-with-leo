@@ -855,17 +855,28 @@ def _realtime_voice_settings() -> RealtimeVoiceSettings:
     return RealtimeVoiceSettings.from_environment()
 
 
-@app.post("/api/attempts/{attempt_id}/voice-realtime/session")
-def create_realtime_voice_session(
-    attempt_id: str, user: User = Depends(require_user)
-) -> dict[str, object]:
-    """Hand the browser two short-lived speech credentials and nothing more.
+def _realtime_socket_urls(
+    realtime: RealtimeVoiceSettings, session: InterviewSession
+) -> dict[str, str]:
+    """Mint one fresh credential per socket and return the URLs that carry them.
 
-    The workspace API key stays here. Single-use tokens expire in fifteen
-    minutes and are consumed on use, so they are minted per utterance rather
-    than once per case, and the browser opens both sockets itself: proxying the
-    audio through this process would add a network hop to every spoken turn.
+    ElevenLabs single-use tokens are consumed by the connection that uses them,
+    so a pair cannot be handed out once and reused for the rest of the case: the
+    second utterance would open a socket that closes immediately. The browser
+    therefore asks for a new pair before every utterance, and the two mints run
+    concurrently behind the microphone warming up, which is why this costs
+    nothing the candidate can hear.
     """
+    tokens = REALTIME_VOICE_PROVIDER.mint_tokens(realtime, SCRIBE_TOKEN, TTS_TOKEN)
+    return {
+        "stt_url": speech_to_text_url(
+            realtime, tokens[SCRIBE_TOKEN], keyterms=case_keyterms(session.case)
+        ),
+        "tts_url": text_to_speech_url(realtime, tokens[TTS_TOKEN]),
+    }
+
+
+def _realtime_session(attempt_id: str, user: User) -> tuple[RealtimeVoiceSettings, InterviewSession]:
     realtime = _realtime_voice_settings()
     session = _session(attempt_id, user)
     if session.ended:
@@ -874,29 +885,46 @@ def create_realtime_voice_session(
         raise HTTPException(
             status_code=503, detail="Leo voice is temporarily unavailable. Please use chat."
         )
+    return realtime, session
+
+
+@app.post("/api/attempts/{attempt_id}/voice-realtime/session")
+def create_realtime_voice_session(
+    attempt_id: str, user: User = Depends(require_user)
+) -> dict[str, object]:
+    """Describe the transport once, without issuing anything spendable.
+
+    The workspace API key stays here. Credentials are per utterance and come
+    from the sockets route below; this response is only the shape of the
+    session, so it can be cached by the browser for the whole case.
+    """
+    realtime, session = _realtime_session(attempt_id, user)
+    return {
+        "attempt_id": session.id,
+        "transport": "realtime",
+        "sample_rate": realtime.sample_rate,
+        "tts_output_format": realtime.tts_output_format,
+        "sockets_url": f"/api/attempts/{session.id}/voice-realtime/sockets",
+        "turn_stream_url": f"/api/attempts/{session.id}/turn/stream",
+        "voice_intro": _voice_intro(session),
+        "case_started": session.case_started,
+    }
+
+
+@app.post("/api/attempts/{attempt_id}/voice-realtime/sockets")
+def issue_realtime_sockets(
+    attempt_id: str, user: User = Depends(require_user)
+) -> dict[str, object]:
+    """Issue a fresh, single-use socket pair for one utterance."""
+    realtime, session = _realtime_session(attempt_id, user)
     try:
-        tokens = REALTIME_VOICE_PROVIDER.mint_tokens(realtime, SCRIBE_TOKEN, TTS_TOKEN)
-        scribe_token, tts_token = tokens[SCRIBE_TOKEN], tokens[TTS_TOKEN]
+        return _realtime_socket_urls(realtime, session)
     except VoiceConfigurationError as error:
         raise HTTPException(status_code=503, detail=str(error)) from error
     except VoiceProviderError as error:
         raise HTTPException(
             status_code=503, detail="Leo voice is temporarily unavailable. Please use chat."
         ) from error
-
-    return {
-        "attempt_id": session.id,
-        "transport": "realtime",
-        "sample_rate": realtime.sample_rate,
-        "stt_url": speech_to_text_url(
-            realtime, scribe_token, keyterms=case_keyterms(session.case)
-        ),
-        "tts_url": text_to_speech_url(realtime, tts_token),
-        "tts_output_format": realtime.tts_output_format,
-        "turn_stream_url": f"/api/attempts/{session.id}/turn/stream",
-        "voice_intro": _voice_intro(session),
-        "case_started": session.case_started,
-    }
 
 
 def _sse_event(name: str, payload: object) -> str:

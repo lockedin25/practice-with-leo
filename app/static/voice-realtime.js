@@ -116,10 +116,10 @@ function stopPlayback() {
   state.playHead = state.audioContext ? state.audioContext.currentTime : 0;
 }
 
-function openSynthesisSocket() {
+function openSynthesisSocket(url) {
   // Opened before Leo has any words so the handshake overlaps the candidate
   // still speaking. By the time a sentence exists the socket is warm.
-  const socket = new WebSocket(state.config.tts_url);
+  const socket = new WebSocket(url);
   state.speechBroken = false;
   socket.onopen = () => {
     socket.send(
@@ -294,8 +294,7 @@ function settleTranscript(reason) {
   waiter.resolve({ text: state.transcript.trim(), reason });
 }
 
-function openScribeSocket() {
-  const socket = new WebSocket(state.config.stt_url);
+function attachScribeHandlers(socket) {
   socket.onmessage = (event) => {
     let payload;
     try {
@@ -304,6 +303,11 @@ function openScribeSocket() {
       return;
     }
     const type = payload.message_type || payload.type;
+    if (type === "session_started") {
+      // Proof the credential was accepted, not merely that a socket opened.
+      socket.dispatchEvent(new Event("leo:scribe-ready"));
+      return;
+    }
     if (type === "partial_transcript") {
       state.interim = payload.text || payload.transcript || "";
       dispatch("leo:voice-caption", { text: `${state.transcript} ${state.interim}`.trim() });
@@ -349,6 +353,38 @@ function sendAudio(frame, { commit = false } = {}) {
   );
 }
 
+/* Sockets must be confirmed live before the candidate is told to speak.
+ *
+ * A spent or rejected token closes the socket the instant it opens. Recording
+ * into that produced the worst possible failure: the candidate talks, waits out
+ * the transcript timeout, and is then told nothing was heard, which sends them
+ * to check a microphone that was working perfectly. */
+function openScribeAndConfirm(url) {
+  return new Promise((resolve, reject) => {
+    const socket = attachScribeHandlers(new WebSocket(url));
+    const settled = { done: false };
+    const finish = (fn, value) => {
+      if (settled.done) return;
+      settled.done = true;
+      window.clearTimeout(timer);
+      fn(value);
+    };
+    const timer = window.setTimeout(
+      () => finish(reject, new Error("The transcription service did not respond.")),
+      6000,
+    );
+    // session_started, not merely onopen: an accepted TCP connection with a
+    // rejected credential still opens before it closes.
+    socket.addEventListener("leo:scribe-ready", () => finish(resolve, socket), { once: true });
+    socket.addEventListener("close", () =>
+      finish(reject, new Error("Transcription could not start. Try again.")),
+    );
+    socket.addEventListener("error", () =>
+      finish(reject, new Error("The transcription service could not be reached.")),
+    );
+  });
+}
+
 async function startRecording() {
   // Barge-in: the candidate speaking over Leo ends Leo's turn immediately.
   if (state.phase === "speaking") {
@@ -361,27 +397,45 @@ async function startRecording() {
   state.audioArrived = false;
   window.clearTimeout(state.audioWatchdog);
   dispatch("leo:voice-caption", { text: "" });
+  setPhase("connecting");
 
-  if (!state.audioContext) state.audioContext = new AudioContext();
-  if (state.audioContext.state === "suspended") await state.audioContext.resume();
+  try {
+    if (!state.audioContext) state.audioContext = new AudioContext();
+    if (state.audioContext.state === "suspended") await state.audioContext.resume();
 
-  state.micStream = await navigator.mediaDevices.getUserMedia({
-    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-  });
-  await state.audioContext.audioWorklet.addModule("/static/pcm-recorder.worklet.js");
+    // Fresh credentials for this utterance, fetched alongside the microphone
+    // coming up. Single-use tokens are consumed by the socket that uses them,
+    // so the pair from the previous turn is already spent. Running the mint
+    // concurrently with getUserMedia and the worklet load keeps it inaudible.
+    const [sockets, micStream] = await Promise.all([
+      api(state.config.sockets_url, { method: "POST" }),
+      navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      }),
+      state.audioContext.audioWorklet.addModule("/static/pcm-recorder.worklet.js"),
+    ]);
+    state.micStream = micStream;
 
-  state.scribe = openScribeSocket();
-  // Warm the synthesis socket now: its handshake costs nothing while the
-  // candidate is still talking, and Leo's first sentence will not wait for it.
-  if (!state.tts) state.tts = openSynthesisSocket();
+    state.scribe = await openScribeAndConfirm(sockets.stt_url);
+    // Warmed now so its handshake overlaps the candidate talking, and Leo's
+    // first sentence never waits on it.
+    closeSynthesis();
+    state.tts = openSynthesisSocket(sockets.tts_url);
 
-  state.micSource = state.audioContext.createMediaStreamSource(state.micStream);
-  state.workletNode = new AudioWorkletNode(state.audioContext, "pcm-recorder", {
-    processorOptions: { targetSampleRate: state.config.sample_rate },
-  });
-  state.workletNode.port.onmessage = (event) => sendAudio(event.data);
-  state.micSource.connect(state.workletNode);
-  setPhase("recording");
+    state.micSource = state.audioContext.createMediaStreamSource(state.micStream);
+    state.workletNode = new AudioWorkletNode(state.audioContext, "pcm-recorder", {
+      processorOptions: { targetSampleRate: state.config.sample_rate },
+    });
+    state.workletNode.port.onmessage = (event) => sendAudio(event.data);
+    state.micSource.connect(state.workletNode);
+    setPhase("recording");
+  } catch (error) {
+    console.error("Leo voice: could not start recording", error);
+    teardownMicrophone();
+    state.scribe?.close();
+    state.scribe = null;
+    setPhase("idle", { error: error.message || "Voice could not start. Try again." });
+  }
 }
 
 function teardownMicrophone() {

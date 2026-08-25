@@ -124,24 +124,71 @@ def test_socket_urls_carry_the_single_use_token_and_never_the_api_key(monkeypatc
     assert "test-key" not in stt and "test-key" not in tts
 
 
-def test_a_realtime_session_mints_two_tokens_and_returns_no_credentials(monkeypatch) -> None:
+def test_the_session_route_describes_the_transport_without_issuing_anything(monkeypatch) -> None:
+    """Session setup must not hand out a credential it cannot replace."""
     _enable_realtime(monkeypatch)
     monkeypatch.setattr(main, "SPOKEN_INTERVIEWER", StubSpokenInterviewer())
-    minted: list[str] = []
 
-    def mint(_self, settings, token_type):
-        minted.append(token_type)
-        return f"sutkn_{token_type}"
+    def explode(_self, _settings, _token_type):
+        raise AssertionError("the session route must not mint tokens")
 
-    monkeypatch.setattr(main.REALTIME_VOICE_PROVIDER, "mint_token", mint.__get__(main.REALTIME_VOICE_PROVIDER))
+    monkeypatch.setattr(type(main.REALTIME_VOICE_PROVIDER), "mint_token", explode)
     client = _client()
     attempt_id = client.post("/api/attempts", json={}).json()["id"]
 
     body = client.post(f"/api/attempts/{attempt_id}/voice-realtime/session").json()
 
-    assert sorted(minted) == ["realtime_scribe", "tts_websocket"]
     assert body["sample_rate"] == 16_000
+    assert body["sockets_url"] == f"/api/attempts/{attempt_id}/voice-realtime/sockets"
     assert body["turn_stream_url"] == f"/api/attempts/{attempt_id}/turn/stream"
+    # Nothing spendable, so nothing to go stale between utterances.
+    assert "stt_url" not in body and "tts_url" not in body
+
+
+def test_every_utterance_gets_a_freshly_minted_socket_pair(monkeypatch) -> None:
+    """The regression: a single-use token is consumed by the socket that uses it.
+
+    Reusing one pair for the whole case meant the second utterance opened a
+    socket that closed instantly, and the candidate was told nothing was heard
+    after speaking into it.
+    """
+    _enable_realtime(monkeypatch)
+    monkeypatch.setattr(main, "SPOKEN_INTERVIEWER", StubSpokenInterviewer())
+    issued = []
+
+    def mint(_self, _settings, token_type):
+        issued.append(token_type)
+        return f"sutkn_{token_type}_{len(issued)}"
+
+    monkeypatch.setattr(type(main.REALTIME_VOICE_PROVIDER), "mint_token", mint)
+    client = _client()
+    attempt_id = client.post("/api/attempts", json={}).json()["id"]
+    url = f"/api/attempts/{attempt_id}/voice-realtime/sockets"
+
+    first = client.post(url).json()
+    second = client.post(url).json()
+
+    assert len(issued) == 4, "two utterances need two pairs, not one reused pair"
+    assert first["stt_url"] != second["stt_url"]
+    assert first["tts_url"] != second["tts_url"]
+    assert "test-key" not in json.dumps([first, second])
+
+
+def test_socket_urls_never_carry_the_workspace_key(monkeypatch) -> None:
+    _enable_realtime(monkeypatch)
+    monkeypatch.setattr(main, "SPOKEN_INTERVIEWER", StubSpokenInterviewer())
+    monkeypatch.setattr(
+        type(main.REALTIME_VOICE_PROVIDER),
+        "mint_token",
+        lambda _self, _settings, token_type: f"sutkn_{token_type}",
+    )
+    client = _client()
+    attempt_id = client.post("/api/attempts", json={}).json()["id"]
+
+    body = client.post(f"/api/attempts/{attempt_id}/voice-realtime/sockets").json()
+
+    assert "commit_strategy=manual" in body["stt_url"]
+    assert "auto_mode=true" in body["tts_url"]
     assert "test-key" not in json.dumps(body)
 
 
@@ -197,7 +244,7 @@ def test_a_provider_outage_degrades_to_chat_without_leaking_the_reason(monkeypat
     client = _client()
     attempt_id = client.post("/api/attempts", json={}).json()["id"]
 
-    response = client.post(f"/api/attempts/{attempt_id}/voice-realtime/session")
+    response = client.post(f"/api/attempts/{attempt_id}/voice-realtime/sockets")
 
     assert response.status_code == 503
     assert "sk-live" not in response.text

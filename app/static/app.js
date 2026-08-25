@@ -668,13 +668,36 @@ function setEndedState(ended) {
 
 /* --- Voice mode --------------------------------------------------------- */
 
-function updateVoiceCaption() {
-  if (!el.captionText || !state.attempt?.messages?.length) return;
-  const last = state.attempt.messages[state.attempt.messages.length - 1];
-  if (last) {
-    const isUser = last.role === "candidate";
-    el.captionText.innerHTML = `<strong>${isUser ? "You" : "Leo"}:</strong> ${last.content}`;
+/* The caption is live interim speech and nothing else.
+ *
+ * It used to fall back to echoing the last transcript message, which meant the
+ * HUD permanently mirrored the conversation below it: Leo's case brief rendered
+ * twice, several lines tall, pushing the real transcript out of view. Its only
+ * job is to show what the candidate is saying in the window before that turn
+ * exists as a message. Once it does, the transcript is the record. */
+/* Roughly two lines at the caption's size. Long enough to confirm recognition
+ * is tracking, short enough that the HUD never grows. */
+const CAPTION_TAIL = 150;
+
+function setVoiceCaption(text = "") {
+  if (!el.captionText) return;
+  let visible = text;
+  if (visible.length > CAPTION_TAIL) {
+    // Keep the tail, not the head. Thirty seconds into an answer, the opening
+    // words are worthless; the point of a live caption is confirming that what
+    // you just said was heard. Cut on a word boundary so it does not flicker
+    // mid-word as each interim update arrives.
+    const tail = visible.slice(-CAPTION_TAIL);
+    const boundary = tail.indexOf(" ");
+    visible = `…${boundary === -1 ? tail : tail.slice(boundary + 1)}`;
   }
+  // Never innerHTML: this carries speech-recognition output.
+  el.captionText.textContent = visible;
+  el.captionText.classList.toggle("is-empty", !visible);
+}
+
+function clearVoiceCaption() {
+  setVoiceCaption("");
 }
 
 function setVoiceState(status = "chat") {
@@ -736,7 +759,9 @@ function setVoiceState(status = "chat") {
     el.voiceTalk.disabled = ["connecting", "transcribing", "thinking"].includes(status);
   }
 
-  updateVoiceCaption();
+  // Interim speech belongs to the turn being spoken. Leaving the last utterance
+  // on screen while Leo answers reads as though he is still hearing it.
+  if (!["recording", "transcribing"].includes(status)) clearVoiceCaption();
   if (active) {
     scrollToLatest({ force: true });
   }
@@ -839,13 +864,7 @@ window.addEventListener("leo:voice-status", (event) => {
 
 /* Live transcription of the candidate, before any turn has been submitted. */
 window.addEventListener("leo:voice-caption", (event) => {
-  if (!el.captionText) return;
-  const text = event.detail?.text || "";
-  if (!text) {
-    updateVoiceCaption();
-    return;
-  }
-  el.captionText.innerHTML = `<strong>You:</strong> ${text}`;
+  setVoiceCaption(event.detail?.text || "");
 });
 
 /* The transcript the candidate committed, shown before Leo's reply lands. */
@@ -892,7 +911,6 @@ window.addEventListener("leo:voice-sync", async () => {
   try {
     const updated = await request(`/api/attempts/${state.attempt.id}`);
     renderAttempt(updated);
-    updateVoiceCaption();
   } catch {
     // The provider can disconnect independently; the chat UI remains usable.
   }

@@ -1000,20 +1000,33 @@ kbd {
   opacity: 0.7;
 }
 
-/* Interim transcription. Reserving a line stops the HUD from reflowing on the
-   first word the candidate says. */
+/* Interim transcription, capped at two lines.
+ *
+ * The HUD sits above the scrolling transcript rather than inside it, so any
+ * growth here comes straight out of the conversation's height. A long spoken
+ * answer must not be able to push the transcript off screen, so the caption
+ * clamps and keeps the most recent words visible. Reserving the height stops
+ * the HUD reflowing on the first word spoken. */
 .voice-hud .voice-caption {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   margin: 0;
-  min-height: 1.35em;
+  /* Two lines at this line-height, so the HUD is exactly as tall with a caption
+     as without one and never nudges the transcript mid-sentence. */
+  min-height: 2.8em;
   max-width: var(--room-measure);
   font-size: 0.75rem;
   line-height: 1.4;
   color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
 }
 
-.voice-hud .voice-caption strong {
-  color: var(--ink-3);
-  font-weight: 650;
+/* Holds its height when empty so the layout is identical before and after the
+   first word, rather than nudging everything down mid-sentence. */
+.voice-hud .voice-caption.is-empty::after {
+  content: "";
 }
 
 .voice-dialog {
