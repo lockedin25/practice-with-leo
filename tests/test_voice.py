@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import json
 import time
+from uuid import uuid4
 
 from fastapi.testclient import TestClient
 import pytest
@@ -16,7 +17,10 @@ from conftest import sign_in
 
 def _client() -> TestClient:
     client = TestClient(main.app)
-    sign_in(client, "voice-candidate@casecall.test")
+    # A fresh candidate per test. One open attempt per user and case is
+    # intended product behaviour, so a shared identity makes every attempt
+    # after the first return 409 once a test has started one.
+    sign_in(client, f"voice-candidate-{uuid4()}@casecall.test")
     return client
 
 

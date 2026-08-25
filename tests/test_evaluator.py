@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from uuid import uuid4
 
 import pytest
 from fastapi.testclient import TestClient
@@ -436,7 +437,9 @@ def evaluation_api(monkeypatch, stub_interviewer):
     monkeypatch.setattr(main, "EVALUATOR", stub)
     main.app.state.evaluator = stub
     client = TestClient(main.app)
-    sign_in(client, "evaluator-api@casecall.test")
+    # Fresh candidate per fixture use: one open attempt per user and case is
+    # intended, so a shared identity 409s on the second test to use this.
+    sign_in(client, f"evaluator-api-{uuid4()}@casecall.test")
     started = client.post("/api/attempts", json={})
     assert started.status_code == 200
     attempt_id = started.json()["id"]
@@ -472,10 +475,12 @@ def test_end_returns_the_evaluation_report_and_stores_it(evaluation_api) -> None
 
 
 def test_evaluation_of_an_open_attempt_is_rejected(evaluation_api) -> None:
-    client, _, _ = evaluation_api
-    started = client.post("/api/attempts", json={})
+    # The fixture's attempt has taken a turn but has never been ended, so it is
+    # already the open attempt this test needs. Starting a second one would be
+    # refused anyway: one attempt per candidate per case.
+    client, attempt_id, _ = evaluation_api
 
-    response = client.get(f"/api/attempts/{started.json()['id']}/evaluation")
+    response = client.get(f"/api/attempts/{attempt_id}/evaluation")
 
     assert response.status_code == 409
 

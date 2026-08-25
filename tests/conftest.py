@@ -71,6 +71,15 @@ def _authentication_stays_real(monkeypatch):
 
     main.app.dependency_overrides.pop(require_user, None)
     monkeypatch.setattr(main, "VOICE_ONBOARDING", ReadyOnboarding())
+
+    # A developer .env is loaded on import, so a real evaluator exists during
+    # tests and any unstubbed /end would make a live, billable LLM call and
+    # block until it returned. Ending an attempt with no evaluator is an
+    # already-supported path: the deterministic scorecard fills in. Tests that
+    # need an evaluator install their own after this fixture, which wins.
+    monkeypatch.setattr(main, "EVALUATOR", None)
+    monkeypatch.setattr(main.app.state, "evaluator", None, raising=False)
+
     yield
     main.app.dependency_overrides.pop(require_user, None)
 

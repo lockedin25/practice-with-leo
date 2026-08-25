@@ -8,8 +8,11 @@ import app.main as main
 from conftest import sign_in
 
 
-def _start(client) -> str:
-    started = client.post("/api/attempts", json={})
+def _start(client, case_id: str | None = None) -> str:
+    # A candidate may hold only one attempt per case, so a test that needs two
+    # attempts for one person must spread them across two cases.
+    payload = {} if case_id is None else {"case_id": case_id}
+    started = client.post("/api/attempts", json=payload)
     assert started.status_code == 200
     return started.json()["id"]
 
@@ -73,7 +76,7 @@ def test_the_overview_counts_attempts_and_completion(admin_client) -> None:
     candidate = TestClient(main.app)
     owner = sign_in(candidate, "metrics@casecall.test", name="Metrics Candidate")
     first = _start(candidate)
-    _start(candidate)
+    _start(candidate, "clearcart-v1")
     assert candidate.post(f"/api/attempts/{first}/end").status_code == 200
 
     totals = admin.get("/api/admin/overview").json()["totals"]
