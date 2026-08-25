@@ -284,11 +284,16 @@ class LangChainCaseInterviewer:
                     "candidate_turn": candidate_turn,
                 }
             )
+            max_facts = 1 if is_early_precision_turn else 2
+            # Truncate to the cap before validating. validate_fact_selection
+            # slices in authored order, so an over-selection could otherwise
+            # keep the director's third choice and drop its second, leaving the
+            # reply narrating a fact the ledger never recorded.
             facts = session.case.validate_fact_selection(
-                decision.fact_ids,
+                decision.fact_ids[:max_facts],
                 session.stage,
                 session.disclosed_ids,
-                max_facts=1 if is_early_precision_turn else 2,
+                max_facts=max_facts,
             )
             next_phase = (
                 session.stage

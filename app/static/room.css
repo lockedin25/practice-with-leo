@@ -933,6 +933,9 @@ kbd {
 
 .voice-hud-actions {
   flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btn-voice-action {
@@ -955,6 +958,62 @@ kbd {
   background: var(--sunken);
   border-color: var(--brand);
   color: var(--ink);
+}
+
+.btn-voice-action:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.btn-voice-action:disabled:hover {
+  background: var(--surface);
+  border-color: var(--line-strong);
+  color: var(--ink-2);
+}
+
+/* The push-to-talk control is the primary action while voice is live, so it
+   reads as filled rather than as one more ghost button. */
+.btn-voice-talk {
+  border-color: var(--brand);
+  color: var(--ink);
+}
+
+.btn-voice-talk.is-recording {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--surface);
+}
+
+.btn-voice-talk.is-recording:hover {
+  background: var(--brand);
+  color: var(--surface);
+}
+
+.voice-kbd {
+  padding: 1px 5px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.625rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+}
+
+/* Interim transcription. Reserving a line stops the HUD from reflowing on the
+   first word the candidate says. */
+.voice-hud .voice-caption {
+  margin: 0;
+  min-height: 1.35em;
+  max-width: var(--room-measure);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+.voice-hud .voice-caption strong {
+  color: var(--ink-3);
+  font-weight: 650;
 }
 
 .voice-dialog {

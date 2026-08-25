@@ -69,22 +69,35 @@ def _enable_native_voice(monkeypatch) -> None:
 
 def test_voice_session_route_is_hidden_until_feature_is_enabled(monkeypatch) -> None:
     monkeypatch.setenv("VOICE_ENABLED", "false")
+    # Pin the transport rather than inheriting whatever the developer's .env
+    # happens to say: status now reports the mode so the browser can pick an
+    # island, and that must not make this assertion environment-dependent.
+    monkeypatch.setenv("ELEVENLABS_VOICE_MODE", "custom")
     client = _client()
     attempt_id = client.post("/api/attempts", json={}).json()["id"]
 
     response = client.post(f"/api/attempts/{attempt_id}/voice-sessions")
 
     assert response.status_code == 404
-    assert client.get("/api/voice/status").json() == {"enabled": False, "ready": False}
+    assert client.get("/api/voice/status").json() == {
+        "enabled": False,
+        "mode": "custom",
+        "ready": False,
+    }
 
 
 def test_voice_status_needs_the_adapter_secret_before_the_browser_can_start(monkeypatch) -> None:
     monkeypatch.setenv("VOICE_ENABLED", "true")
     monkeypatch.setenv("ELEVENLABS_API_KEY", "test-key")
     monkeypatch.setenv("ELEVENLABS_AGENT_ID", "agent_leo_test")
+    monkeypatch.setenv("ELEVENLABS_VOICE_MODE", "custom")
     monkeypatch.delenv("ELEVENLABS_CUSTOM_LLM_SECRET", raising=False)
 
-    assert _client().get("/api/voice/status").json() == {"enabled": True, "ready": False}
+    assert _client().get("/api/voice/status").json() == {
+        "enabled": True,
+        "mode": "custom",
+        "ready": False,
+    }
 
 
 def test_voice_session_issues_only_a_browser_safe_conversation_token(monkeypatch) -> None:

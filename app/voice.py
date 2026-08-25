@@ -50,19 +50,33 @@ class VoiceSettings:
     def uses_native_agent(self) -> bool:
         return self.mode == "native"
 
+    @property
+    def uses_realtime_speech(self) -> bool:
+        """Push-to-talk over the raw Scribe and TTS endpoints, with no Agent.
+
+        Nothing calls back into this server in realtime mode, so it needs no
+        agent, no Custom LLM secret, and no public HTTPS tunnel.
+        """
+        return self.mode == "realtime"
+
+    @property
+    def uses_agent(self) -> bool:
+        return self.mode in {"custom", "native"}
+
     def assert_mode_configuration(self) -> None:
-        if self.mode not in {"custom", "native"}:
-            raise VoiceConfigurationError("ELEVENLABS_VOICE_MODE must be either 'custom' or 'native'")
+        if self.mode not in {"custom", "native", "realtime"}:
+            raise VoiceConfigurationError(
+                "ELEVENLABS_VOICE_MODE must be 'custom', 'native', or 'realtime'"
+            )
         if self.uses_native_agent and not self.case_tool_secret:
             raise VoiceConfigurationError("Missing voice configuration: ELEVENLABS_CASE_TOOL_SECRET")
 
     def assert_token_configuration(self) -> None:
         self.assert_mode_configuration()
-        missing = [
-            name
-            for name, value in (("ELEVENLABS_API_KEY", self.api_key), ("ELEVENLABS_AGENT_ID", self.agent_id))
-            if not value
-        ]
+        required = [("ELEVENLABS_API_KEY", self.api_key)]
+        if self.uses_agent:
+            required.append(("ELEVENLABS_AGENT_ID", self.agent_id))
+        missing = [name for name, value in required if not value]
         if missing:
             raise VoiceConfigurationError("Missing voice configuration: " + ", ".join(missing))
 

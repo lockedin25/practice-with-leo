@@ -35,6 +35,16 @@ from app.voice import (
     voice_session_id_from_request,
 )
 from app.voice_onboarding import VoiceOnboardingUnavailable, create_voice_onboarding
+from app.voice_realtime import (
+    SCRIBE_TOKEN,
+    TTS_TOKEN,
+    ElevenLabsRealtimeProvider,
+    RealtimeVoiceSettings,
+    case_keyterms,
+    speech_to_text_url,
+    text_to_speech_url,
+)
+from app.spoken_interviewer import ControlBlockMissing, create_spoken_interviewer
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -50,6 +60,11 @@ ACCOUNTS = AccountStore(DATABASE_PATH)
 STORE.backfill_attempt_users()
 ATTEMPT_TURNS = AttemptTurnService()
 VOICE_PROVIDER = ElevenLabsProvider()
+REALTIME_VOICE_PROVIDER = ElevenLabsRealtimeProvider()
+# One fused streaming call per spoken turn. None when no Anthropic
+# credentials exist, in which case realtime voice reports itself unready
+# and the candidate keeps typed chat.
+SPOKEN_INTERVIEWER = create_spoken_interviewer()
 # Built only when the candidate replies to Leo's welcome. Readiness is shared
 # by typed chat and voice, and remains LLM-led rather than keyword-driven.
 VOICE_ONBOARDING = None
@@ -794,20 +809,178 @@ def create_voice_session(attempt_id: str, user: User = Depends(require_user)) ->
 
 
 @app.get("/api/voice/status")
-def voice_status(_: User = Depends(require_user)) -> dict[str, bool]:
+def voice_status(_: User = Depends(require_user)) -> dict[str, object]:
     """Expose capability state, never credentials or agent configuration."""
     settings = VoiceSettings.from_environment()
+    if settings.uses_realtime_speech:
+        realtime = RealtimeVoiceSettings.from_environment()
+        return {
+            "enabled": settings.enabled,
+            "mode": settings.mode,
+            # Push-to-talk needs a voice and a fused interviewer. Without either
+            # the browser must not offer a control that cannot complete a turn.
+            "ready": bool(
+                settings.enabled and realtime.is_configured and SPOKEN_INTERVIEWER is not None
+            ),
+        }
     adapter_ready = bool(settings.custom_llm_secret) if not settings.uses_native_agent else bool(settings.case_tool_secret)
     return {
         "enabled": settings.enabled,
+        "mode": settings.mode,
         "ready": bool(
             settings.enabled
-            and settings.mode in {"custom", "native"}
+            and settings.uses_agent
             and settings.api_key
             and settings.agent_id
             and adapter_ready
         ),
     }
+
+
+# --- Realtime push-to-talk ------------------------------------------------
+
+
+def _realtime_voice_settings() -> RealtimeVoiceSettings:
+    settings = _voice_settings()
+    if not settings.uses_realtime_speech:
+        raise HTTPException(status_code=404, detail="Realtime voice practice is not enabled")
+    return RealtimeVoiceSettings.from_environment()
+
+
+@app.post("/api/attempts/{attempt_id}/voice-realtime/session")
+def create_realtime_voice_session(
+    attempt_id: str, user: User = Depends(require_user)
+) -> dict[str, object]:
+    """Hand the browser two short-lived speech credentials and nothing more.
+
+    The workspace API key stays here. Single-use tokens expire in fifteen
+    minutes and are consumed on use, so they are minted per utterance rather
+    than once per case, and the browser opens both sockets itself: proxying the
+    audio through this process would add a network hop to every spoken turn.
+    """
+    realtime = _realtime_voice_settings()
+    session = _session(attempt_id, user)
+    if session.ended:
+        raise HTTPException(status_code=409, detail="This attempt has already ended")
+    if SPOKEN_INTERVIEWER is None:
+        raise HTTPException(
+            status_code=503, detail="Leo voice is temporarily unavailable. Please use chat."
+        )
+    try:
+        scribe_token = REALTIME_VOICE_PROVIDER.mint_token(realtime, SCRIBE_TOKEN)
+        tts_token = REALTIME_VOICE_PROVIDER.mint_token(realtime, TTS_TOKEN)
+    except VoiceConfigurationError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    except VoiceProviderError as error:
+        raise HTTPException(
+            status_code=503, detail="Leo voice is temporarily unavailable. Please use chat."
+        ) from error
+
+    return {
+        "attempt_id": session.id,
+        "transport": "realtime",
+        "sample_rate": realtime.sample_rate,
+        "stt_url": speech_to_text_url(
+            realtime, scribe_token, keyterms=case_keyterms(session.case)
+        ),
+        "tts_url": text_to_speech_url(realtime, tts_token),
+        "tts_output_format": realtime.tts_output_format,
+        "turn_stream_url": f"/api/attempts/{session.id}/turn/stream",
+        "voice_intro": _voice_intro(session),
+        "case_started": session.case_started,
+    }
+
+
+def _sse_event(name: str, payload: object) -> str:
+    return f"event: {name}\ndata: {json.dumps(payload)}\n\n"
+
+
+@app.post("/api/attempts/{attempt_id}/turn/stream")
+def stream_turn(
+    attempt_id: str, request: CandidateTurnRequest, user: User = Depends(require_user)
+) -> StreamingResponse:
+    """Stream one spoken turn as server-sent events.
+
+    The control event carries the facts the runtime approved, so the side panel
+    fills before Leo has finished speaking. Every later delta is speakable text
+    the browser forwards to synthesis a clause at a time, which is what lets
+    audio begin on the first sentence instead of the last token.
+    """
+    _realtime_voice_settings()
+    session = _session(attempt_id, user)
+    if SPOKEN_INTERVIEWER is None:
+        raise HTTPException(
+            status_code=503, detail="Leo is temporarily unavailable. Please switch to chat."
+        )
+
+    def events():
+        # The pre-case readiness exchange is not a case turn. It stays on the
+        # shared onboarding path so voice and chat gate identically, and is
+        # emitted as one delta because it is already complete.
+        if not session.case_started:
+            try:
+                result = _submit_pre_case_turn(
+                    session, content=request.content, turn_id=request.turn_id
+                )
+            except (RuntimeError, VoiceOnboardingUnavailable):
+                yield _sse_event("error", {"detail": "Leo is temporarily unavailable."})
+                return
+            yield _sse_event("control", {"facts": []})
+            yield _sse_event("delta", {"text": result.reply})
+            yield _sse_event("done", {"attempt": session.candidate_view(), "new_facts": []})
+            return
+
+        new_facts: list[dict[str, str]] = []
+        try:
+            for event, payload in ATTEMPT_TURNS.submit_stream(
+                session,
+                content=request.content,
+                turn_id=request.turn_id,
+                spoken_interviewer=SPOKEN_INTERVIEWER,
+                store=STORE,
+            ):
+                if event == "control":
+                    new_facts = payload  # type: ignore[assignment]
+                    yield _sse_event("control", {"facts": new_facts})
+                elif event == "delta":
+                    yield _sse_event("delta", {"text": payload})
+                else:
+                    yield _sse_event(
+                        "done",
+                        {"attempt": session.candidate_view(), "new_facts": new_facts},
+                    )
+        except AttemptAlreadyEnded as error:
+            yield _sse_event("error", {"detail": str(error)})
+        except (ControlBlockMissing, InterviewerUnavailable):
+            # The fused call did not produce a usable turn. Fall back to the
+            # chat pipeline, which is slower but is the path typed attempts
+            # already rely on, then emit its reply as one delta.
+            logging.getLogger(__name__).warning(
+                "Fused spoken turn failed; falling back to the chat pipeline"
+            )
+            try:
+                result = ATTEMPT_TURNS.submit(
+                    session,
+                    content=request.content,
+                    turn_id=request.turn_id,
+                    transport="voice",
+                    interviewer=INTERVIEWER,
+                    store=STORE,
+                )
+            except (AttemptAlreadyEnded, InterviewerUnavailable) as error:
+                yield _sse_event("error", {"detail": str(error)})
+                return
+            yield _sse_event("control", {"facts": result.facts})
+            yield _sse_event("delta", {"text": result.reply})
+            yield _sse_event(
+                "done", {"attempt": session.candidate_view(), "new_facts": result.facts}
+            )
+
+    return StreamingResponse(
+        events(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 @app.post("/api/voice-sessions/{voice_session_id}/lifecycle/{event}")

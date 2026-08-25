@@ -4,6 +4,9 @@ version = "0.1.0"
 description = "A LangChain-powered case interview simulator."
 requires-python = ">=3.11"
 dependencies = [
+  # The spoken interview path calls Anthropic directly: one fused streaming
+  # call per turn, with prompt caching on the stable half of the prompt.
+  "anthropic>=1.0,<2.0",
   "fastapi>=0.115,<1.0",
   "httpx>=0.27,<1.0",
   "jinja2>=3.1,<4.0",

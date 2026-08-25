@@ -100,6 +100,9 @@ const el = {
   voiceStateLabel: document.querySelector("#voice-state-label"),
   voiceGuidance: document.querySelector("#voice-guidance"),
   voiceReturnChat: document.querySelector("#voice-return-chat"),
+  voiceTalk: document.querySelector("#voice-talk"),
+  voiceTalkLabel: document.querySelector("#voice-talk-label"),
+  captionText: document.querySelector("#voice-caption-text"),
 };
 
 /* --- API ---------------------------------------------------------------- */
@@ -675,19 +678,37 @@ function updateVoiceCaption() {
 }
 
 function setVoiceState(status = "chat") {
-  const active = ["connecting", "listening", "speaking"].includes(status);
+  const active = [
+    "connecting",
+    "listening",
+    "speaking",
+    "idle",
+    "recording",
+    "transcribing",
+    "thinking",
+  ].includes(status);
   const labels = {
     chat: "Chat",
     connecting: "Connecting...",
     listening: "Leo is listening",
     speaking: "Leo is speaking",
     reconnecting: "Reconnecting...",
+    // Push-to-talk states. The candidate owns the turn boundary, so the label
+    // has to say whose turn it is at every moment.
+    idle: "Press space to speak",
+    recording: "Listening to you",
+    transcribing: "Transcribing...",
+    thinking: "Leo is thinking",
   };
   const guidance = {
     connecting: "Establishing encrypted WebRTC audio channel with Leo...",
     listening: "Speak naturally · Formulate hypotheses · Ask for facts",
     speaking: "Listen closely to the released evidence and interviewer steer",
     chat: "Chat mode",
+    idle: "Press and release space to take your turn · Esc discards a recording",
+    recording: "Press space again when you have finished speaking",
+    transcribing: "Committing what you said...",
+    thinking: "Leo is composing an answer",
   };
 
   el.voiceStatus.textContent = labels[status] || "Chat";
@@ -705,6 +726,15 @@ function setVoiceState(status = "chat") {
   if (el.voiceGuidance && guidance[status]) {
     el.voiceGuidance.textContent = guidance[status];
   }
+  if (el.voiceTalkLabel) {
+    el.voiceTalkLabel.textContent = status === "recording" ? "Yield the floor" : "Hold the floor";
+  }
+  if (el.voiceTalk) {
+    el.voiceTalk.classList.toggle("is-recording", status === "recording");
+    // Leo's turn is not interruptible by the button, only by barge-in, so the
+    // control is disabled while a transcript or an answer is still resolving.
+    el.voiceTalk.disabled = ["connecting", "transcribing", "thinking"].includes(status);
+  }
 
   updateVoiceCaption();
   if (active) {
@@ -712,11 +742,31 @@ function setVoiceState(status = "chat") {
   }
 }
 
+/* Which transport the server has configured. "realtime" is push-to-talk over
+ * raw Scribe and TTS sockets; "custom" and "native" are the ElevenLabs Agent. */
+let voiceMode = null;
+
 async function loadVoiceAvailability() {
   try {
     const voice = await request("/api/voice/status");
     el.voiceControls.classList.toggle("hidden", !voice.ready);
-    if (!voice.ready) setVoiceState("chat");
+    if (!voice.ready) {
+      setVoiceState("chat");
+      return;
+    }
+    voiceMode = voice.mode;
+    // Import the island only once voice is known to work, so a chat-only
+    // deployment never downloads a transport it cannot use.
+    await import(voiceMode === "realtime" ? "/static/voice-realtime.js" : "/static/voice.js");
+    // Push-to-talk only exists in realtime mode. The Agent transports detect
+    // turns themselves, so a floor control there would be a lie.
+    const pushToTalk = voiceMode === "realtime";
+    el.voiceTalk?.classList.toggle("hidden", !pushToTalk);
+    if (el.voiceToggle) {
+      el.voiceToggle.title = pushToTalk
+        ? "Start a spoken case. Press space to take and yield the floor."
+        : "Start a spoken case with Leo.";
+    }
   } catch {
     // Voice is progressive enhancement. A failed capability check must never
     // prevent the established text room from loading.
@@ -775,7 +825,66 @@ window.addEventListener("leo:voice-status", (event) => {
     return;
   }
   if (status === "connected") setVoiceState("listening");
-  if (status === "speaking" || status === "listening" || status === "connecting") setVoiceState(status);
+  if (
+    ["speaking", "listening", "connecting", "idle", "recording", "transcribing", "thinking"].includes(
+      status,
+    )
+  ) {
+    setVoiceState(status);
+  }
+  if (errorReason && status !== "disconnected") toast(errorReason, "warning");
+});
+
+/* --- Push-to-talk ------------------------------------------------------- */
+
+/* Live transcription of the candidate, before any turn has been submitted. */
+window.addEventListener("leo:voice-caption", (event) => {
+  if (!el.captionText) return;
+  const text = event.detail?.text || "";
+  if (!text) {
+    updateVoiceCaption();
+    return;
+  }
+  el.captionText.innerHTML = `<strong>You:</strong> ${text}`;
+});
+
+/* The transcript the candidate committed, shown before Leo's reply lands. */
+window.addEventListener("leo:voice-candidate", (event) => {
+  const text = event.detail?.text;
+  if (text) showPendingTurn(text);
+});
+
+window.addEventListener("leo:voice-transcript", (event) => {
+  const attempt = event.detail?.attempt;
+  if (attempt) renderAttempt(attempt);
+});
+
+/* A space typed into the composer must stay a space. Push-to-talk only claims
+ * the key when focus is not in a field and voice is actually live. */
+function spacebarIsForTalking(event) {
+  if (event.code !== "Space" || event.repeat) return false;
+  if (event.metaKey || event.ctrlKey || event.altKey) return false;
+  if (!window.LeoVoice?.active || typeof window.LeoVoice.toggleTalking !== "function") return false;
+  const target = event.target;
+  if (!target) return true;
+  if (target.isContentEditable) return false;
+  return !["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(target.tagName);
+}
+
+document.addEventListener("keydown", async (event) => {
+  if (event.key === "Escape" && window.LeoVoice?.isRecording) {
+    event.preventDefault();
+    await window.LeoVoice.discardRecording();
+    return;
+  }
+  if (!spacebarIsForTalking(event)) return;
+  // Without this the transcript pane scrolls on every turn.
+  event.preventDefault();
+  await window.LeoVoice.toggleTalking();
+});
+
+el.voiceTalk?.addEventListener("click", async () => {
+  if (window.LeoVoice?.active) await window.LeoVoice.toggleTalking();
 });
 
 window.addEventListener("leo:voice-sync", async () => {

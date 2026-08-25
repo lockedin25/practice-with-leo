@@ -8,10 +8,10 @@ state.  Keeping it small makes chat regression behaviour explicit.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal
+from typing import Any, Iterator, Literal
 
 from app.case_runtime import InterviewSession
-from app.interviewer import InterviewTurn, Interviewer
+from app.interviewer import InterviewTurn, Interviewer, InterviewerUnavailable
 from app.store import SessionStore
 
 
@@ -75,6 +75,69 @@ class AttemptTurnService:
         session.turn_results[turn_id] = result
         store.save(session)
         return TurnSubmission(reply=turn.reply, facts=result["new_facts"], spoken_reply=turn.spoken_reply)
+
+    def submit_stream(
+        self,
+        session: InterviewSession,
+        *,
+        content: str,
+        turn_id: str,
+        spoken_interviewer: Any,
+        store: SessionStore,
+    ) -> Iterator[tuple[str, object]]:
+        """Stream one spoken turn, persisting exactly what ``submit`` would.
+
+        Yields ``('control', facts)``, then ``('delta', text)`` repeatedly, then
+        ``('done', TurnSubmission)``. The stored ``turn_results`` payload is the
+        same shape the chat path writes, so a spoken attempt and a typed one
+        remain indistinguishable to the evaluator and the transcript API.
+        """
+        if session.ended:
+            raise AttemptAlreadyEnded("This attempt has already ended")
+
+        if cached_result := session.turn_results.get(turn_id):
+            # A provider or browser retry must replay, not re-charge. The cached
+            # reply is emitted as one delta so the caller's speech path needs no
+            # special case for a replayed turn.
+            reply = str(cached_result["reply"])
+            facts = list(cached_result.get("new_facts", []))
+            yield ("control", facts)
+            yield ("delta", reply)
+            yield ("done", TurnSubmission(reply=reply, facts=facts, spoken_reply=reply, cached=True))
+            return
+
+        turn: InterviewTurn | None = None
+        for event, payload in spoken_interviewer.respond_stream(session, content):
+            if event == "done":
+                turn = payload  # type: ignore[assignment]
+                break
+            if event == "control":
+                yield (
+                    "control",
+                    [{"id": fact.id, "content": fact.content} for fact in payload],  # type: ignore[union-attr]
+                )
+                continue
+            yield (event, payload)
+
+        if turn is None:
+            raise InterviewerUnavailable("The spoken interviewer produced no turn")
+
+        result: dict[str, object] = {
+            "reply": turn.reply,
+            "new_facts": [{"id": fact.id, "content": fact.content} for fact in turn.facts],
+        }
+        if turn.spoken_reply:
+            result["spoken_reply"] = turn.spoken_reply
+        session.turn_results[turn_id] = result
+        store.save(session)
+        yield (
+            "done",
+            TurnSubmission(
+                reply=turn.reply,
+                facts=result["new_facts"],  # type: ignore[arg-type]
+                spoken_reply=turn.spoken_reply,
+            ),
+        )
 
 
 class AttemptLifecycleService:

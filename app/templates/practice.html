@@ -48,9 +48,23 @@
               </div>
             </div>
             <p class="voice-guidance" id="voice-guidance">Think aloud, form a hypothesis, and ask for the facts you need.</p>
+            {# Interim transcription while the candidate is still speaking, then
+               the last exchange once a turn has been submitted. #}
+            <p class="voice-caption" id="voice-caption-text" aria-live="polite"></p>
           </div>
 
           <div class="voice-hud-actions">
+            {# Push-to-talk. The spacebar is the primary control; this button is
+               the visible affordance for it and the pointer equivalent. #}
+            <button class="btn-voice-action btn-voice-talk hidden" id="voice-talk" type="button" title="Press space, or click, to start and stop speaking">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+              </svg>
+              <span id="voice-talk-label">Hold the floor</span>
+              <kbd class="voice-kbd">Space</kbd>
+            </button>
             <button class="btn-voice-action" id="voice-return-chat" type="button" title="Mute the microphone and type instead">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
