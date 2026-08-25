@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: cost.composition
+  domain: financials
+  release_level: broad_context
+  content: Lead raw material accounts for 68% of total battery manufacturing cost.
+- id: sourcing.split
+  domain: operations
+  release_level: sharp_question
+  content: Share of expensive virgin imported lead rose from 20% to 55%, while low-cost recycled scrap fell from 80% to 45%.
+- id: scrap.cartel
+  domain: market
+  release_level: hypothesis_backed
+  content: Unorganized scrap dealers formed regional syndicates to hoard spent batteries, driving scrap prices close to virgin
+    LME levels.
+  dependencies:
+  - sourcing.split
+- id: retail.buyback
+  domain: operations
+  release_level: hypothesis_backed
+  content: "Client's retail dealer exchange discount (\u20B9500/old battery) was too low to incentivize consumers, allowing\
+    \ scrap hoarders to buy spent batteries for cash."
+  dependencies:
+  - scrap.cartel
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Gross margin fell 600 bps because client had to buy expensive virgin lead (55% share) as unorganized scrap syndicates
+    hoarded secondary lead, enabled by an ineffective dealer buyback program.
+- id: recommendation.buyback
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Increase dealer old battery exchange discount to \u20B91,200 and mandate 1-for-1 return quotas on retail distributors."
+- id: recommendation.smelting
+  domain: recommendation
+  release_level: synthesis_support
+  content: Establish direct captive secondary lead smelting and refining joint ventures to bypass unorganized scrap traders.
+- id: recommendation.b2b_closed_loop
+  domain: recommendation
+  release_level: synthesis_support
+  content: Sign direct scrap collection contracts with commercial fleet operators and telecom tower companies.

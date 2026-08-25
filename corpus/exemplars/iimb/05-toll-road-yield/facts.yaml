@@ -1,0 +1,46 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: concession.terms
+  domain: company
+  release_level: broad_context
+  content: "Client operates 140 km 4-lane highway with 2 toll plazas charging \u20B9120 for cars and \u20B9850 for multi-axle\
+    \ trucks (MAVs)."
+- id: revenue.shortfall
+  domain: financials
+  release_level: sharp_question
+  content: "Toll collection is \u20B9112 Cr vs \u20B9136 Cr projected; car traffic is on target, but MAV truck volume at toll\
+    \ plazas fell 22%."
+- id: bypass.route
+  domain: operations
+  release_level: hypothesis_backed
+  content: Drone surveys identify 2,400 daily trucks diverting through a 12 km rural state road (SH-42) that bypasses Plaza
+    1.
+  dependencies:
+  - revenue.shortfall
+- id: overload.avoidance
+  domain: regulation
+  release_level: hypothesis_backed
+  content: Truckers bypass the plaza primarily to avoid the automated Weigh-in-Motion (WIM) system that imposes 10x penalty
+    fees for overloading.
+  dependencies:
+  - bypass.route
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Toll revenue shortfall is caused by 2,400 daily multi-axle trucks diverting to a rural state bypass road to avoid\
+    \ the \u20B9850 toll fee and automated weigh-in-motion overloading penalties."
+- id: recommendation.bypass_toll
+  domain: recommendation
+  release_level: synthesis_support
+  content: Partner with state government to install an automated check-post/toll barrier on the SH-42 rural road under commercial
+    load restrictions.
+- id: recommendation.weigh_regulation
+  domain: recommendation
+  release_level: synthesis_support
+  content: Implement graduated overload fee structures rather than punitive 10x fines to encourage compliance on the main
+    expressway.
+- id: recommendation.fleet_pass
+  domain: recommendation
+  release_level: synthesis_support
+  content: Offer 15% volume discount monthly FASTag passes to major regional fleet logistics operators.

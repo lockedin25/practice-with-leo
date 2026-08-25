@@ -1,0 +1,44 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: cracker.config
+  domain: company
+  release_level: broad_context
+  content: Cracker has 1.5M MT ethylene capacity with dual-feed furnaces capable of 30% to 70% ethane/naphtha variation.
+- id: yield.differences
+  domain: operations
+  release_level: sharp_question
+  content: Ethane feed yields 80% Ethylene, 3% Propylene, 1% C4s; Naphtha yields 32% Ethylene, 16% Propylene, 9% Butadiene,
+    14% Aromatics.
+- id: spread.volatility
+  domain: market
+  release_level: hypothesis_backed
+  content: US ethane import price rose due to VLGC shipping rates, while regional butadiene prices spiked to $1,400/MT, favoring
+    naphtha.
+  dependencies:
+  - yield.differences
+- id: switching.agility
+  domain: operations
+  release_level: hypothesis_backed
+  content: Plant takes 18 days to adjust furnace feed ratios due to rigid monthly procurement contracts, missing profitable
+    30-day crack spread windows.
+  dependencies:
+  - spread.volatility
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Cracker margins were volatile because rigid 30-day procurement prevented rapid switching between ethane and naphtha,
+    missing high co-product (butadiene/benzene) crack spreads when crude-gas spreads shifted.
+- id: recommendation.lp_dispatch
+  domain: recommendation
+  release_level: synthesis_support
+  content: Deploy real-time Linear Programming (LP) optimization linking daily global polymer prices to furnace feed selection
+    within 48 hours.
+- id: recommendation.feedstock_hedging
+  domain: recommendation
+  release_level: synthesis_support
+  content: Hedge ethane-naphtha crack spreads using financial derivatives on Brent crude vs Mont Belvieu ethane.
+- id: recommendation.downstream_integration
+  domain: recommendation
+  release_level: synthesis_support
+  content: Expand on-site polybutadiene rubber (PBR) and alkylation units to capture maximum value from naphtha C4 co-products.

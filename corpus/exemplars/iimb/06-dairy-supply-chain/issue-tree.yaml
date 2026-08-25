@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.dairy-sour-loss
+  label: Reduce milk sourage losses from 3.4% to below 0.8%.
+nodes:
+- id: village-chilling-operations
+  type: branch
+  label: Village Chilling Time & Rural Power Outages
+  status: valid_branch
+  evidence: []
+  conclusion: BMCs delayed chilling past 3.5 hrs due to 2-3 hr morning rural power outages.
+- id: tanker-logistics-and-queuing
+  type: branch
+  label: Tanker Routing & Plant Unloading Queues
+  status: valid_branch
+  evidence: []
+  conclusion: Unscheduled tanker arrivals created 3-hour holding queues in extreme ambient heat.
+- id: farmer-milking-practices
+  type: branch
+  label: Farmgate Hygiene & Collection Timings
+  status: valid_branch
+  evidence: []
+  conclusion: Farmer hygiene is standard; failure occurs entirely in post-milking chilling logistics.
+- id: diagnosis
+  type: diagnosis
+  label: Delayed Initial Chilling & Central Plant Queuing
+  status: hidden_target
+  evidence:
+  - village-chilling-operations
+  - tanker-logistics-and-queuing
+  - farmer-milking-practices
+  conclusion: Sourage is driven by delayed initial chilling at village BMCs due to power cuts, exacerbated by 3-hour tanker
+    unloading queues at central dairies.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Cold Chain Modernization
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy solar thermal BMCs, enforce digital tanker arrival slotting, and pay farmer quality premiums.
+edges:
+- from: objective.dairy-sour-loss
+  to: village-chilling-operations
+  relation: investigate
+- from: objective.dairy-sour-loss
+  to: tanker-logistics-and-queuing
+  relation: investigate
+- from: objective.dairy-sour-loss
+  to: farmer-milking-practices
+  relation: investigate
+- from: village-chilling-operations
+  to: diagnosis
+  relation: supports
+- from: tanker-logistics-and-queuing
+  to: diagnosis
+  relation: supports
+- from: farmer-milking-practices
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: logistics-first
+  sequence:
+  - village-chilling-operations
+  - tanker-logistics-and-queuing
+  - farmer-milking-practices
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate through time-to-chill kinetics across the supply chain.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate how long raw milk can stay un-chilled before souring.
+  - Clarify that insulated tankers do not actively chill milk (they only maintain temperature).
+  - Redirect toward village chilling center power availability and plant queuing.

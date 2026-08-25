@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 12-fast-food-chain-v1
+title: QSR Store Cannibalization
+school: IIM-A
+status: approved
+rights_status: original
+category: growth_strategy
+industry: food_and_beverage_restaurants
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a global burger QSR chain expanding in Delhi NCR. It opened 25 new stores in 12 months, but system-wide
+    same-store sales growth (SSSG) turned negative (-8%).
+  objective: Diagnose the negative same-store sales growth and recommend an optimal store expansion strategy.
+  opening_requirements:
+  - Name QSR Store Cannibalization and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Same-Store Sales Growth (SSSG) and Store Unit Payback) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Same-Store Sales Growth (SSSG) and Store Unit Payback
+  decision_question: Why did QSR same-store sales turn negative during rapid expansion, and how should store territory density
+    be governed?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Store network cannibalization caused by opening new outlets within a 500-meter radius of existing flagship
+    stores, splitting dine-in footfall without expanding total catchment demand.
+  what_the_case_wanted_to_test: Retail trade area dynamics, store cannibalization economics, customer catchment radius, and
+    delivery-only cloud kitchen alternatives.
+  pivotal_insight: 18 of the 25 new stores were located within a 10-minute walk of existing high-performing outlets, cannibalizing
+    30-35% of legacy store sales while duplicating high physical store capex.
+  common_traps:
+  - Assuming customer food preference shifted to healthy salads.
+  - Blaming food quality or menu pricing changes.
+  - Cutting marketing ad spend across all outlets.
+  takeaway_lesson: In brick-and-mortar retail and dining, opening new stores inside existing customer catchment trade areas
+    cannibalizes legacy store sales unless density expansion is shifted to low-capex delivery formats.
+  suggested_readings:
+  - knowledge_base/industries/13_food_and_beverage_restaurants.md
+  - knowledge_base/case_types/growth_strategy.md
+  - knowledge_base/methodology/02_issue_tree_structuring.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

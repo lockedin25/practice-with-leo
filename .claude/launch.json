@@ -2,20 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "casecall",
-      "runtimeExecutable": "/Users/shubhamkorde/Desktop/Projects/MBB Case Prep V2/.venv/bin/uvicorn",
-      "runtimeArgs": [
-        "app.main:app",
-        "--reload",
-        "--reload-dir",
-        "app",
-        "--reload-dir",
-        "reservoir",
-        "--port",
-        "8000"
-      ],
-      "port": 8000,
-      "autoPort": false
+      "name": "leo-dev",
+      "runtimeExecutable": ".venv/bin/uvicorn",
+      "runtimeArgs": ["app.main:app", "--port", "8000"],
+      "port": 8000
     }
   ]
 }

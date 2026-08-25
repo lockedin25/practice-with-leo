@@ -1,14 +1,109 @@
 schema_version: reservoir-facts-v1
 facts:
-  - {id: company.model, domain: company, release_level: broad_context, content: "Aster operates premium diagnostic hubs with in-house pathology, specialist radiology, and strong doctor referral relationships in six metros."}
-  - {id: market.size, domain: market, release_level: sharp_question, content: "The target tier-two-city testing market is about 1,200 crore rupees annually and is growing near 12 percent, with organised chains holding only a quarter of spend."}
-  - {id: demand.mix, domain: customers, release_level: sharp_question, content: "Routine blood tests represent most volume, while imaging and specialised pathology drive a disproportionate share of profit."}
-  - {id: competition, domain: market, release_level: sharp_question, content: "Local labs are trusted for convenience and price but have inconsistent quality systems; national chains have limited physical coverage outside the largest cities."}
-  - {id: economics.hub, domain: economics, release_level: hypothesis_backed, content: "A full diagnostic hub needs high imaging utilisation to earn its cost of capital. Most target cities alone cannot fill a metro-style hub in the first two years."}
-  - {id: economics.network, domain: economics, release_level: hypothesis_backed, content: "A collection-centre network linked to a regional processing hub reaches positive contribution at much lower volume, but samples must meet transport-time requirements."}
-  - {id: operations.logistics, domain: operations, release_level: broad_context, content: "Several target cities are within four hours of a proposed regional hub, allowing routine pathology samples to be transported twice daily."}
-  - {id: customer.trust, domain: customers, release_level: hypothesis_backed, content: "Patients and referring doctors value reliable reports and specialist consultation more than the lowest price for complex tests."}
-  - {id: risk.regulation, domain: risk, release_level: sharp_question, content: "Radiology licensing and specialist staffing are city-specific constraints, making a broad simultaneous imaging rollout high risk."}
-  - {id: recommendation.entry, domain: recommendation, release_level: synthesis_support, content: "Enter first through branded collection centres and doctor partnerships in cities within the hub transport radius."}
-  - {id: recommendation.expand, domain: recommendation, release_level: synthesis_support, content: "Add imaging only in cities that demonstrate sufficient referral density and utilisation, rather than copying the metro hub model."}
-  - {id: recommendation.metrics, domain: recommendation, release_level: synthesis_support, content: "Monitor sample quality, turnaround time, repeat-referrer share, test mix, and hub utilisation before expanding the network."}
+  - id: company.model
+    domain: company
+    release_level: broad_context
+    content: "Aster operates premium diagnostic hubs with in-house pathology, specialist radiology, and strong doctor referral relationships in six metros."
+    candidate_purpose: "Establish client baseline operating model and brand strength."
+    question_examples:
+      - "What is Aster's current core operating model and geographical presence?"
+      - "What services does Aster provide in its metro centers?"
+
+  - id: market.size
+    domain: market
+    release_level: sharp_question
+    content: "The target tier-two-city testing market is about 1,200 crore rupees annually and is growing near 12 percent, with organised chains holding only a quarter of spend."
+    candidate_purpose: "Disclose overall market sizing and organised penetration upside."
+    question_examples:
+      - "What is the total market size and growth rate for diagnostics in tier-2 cities?"
+      - "How large is the organized diagnostics market in these target cities?"
+
+  - id: demand.mix
+    domain: customers
+    release_level: sharp_question
+    content: "Routine blood tests represent most volume, while imaging and specialised pathology drive a disproportionate share of profit."
+    candidate_purpose: "Reveal test volume and margin breakdown across diagnostic categories."
+    question_examples:
+      - "What is the breakdown of demand between routine pathology and specialized testing?"
+      - "Which tests contribute the highest profit margins?"
+
+  - id: competition
+    domain: market
+    release_level: sharp_question
+    content: "Local labs are trusted for convenience and price but have inconsistent quality systems; national chains have limited physical coverage outside the largest cities."
+    candidate_purpose: "Highlight competitive dynamics and local trust barriers."
+    question_examples:
+      - "Who are the key competitors in tier-2 cities?"
+      - "How do local standalone labs compare to national chains?"
+
+  - id: economics.hub
+    domain: economics
+    release_level: hypothesis_backed
+    content: "A full diagnostic hub needs high imaging utilisation to earn its cost of capital. Most target cities alone cannot fill a metro-style hub in the first two years."
+    dependencies: [market.size, demand.mix]
+    candidate_purpose: "Expose the unit economic flaw in full standalone metro-style hubs in tier-2 cities."
+    question_examples:
+      - "What are the unit economics and breakeven utilization for a full diagnostic hub?"
+      - "Can a standalone metro-style hub achieve target ROIC in a tier-2 city?"
+
+  - id: economics.network
+    domain: economics
+    release_level: hypothesis_backed
+    content: "A collection-centre network linked to a regional processing hub reaches positive contribution at much lower volume, but samples must meet transport-time requirements."
+    dependencies: [economics.hub]
+    candidate_purpose: "Introduce the hub-and-spoke asset-light alternative."
+    question_examples:
+      - "What are the unit economics of a collection centre network linked to a regional processing hub?"
+      - "How does capital expenditure compare between standalone hubs and collection centers?"
+
+  - id: operations.logistics
+    domain: operations
+    release_level: broad_context
+    content: "Several target cities are within four hours of a proposed regional hub, allowing routine pathology samples to be transported twice daily."
+    candidate_purpose: "Provide cold chain logistics feasibility constraints."
+    question_examples:
+      - "What are the logistical constraints on sample stability and turnaround time?"
+      - "How far are target tier-2 cities from existing or planned regional labs?"
+
+  - id: customer.trust
+    domain: customers
+    release_level: hypothesis_backed
+    content: "Patients and referring doctors value reliable reports and specialist consultation more than the lowest price for complex tests."
+    candidate_purpose: "Clarify willingness to pay and doctor prescription drivers."
+    question_examples:
+      - "What factors drive doctor referrals and patient choice in tier-2 cities?"
+      - "Are patients highly price sensitive or willing to pay a premium for quality?"
+
+  - id: risk.regulation
+    domain: risk
+    release_level: sharp_question
+    content: "Radiology licensing and specialist staffing are city-specific constraints, making a broad simultaneous imaging rollout high risk."
+    candidate_purpose: "Highlight operational and regulatory staffing hurdles."
+    question_examples:
+      - "Are there regulatory or staffing barriers to setting up radiology centers?"
+      - "What are the key operational risks in rolling out diagnostic centers?"
+
+  - id: diagnosis.hidden
+    domain: diagnosis
+    release_level: interviewer_only
+    provenance: source_derived
+    content: "Full-scale standalone diagnostic hubs cannot achieve breakeven ROIC in tier-2 cities due to low specialized imaging volume; entry must occur via asset-light collection centers connected to a regional central processing hub within 4-hour logistics radius, gating local imaging capex on proven referral density."
+    candidate_purpose: "Never disclose directly. Benchmark for evaluator answer-key comparison and interviewer recovery."
+
+  - id: recommendation.entry
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Enter first through branded collection centres and doctor partnerships in cities within the hub transport radius."
+    candidate_purpose: "Pillar 1: Asset-light collection center rollout."
+
+  - id: recommendation.expand
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Add imaging only in cities that demonstrate sufficient referral density and utilisation, rather than copying the metro hub model."
+    candidate_purpose: "Pillar 2: Gated radiology capex expansion."
+
+  - id: recommendation.metrics
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Monitor sample quality, turnaround time, repeat-referrer share, test mix, and hub utilisation before expanding the network."
+    candidate_purpose: "Pillar 3: Execution governance and operational KPIs."

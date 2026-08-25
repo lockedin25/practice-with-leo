@@ -1,0 +1,34 @@
+schema_version: conversation-policy-v1
+mode: realistic
+
+principles:
+  - Speak naturally and engage in realistic restaurant operations and unit economic problem solving.
+  - Follow candidate-led structuring; encourage mathematical breakdown of order-level unit economics.
+  - Challenge superficial conclusions that blame food inflation or recommend shutting down delivery completely.
+  - "Keep the hidden diagnosis private: do not volunteer the ₹35 vs ₹110 contribution disparity until the candidate asks for channel cost breakdowns."
+  - Ensure recommendations balance menu engineering, consumer willingness to pay, and kitchen labor practicality.
+
+phase_policy:
+  clarification:
+    interviewer_goal: Confirm candidate understands Harvest Table's 180 store network, 14% to 7% EBITDA decline, 5% sales growth, and 12-month recovery target.
+    reveal_levels: [broad_context, sharp_question]
+    expected_candidate_behaviours:
+      - Confirm company-operated store model and channel mix (dine-in, takeaway, delivery).
+      - Inquire whether sales or traffic has dropped.
+      - Establish time horizon and EBITDA margin recovery objective.
+
+  drill_down:
+    interviewer_goal: Guide candidate to discover the delivery surge (20% to 46%) and calculate the drastic unit contribution differential.
+    reveal_levels: [broad_context, sharp_question, hypothesis_backed]
+    expected_candidate_behaviours:
+      - Dissect revenue across dine-in, takeaway, and third-party delivery.
+      - Analyze cost-to-serve per order (commissions, packaging, brand-funded discounts, labor).
+      - Examine kitchen staffing utilization patterns across peak and off-peak hours.
+
+  synthesis:
+    interviewer_goal: Evaluate top-down 12-month recovery plan covering channel pricing, owned-app loyalty, and labor scheduling.
+    reveal_levels: [synthesis_support]
+    expected_candidate_behaviours:
+      - Present a clear 3-pillar turnaround recommendation.
+      - Articulate specific pricing and bundling tactics for aggregator menus.
+      - Identify execution risks (customer pushback, aggregator ranking algorithms) and mitigations.

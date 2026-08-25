@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.genai-compliance
+  label: Fix GenAI wealth advisory copilot adoption and compliance audit accuracy.
+nodes:
+- id: audit-failures-and-hallucinations
+  type: branch
+  label: Compliance Audit Failure Modes
+  status: valid_branch
+  evidence: []
+  conclusion: 26% audit failure rate caused by ungrounded risk citations and product hallucinations.
+- id: advisor-workflow-friction
+  type: branch
+  label: Time-to-Draft & Verification Overhead
+  status: valid_branch
+  evidence: []
+  conclusion: Advisors spend 45 mins verifying un-cited AI notes vs 30 mins writing from scratch.
+- id: liability-and-governance
+  type: branch
+  label: Regulatory Liability Allocation & RAG Tooling
+  status: valid_branch
+  evidence: []
+  conclusion: Advisors bear 100% personal liability without citation tooling to verify claims quickly.
+- id: diagnosis
+  type: diagnosis
+  label: Ungrounded AI Drafts & Advisor Liability Burden
+  status: hidden_target
+  evidence:
+  - audit-failures-and-hallucinations
+  - advisor-workflow-friction
+  - liability-and-governance
+  conclusion: Pilot failed because advisors bear full regulatory liability for AI output that lacks verifiable source citations,
+    making verification slower than manual drafting.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Enterprise GenAI Governance
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy RAG with clickable source citations, replace prose editing with a 3-click verification gate, and establish
+    institutional safe-harbor rules.
+edges:
+- from: objective.genai-compliance
+  to: audit-failures-and-hallucinations
+  relation: investigate
+- from: objective.genai-compliance
+  to: advisor-workflow-friction
+  relation: investigate
+- from: objective.genai-compliance
+  to: liability-and-governance
+  relation: investigate
+- from: audit-failures-and-hallucinations
+  to: diagnosis
+  relation: supports
+- from: advisor-workflow-friction
+  to: diagnosis
+  relation: supports
+- from: liability-and-governance
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: workflow-first
+  sequence:
+  - audit-failures-and-hallucinations
+  - advisor-workflow-friction
+  - liability-and-governance
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from audit error rates to advisor liability and verification friction.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate why advisors take longer to edit an AI draft than write from scratch.
+  - Clarify that the underlying CRM data is accurate.
+  - Redirect toward citation transparency, verification UI, and regulatory liability allocation.

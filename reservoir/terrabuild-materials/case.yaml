@@ -1,19 +1,75 @@
 schema_version: reservoir-v1
 case_id: terrabuild-materials-v1
 title: TerraBuild Materials
-status: draft
+status: approved
 rights_status: original
 category: sustainability_strategy
 industry: construction_materials
 difficulty: advanced
 supported_durations: [30]
 skills_tested: [clarification, sustainability economics, portfolio strategy, implementation, synthesis]
+
 candidate_opening:
   context: >-
     TerraBuild is a regional cement and building-materials producer. Its largest
     customers have announced lower-carbon procurement targets, while carbon costs are expected to rise.
-  objective: Create a credible decarbonisation strategy that protects earnings.
+  objective: >-
+    Create a credible 5-year decarbonisation strategy that protects EBITDA margin and satisfies commercial customer procurement targets.
+  opening_requirements:
+    - Name TerraBuild and describe its heavy building materials operating model (cement, ready-mix, aggregates).
+    - Identify the core strategic challenge (customer green procurement mandates, impending carbon costs, constrained capital).
+    - Confirm the 5-year time horizon and EBITDA resilience / emissions intensity metrics.
+    - Ask clarifying questions regarding emissions baseline (clinker vs electricity/logistics), plant-level variance, abatement cost curves, and customer willingness to pay.
+
 objective_function:
   primary_metric: EBITDA resilience and emissions intensity
   decision_question: Which decarbonisation investments should TerraBuild prioritise first?
   time_horizon: five years
+  expected_candidate_output:
+    - Emissions profile breakdown across clinker production, electricity, and transport.
+    - Marginal Abatement Cost Curve (MACC) sequencing across plants.
+    - Commercial strategy for green certified products with anchor customers.
+    - Phased capital allocation and 100-day execution milestones.
+  design_principle: >-
+    Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+
+case_essence:
+  core_mechanism: >-
+    Marginal Abatement Cost Curve (MACC) sequencing. Deep kiln overhauls and CCUS (carbon capture)
+    require immense capex and fail ROIC hurdles today; energy efficiency and Supplementary Cementitious
+    Materials (SCM) blended cement (using slag/fly ash) yield immediate emissions reductions at net negative/low cost.
+  what_the_case_wanted_to_test: >-
+    Decarbonization strategy sequencing using Marginal Abatement Cost Curves, clinker substitution
+    economics in heavy materials, and aligning product decarbonization with commercial buyer green premiums.
+  pivotal_insight: >-
+    Avoid capital-intensive unproven tech first; prioritize high-blend SCM cement with co-developed
+    certified specs for anchor infrastructure buyers, protecting EBITDA while reducing clinker factor.
+  common_traps:
+    - Proposing multi-billion rupee Carbon Capture and Storage (CCUS) or green hydrogen kilns as near-term priorities, destroying company solvency.
+    - Treating sustainability as a pure cost center rather than developing certified low-carbon green concrete lines for premium infrastructure tenders.
+    - Overlooking the immediate commercial readiness and margin-accretive potential of fly ash / slag clinker substitution.
+  takeaway_lesson: >-
+    In heavy industry decarbonization, sequence initiatives strictly along the Marginal Abatement Cost Curve:
+    harvest negative-cost operational efficiencies and blended material substitutions before committing to capital-intensive transformational technology.
+  suggested_readings:
+    - knowledge_base/industries/14_heavy_manufacturing_and_steel.md
+    - knowledge_base/case_types/growth_strategy.md
+    - knowledge_base/methodology/05_synthesis_and_recommendations.md
+
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+    - clarification
+    - drill_down
+    - synthesis
+
+reservoir_files:
+  - facts.yaml
+  - issue-tree.yaml
+  - conversation-policy.yaml
+  - validation.md

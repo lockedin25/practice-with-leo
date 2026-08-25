@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 23-quick-commerce-pricing-v1
+title: Quick-Commerce Membership Pricing
+school: IIM-A
+status: approved
+rights_status: original
+category: pricing
+industry: ecommerce_and_marketplaces
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is a leading 10-minute quick-commerce grocery app in India. Operating loss per order is \u20B922,\
+    \ driven by free delivery promotions on low-value orders (<\u20B9199)."
+  objective: Redesign delivery fees, minimum order value (MOV) thresholds, and VIP membership pricing to achieve order contribution
+    profitability.
+  opening_requirements:
+  - Name Quick-Commerce Membership Pricing and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Contribution Margin Per Order and Average Order Value (AOV)) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Contribution Margin Per Order and Average Order Value (AOV)
+  decision_question: How should delivery fee thresholds and membership tiers be structured to make quick-commerce unit economics
+    profitable?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "High delivery partner payout (\u20B945/drop) and pick-pack cost (\u20B918) exceeding merchant margin (18%\
+    \ on \u20B9180 average basket = \u20B932), resulting in net negative contribution on sub-\u20B9250 orders."
+  what_the_case_wanted_to_test: Quick commerce unit economics, delivery cost structure, threshold pricing mechanics, and paid
+    subscription program design.
+  pivotal_insight: "Sub-\u20B9199 impulse orders (milk, chips) represent 42% of volume but generate a \u20B935 net loss per\
+    \ drop; introducing a \u20B9299 free-delivery threshold and a \u20B999/month VIP subscription lifts AOV to \u20B9380."
+  common_traps:
+  - Raising item grocery prices above MRP, which violates Indian law and triggers app uninstalls.
+  - Cutting delivery rider payouts causing rider strikes and SLA failures.
+  - Eliminating fast 10-minute delivery entirely.
+  takeaway_lesson: In ultra-fast delivery where logistics cost per drop is fixed, profitability requires basket-building threshold
+    pricing and upfront subscription memberships that subsidize delivery fees.
+  suggested_readings:
+  - knowledge_base/industries/02_ecommerce_and_marketplaces.md
+  - knowledge_base/case_types/pricing_strategy.md
+  - knowledge_base/methodology/04_data_gathering_and_notes.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

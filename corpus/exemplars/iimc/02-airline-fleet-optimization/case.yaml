@@ -1,0 +1,72 @@
+schema_version: reservoir-v1
+case_id: 02-airline-fleet-optimization-v1
+title: Low-Cost Airline Turnaround Time
+school: IIM-C
+status: approved
+rights_status: original
+category: operations
+industry: aviation_and_airlines
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a major Indian low-cost carrier (LCC) operating 180 Airbus A320 aircraft. Ground Turnaround Time
+    (TAT) between flights has slipped from 25 minutes to 36 minutes, reducing aircraft daily utilization by 1.8 block hours
+    per tail.
+  objective: Diagnose ground handling bottlenecks and engineer a 25-minute Turnaround Time process to unlock 1 additional
+    daily flight per aircraft.
+  opening_requirements:
+  - Name Low-Cost Airline Turnaround Time and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Ground Turnaround Time (minutes) and Aircraft Daily Block Hours) and time horizon (six months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Ground Turnaround Time (minutes) and Aircraft Daily Block Hours
+  decision_question: How can the airline compress ground turnaround time to 25 minutes to maximize aircraft daily utilization?
+  time_horizon: six months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Parallel process fragmentation and passenger deplaning bottlenecks. Baggage unloading, cabin catering/cleaning,
+    and passenger boarding occur sequentially instead of concurrently due to single-door jet bridge boarding and delayed gate
+    baggage belt arrivals.
+  what_the_case_wanted_to_test: Aviation turnaround critical path analysis, parallel vs sequential operations, dual-door deplaning,
+    and gate ground-handling coordination.
+  pivotal_insight: Turnaround time critical path is governed by cabin cleaning and passenger boarding; introducing dual-door
+    front/rear boarding stairs and concurrent cleaning cuts ground time by 11 minutes.
+  common_traps:
+  - Assuming pilots are taxiing too slowly on the runway.
+  - Blaming air traffic control (ATC) holding patterns for ground-gate delays.
+  - Hiring twice as many ground crew without restructuring the critical path.
+  takeaway_lesson: In airline fleet operations, every minute saved on ground turnaround accumulates into aircraft utilization;
+    compressing the critical path via parallel ground operations unlocks massive incremental revenue capacity.
+  suggested_readings:
+  - knowledge_base/industries/06_aviation_and_airlines.md
+  - knowledge_base/case_types/unconventional_and_abstract.md
+  - knowledge_base/methodology/02_issue_tree_structuring.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

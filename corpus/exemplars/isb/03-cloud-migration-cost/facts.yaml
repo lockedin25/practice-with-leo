@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: cloud.footprint
+  domain: company
+  release_level: broad_context
+  content: Bank migrated 140 retail banking microservices to public cloud across 1,800 virtual compute instances.
+- id: bill.breakdown
+  domain: financials
+  release_level: sharp_question
+  content: "Monthly bill is \u20B916.2 Cr; compute instances represent 68%, storage 18%, network/data egress 14%."
+- id: utilization.waste
+  domain: operations
+  release_level: hypothesis_backed
+  content: Average CPU utilization across all provisioned cloud instances is only 14%; 600 development/QA environments run
+    24/7 on weekends.
+  dependencies:
+  - bill.breakdown
+- id: pricing.commitment
+  domain: pricing
+  release_level: hypothesis_backed
+  content: 92% of workloads run on expensive on-demand hourly pricing; bank committed zero 1-year or 3-year Reserved Instances
+    or Compute Savings Plans.
+  dependencies:
+  - utilization.waste
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Cloud cost exploded to \u20B916 Cr/month because workloads run on 100% on-demand rates with 14% average CPU utilization\
+    \ and unmanaged 24/7 dev environments; FinOps governance and 3-year Savings Plans reduce spend by 48%."
+- id: recommendation.commitments
+  domain: recommendation
+  release_level: synthesis_support
+  content: Purchase 3-year Compute Savings Plans for steady-state production workloads, securing a 60% hourly discount.
+- id: recommendation.rightsizer
+  domain: recommendation
+  release_level: synthesis_support
+  content: Right-size oversized virtual machines and deploy automated horizontal pod autoscaling (HPA) to match diurnal banking
+    traffic.
+- id: recommendation.dev_governance
+  domain: recommendation
+  release_level: synthesis_support
+  content: Implement automated cron schedules to shut down all non-production dev/QA environments during nights and weekends.

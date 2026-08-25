@@ -1,0 +1,69 @@
+schema_version: reservoir-v1
+case_id: 17-fishing-fleet-v1
+title: Deep-Sea Fishing Fleet
+school: IIM-A
+status: approved
+rights_status: original
+category: profitability
+industry: food_and_beverage_restaurants
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client operates a fleet of 30 deep-sea trawlers based in Kochi. Operating profit per voyage has turned negative
+    over the last two fishing seasons.
+  objective: Diagnose voyage profitability decline and recommend a catch optimization strategy.
+  opening_requirements:
+  - Name Deep-Sea Fishing Fleet and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Profit per 20-day trawler voyage) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Profit per 20-day trawler voyage
+  decision_question: Why are trawler voyages unprofitable and how should fleet dispatch and catch processing be optimized?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Marine diesel fuel cost inflation (55% of voyage cost) combined with excessive low-value bycatch discard
+    (45% of netted volume) due to lack of onboard cold-hold sorting.
+  what_the_case_wanted_to_test: Marine operations, voyage variable cost decomposition, catch composition value optimization,
+    and satellite fishery scouting.
+  pivotal_insight: Trawlers spend 8 days searching blindly for high-value tuna, burning diesel while discarding thousands
+    of tons of edible secondary fish that could be sold to surimi processors.
+  common_traps:
+  - Blaming international fish export tariff quotas.
+  - Assuming overfishing has wiped out all marine stock without checking secondary catch.
+  - Recommending purchasing larger mega-trawlers.
+  takeaway_lesson: In asset-heavy natural resource extraction facing fuel inflation, profitability requires monetizing secondary
+    co-products (bycatch) and using predictive scouting to reduce transit search fuel burn.
+  suggested_readings:
+  - knowledge_base/industries/13_food_and_beverage_restaurants.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

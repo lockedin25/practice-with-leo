@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: edtech.model
+  domain: company
+  release_level: broad_context
+  content: "Client enrols 60,000 K-12 students annually paying \u20B935,000 for live math and science classes."
+- id: sales.spend
+  domain: financials
+  release_level: sharp_question
+  content: "Sales & marketing expenses represent 63% of total revenue; outbound sales force CAC is \u20B922,500 per customer."
+- id: lead.funnel
+  domain: operations
+  release_level: hypothesis_backed
+  content: Outbound sales conversion is 0.8% on purchased cold lead lists; parent rejection and spam blocking reached 76%.
+  dependencies:
+  - sales.spend
+- id: organic.referral
+  domain: customers
+  release_level: hypothesis_backed
+  content: "Piloting free national diagnostic math benchmarking tests in 250 schools generated 45,000 qualified student leads\
+    \ with a 14.5% conversion rate at \u20B93,200 CAC."
+  dependencies:
+  - lead.funnel
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "CAC reached \u20B922,000 because client relied on cold outbound tele-calling with a 0.8% conversion rate; shifting\
+    \ acquisition to school diagnostic benchmarking tests and teacher referrals slashes CAC to \u20B94,000."
+- id: recommendation.diagnostic_funnel
+  domain: recommendation
+  release_level: synthesis_support
+  content: Replace cold calling with free nationwide school diagnostic benchmarking assessments that deliver customized learning
+    gap reports to parents.
+- id: recommendation.teacher_advocates
+  domain: recommendation
+  release_level: synthesis_support
+  content: Establish a Teacher Ambassador Program offering free classroom teaching tools and academic referral grants.
+- id: recommendation.sales_rebalance
+  domain: recommendation
+  release_level: synthesis_support
+  content: Downsize aggressive outbound cold-calling reps by 60% and transition remaining team into consultative academic
+    counselors.

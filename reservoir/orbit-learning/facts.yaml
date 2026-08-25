@@ -1,14 +1,110 @@
 schema_version: reservoir-facts-v1
 facts:
-  - {id: company.model, domain: company, release_level: broad_context, content: "Orbit operates vocational colleges that combine classroom teaching, practical labs, and employer placement support."}
-  - {id: pilot.result, domain: customers, release_level: sharp_question, content: "Only 38 percent of students complete assigned digital modules, and faculty usage varies from near zero to daily use across pilot campuses."}
-  - {id: learning_outcome, domain: outcomes, release_level: hypothesis_backed, content: "Students who complete the blended modules perform as well as or better than peers in practical assessments, so the core learning content is not the main problem."}
-  - {id: faculty, domain: operations, release_level: sharp_question, content: "Faculty report that the platform adds preparation work and does not fit their current timetable or performance incentives."}
-  - {id: student_access, domain: customers, release_level: hypothesis_backed, content: "Many students have smartphones but inconsistent data access and prefer short mobile modules that can be completed between work or commute commitments."}
-  - {id: product_design, domain: operations, release_level: hypothesis_backed, content: "The pilot primarily mirrors long classroom lectures online, with limited feedback, practice, or connection to the next in-person lab session."}
-  - {id: employer, domain: market, release_level: broad_context, content: "Employers value demonstrable technical skills and reliable completion records more than the delivery format of the course."}
-  - {id: economics, domain: financials, release_level: sharp_question, content: "The platform has already been built; the next investment decision is about adoption support, content redesign, and campus rollout capacity."}
-  - {id: rollout_risk, domain: risk, release_level: hypothesis_backed, content: "Scaling the existing experience to every campus would make low adoption harder to reverse and could reduce faculty trust in future changes."}
-  - {id: recommendation.workflow, domain: recommendation, release_level: synthesis_support, content: "Redesign modules around short practice-based activities linked to the next classroom or lab session, with offline-friendly access where needed."}
-  - {id: recommendation.faculty, domain: recommendation, release_level: synthesis_support, content: "Give faculty protected preparation time, campus champions, and adoption measures tied to learner outcomes rather than raw logins alone."}
-  - {id: recommendation_scale, domain: recommendation, release_level: synthesis_support, content: "Run a second pilot across different campus types, prove completion and skill outcomes, then scale in waves with support capacity."}
+  - id: company.model
+    domain: company
+    release_level: broad_context
+    content: "Orbit operates vocational colleges that combine classroom teaching, practical labs, and employer placement support."
+    candidate_purpose: "Establish vocational college educational model and placement mission."
+    question_examples:
+      - "What is Orbit's operating model and educational delivery structure?"
+      - "How are courses delivered between classroom, lab, and digital formats?"
+
+  - id: pilot.result
+    domain: customers
+    release_level: sharp_question
+    content: "Only 38 percent of students complete assigned digital modules, and faculty usage varies from near zero to daily use across pilot campuses."
+    candidate_purpose: "Disclose low completion rate (38%) and wide variance in faculty adoption."
+    question_examples:
+      - "What were the exact results and completion rates from the digital pilot?"
+      - "How actively are students and faculty using the digital platform?"
+
+  - id: learning_outcome
+    domain: outcomes
+    release_level: hypothesis_backed
+    content: "Students who complete the blended modules perform as well as or better than peers in practical assessments, so the core learning content is not the main problem."
+    dependencies: [pilot.result]
+    candidate_purpose: "Confirm learning efficacy when modules are completed, isolating the issue to adoption friction."
+    question_examples:
+      - "How do learning outcomes compare for students who actually complete the modules?"
+      - "Is the academic quality of the content causing the drop-off?"
+
+  - id: faculty
+    domain: operations
+    release_level: sharp_question
+    content: "Faculty report that the platform adds preparation work and does not fit their current timetable or performance incentives."
+    dependencies: [pilot.result]
+    candidate_purpose: "Identify faculty friction: uncompensated prep time and misaligned contact-hour KPIs."
+    question_examples:
+      - "What feedback did faculty provide on using the platform?"
+      - "How are faculty incentivized and compensated for digital teaching?"
+
+  - id: student_access
+    domain: customers
+    release_level: hypothesis_backed
+    content: "Many students have smartphones but inconsistent data access and prefer short mobile modules that can be completed between work or commute commitments."
+    candidate_purpose: "Highlight student device constraints: mobile-first, variable data, short attention windows."
+    question_examples:
+      - "What devices and connectivity do vocational students use?"
+      - "When and where do students attempt to access digital coursework?"
+
+  - id: product_design
+    domain: operations
+    release_level: hypothesis_backed
+    content: "The pilot primarily mirrors long classroom lectures online, with limited feedback, practice, or connection to the next in-person lab session."
+    dependencies: [learning_outcome]
+    candidate_purpose: "Identify pedagogical flaw: passive long-form lecture videos lacking interactive lab integration."
+    question_examples:
+      - "How is the digital course content structured and formatted?"
+      - "Are digital lessons connected to in-person lab sessions?"
+
+  - id: employer
+    domain: market
+    release_level: broad_context
+    content: "Employers value demonstrable technical skills and reliable completion records more than the delivery format of the course."
+    candidate_purpose: "Clarify employer hiring criteria: practical competence over pedagogy format."
+    question_examples:
+      - "What do recruiting employers look for in Orbit graduates?"
+      - "Do employers differentiate between online and classroom learning?"
+
+  - id: economics
+    domain: financials
+    release_level: sharp_question
+    content: "The platform has already been built; the next investment decision is about adoption support, content redesign, and campus rollout capacity."
+    candidate_purpose: "Frame the financial decision: sunk software capex vs adoption enablement opex."
+    question_examples:
+      - "What is the cost structure of the digital initiative?"
+      - "What incremental investments are required for full scaling?"
+
+  - id: rollout_risk
+    domain: risk
+    release_level: hypothesis_backed
+    content: "Scaling the existing experience to every campus would make low adoption harder to reverse and could reduce faculty trust in future changes."
+    candidate_purpose: "Warn against premature scaling of a broken user experience."
+    question_examples:
+      - "What are the risks of scaling the current pilot without changes?"
+      - "How would a premature rollout affect campus faculty morale?"
+
+  - id: diagnosis.hidden
+    domain: diagnosis
+    release_level: interviewer_only
+    provenance: source_derived
+    content: "Low completion (38%) is driven by a pedagogy-workflow mismatch: long passive video lectures clash with mobile vocational students' fragmented time and lack offline capability, while faculty face uncompensated prep work and misaligned contact-hour KPIs; Orbit must chunk content into 10-minute micro-drills linked to lab sessions, provide offline access, and align faculty incentives."
+    candidate_purpose: "Never disclose directly. Benchmark for evaluator answer-key comparison and interviewer recovery."
+
+  - id: recommendation.workflow
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Redesign modules around short practice-based activities linked to the next classroom or lab session, with offline-friendly access where needed."
+    candidate_purpose: "Pillar 1: Modular micro-learning and offline-first lab integration."
+
+  - id: recommendation.faculty
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Give faculty protected preparation time, campus champions, and adoption measures tied to learner outcomes rather than raw logins alone."
+    candidate_purpose: "Pillar 2: Faculty workload protection, incentives, and campus champion network."
+
+  - id: recommendation_scale
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Run a second pilot across different campus types, prove completion and skill outcomes, then scale in waves with support capacity."
+    candidate_purpose: "Pillar 3: Wave-gated rollout based on verified adoption benchmarks."

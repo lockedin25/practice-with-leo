@@ -21,17 +21,26 @@ const GENERIC_CATEGORIES = new Set(["case interview", "case", "general"]);
 const DURATION_MINUTES = 30;
 const STORAGE_SESSION = "casecall:session";
 const MAX_COMPOSER_HEIGHT = 190;
+const AUDIO_CUE = /\[(?:warmly|confidently|patiently|empathetically|seriously|enthusiastically|excitedly|chuckles|laughing|sighs)\]\s*/gi;
 
 const state = {
   viewer: null,
   attempt: null,
   renderedId: null,
   renderedCount: 0,
+  renderedMessages: [],
   knownFactIds: new Set(),
+  // Facts released since the candidate's last turn, so the rail can mark them.
+  newFactIds: new Set(),
+  expandedFactIds: new Set(),
+  factsSignature: "",
   phases: [],
   sending: false,
   startedAt: null,
   timerId: null,
+  /* The clock measures time spent in the room, not wall-clock time since the
+   * attempt was created. Otherwise reopening yesterday's case shows 00:00. */
+  elapsedMs: 0,
   timeUpAnnounced: false,
   endArmedTimer: null,
   // A practice room is pinned to its chosen case, including after a reload.
@@ -46,17 +55,26 @@ const el = {
   input: document.querySelector("#candidate-message"),
   send: document.querySelector("#send-message"),
   endedBar: document.querySelector("#ended-bar"),
+  completionNote: document.querySelector("#completion-note"),
   endButton: document.querySelector("#end-attempt"),
   restart: document.querySelector("#restart-attempt"),
+  viewDebriefBtn: document.querySelector("#view-debrief-btn"),
+  beginCase: document.querySelector("#begin-case"),
   title: document.querySelector("#case-title"),
   tags: document.querySelector("#case-tags"),
+  stageLabel: document.querySelector("#case-stage-label"),
   sessionMode: document.querySelector("#session-mode"),
+  sessionStatus: document.querySelector("#session-status-text"),
   stepper: document.querySelector("#stepper"),
   stageCounter: document.querySelector("#stage-counter"),
   skills: document.querySelector("#skills-list"),
   facts: document.querySelector("#facts"),
   factsCounter: document.querySelector("#facts-counter"),
+  factTemplate: document.querySelector("#fact-template"),
   rail: document.querySelector(".rail"),
+  railTabs: document.querySelector(".rail-tabs"),
+  railTabEvidence: document.querySelector("#rail-tab-evidence"),
+  railEvidenceCount: document.querySelector("#rail-evidence-count"),
   scorecard: document.querySelector("#scorecard"),
   scorecardStatus: document.querySelector("#scorecard-status"),
   scorecardBody: document.querySelector("#scorecard-content"),
@@ -71,6 +89,17 @@ const el = {
   userEmail: document.querySelector("#user-email"),
   adminLink: document.querySelector("#admin-link"),
   signOut: document.querySelector("#sign-out"),
+  voiceControls: document.querySelector("#voice-controls"),
+  voiceStatus: document.querySelector("#voice-status"),
+  voiceToggle: document.querySelector("#voice-toggle"),
+  voiceConsent: document.querySelector("#voice-consent"),
+  voiceStart: document.querySelector("#voice-start"),
+  voiceCancel: document.querySelector("#voice-cancel"),
+  voiceHud: document.querySelector("#voice-hud"),
+  voiceStatePill: document.querySelector("#voice-state-pill"),
+  voiceStateLabel: document.querySelector("#voice-state-label"),
+  voiceGuidance: document.querySelector("#voice-guidance"),
+  voiceReturnChat: document.querySelector("#voice-return-chat"),
 };
 
 /* --- API ---------------------------------------------------------------- */
@@ -111,7 +140,12 @@ const startAttempt = (caseId = state.selectedCaseId) =>
 
 /* --- Small helpers ------------------------------------------------------- */
 
-const titleCase = (value) => String(value || "").replace(/(^|[\s·/-])([a-z])/g, (_, edge, char) => edge + char.toUpperCase());
+const titleCase = (value) =>
+  String(value || "")
+    .replace(/[-_]/g, " ")
+    .trim()
+    .replace(/\b\w+/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .replace(/\bAnd\b/g, "&");
 
 const humanise = (id) =>
   String(id)
@@ -137,11 +171,37 @@ function toast(message, kind = "info") {
 }
 
 /* --- Timer -------------------------------------------------------------- */
+/* The 30 minutes belong to the interview, not to the calendar. The clock is
+ * therefore driven by time accumulated inside the room: it does not start
+ * until Leo opens the case, it is banked when the room closes, and it resumes
+ * from that total. Reopening a case after a long break no longer greets the
+ * candidate with an expired red 00:00 and a "time is up" alert. */
 
-function startTimer(startedAt) {
-  state.startedAt = startedAt;
-  state.timeUpAnnounced = false;
-  window.clearInterval(state.timerId);
+const DURATION_MS = DURATION_MINUTES * 60 * 1000;
+
+function remainingMs() {
+  return Math.max(0, DURATION_MS - state.elapsedMs);
+}
+
+function paintTimer() {
+  const remaining = Math.ceil(remainingMs() / 1000);
+  const minutes = String(Math.floor(remaining / 60)).padStart(2, "0");
+  const seconds = String(remaining % 60).padStart(2, "0");
+  const running = Boolean(state.timerId);
+  const expired = remaining === 0;
+
+  el.timerValue.textContent = `${minutes}:${seconds}`;
+  el.timer.classList.toggle("is-idle", !running && !expired && state.elapsedMs === 0);
+  el.timer.classList.toggle("is-warning", running && remaining <= 300 && remaining > 60);
+  el.timer.classList.toggle("is-critical", running && remaining <= 60 && remaining > 0);
+  el.timer.classList.toggle("is-expired", expired);
+}
+
+function startTimer() {
+  if (state.timerId) return;
+  state.startedAt = Date.now() - state.elapsedMs;
+  // Already over time on resume: show it calmly, never announce it as news.
+  if (!remainingMs()) state.timeUpAnnounced = true;
   tickTimer();
   state.timerId = window.setInterval(tickTimer, 1000);
 }
@@ -152,22 +212,40 @@ function stopTimer() {
 }
 
 function tickTimer() {
-  const elapsed = Math.floor((Date.now() - state.startedAt) / 1000);
-  const remaining = Math.max(0, DURATION_MINUTES * 60 - elapsed);
-  const minutes = String(Math.floor(remaining / 60)).padStart(2, "0");
-  const seconds = String(remaining % 60).padStart(2, "0");
+  if (state.startedAt !== null) state.elapsedMs = Date.now() - state.startedAt;
+  paintTimer();
 
-  el.timerValue.textContent = `${minutes}:${seconds}`;
-  el.timer.classList.toggle("is-warning", remaining <= 300 && remaining > 60);
-  el.timer.classList.toggle("is-critical", remaining <= 60);
-
-  if (remaining === 0 && !state.timeUpAnnounced) {
+  if (!remainingMs()) {
+    const announce = !state.timeUpAnnounced;
     state.timeUpAnnounced = true;
     stopTimer();
-    if (!state.attempt?.ended) {
+    paintTimer();
+    if (announce && !state.attempt?.ended) {
       toast("Time is up. Land your recommendation, then end the practice.", "warning");
     }
   }
+}
+
+/* One place decides whether the clock should be running for this attempt. */
+function syncTimer(attempt) {
+  if (attempt.ended) {
+    bankElapsed();
+    stopTimer();
+    paintTimer();
+    return;
+  }
+  if (!attempt.case_started) {
+    stopTimer();
+    state.elapsedMs = 0;
+    state.startedAt = null;
+    paintTimer();
+    return;
+  }
+  startTimer();
+}
+
+function bankElapsed() {
+  if (state.startedAt !== null && state.timerId) state.elapsedMs = Date.now() - state.startedAt;
 }
 
 /* --- Rendering ---------------------------------------------------------- */
@@ -177,7 +255,9 @@ function renderAttempt(attempt) {
   state.attempt = attempt;
   state.selectedCaseId = attempt.case.id;
 
+  setPhaseState(attempt);
   setEndedState(attempt.ended);
+  syncTimer(attempt);
   renderCaseHeader(attempt);
   renderStage(attempt);
   renderFacts(attempt.facts, isNewAttempt);
@@ -185,17 +265,44 @@ function renderAttempt(attempt) {
   state.renderedId = attempt.id;
 }
 
+/* Before the case opens the room is a briefing, not an interview. The two
+ * states are driven from one body class so the toolbar, the clock, the
+ * composer and the copy cannot drift apart. */
+function setPhaseState(attempt) {
+  const preCase = !attempt.case_started && !attempt.ended;
+  document.body.classList.toggle("is-pre-case", preCase);
+  document.body.classList.toggle("is-ended", Boolean(attempt.ended));
+
+  if (el.stageLabel) {
+    el.stageLabel.textContent = attempt.ended
+      ? "Practice complete"
+      : preCase
+        ? "Before we start"
+        : "Live interview";
+  }
+  if (el.sessionStatus) {
+    el.sessionStatus.textContent = attempt.ended
+      ? "Practice ended"
+      : preCase
+        ? "Waiting for you"
+        : "Case in progress";
+  }
+  el.input.placeholder = preCase
+    ? "Reply to Leo, or start the case when you are ready…"
+    : "Ask Leo a question or talk through your reasoning…";
+}
+
 function renderCaseHeader(attempt) {
-  const { title, category, difficulty, supported_durations: durations, skills_tested: skills } = attempt.case;
+  const { title, category, difficulty, skills_tested: skills } = attempt.case;
   document.title = `${title} · Leo`;
   el.title.textContent = title;
   el.sessionMode.textContent = attempt.mode;
 
+  /* Duration and mode are already stated by the clock and the toolbar chip, so
+   * the header keeps only what identifies the case. */
   const labels = [
     GENERIC_CATEGORIES.has(String(category).toLowerCase()) ? null : titleCase(category),
     `${titleCase(difficulty)} difficulty`,
-    `${durations?.[0] ?? DURATION_MINUTES} minutes`,
-    `${titleCase(attempt.mode)} mode`,
   ].filter(Boolean);
 
   el.tags.replaceChildren(
@@ -248,35 +355,93 @@ function renderStage(attempt) {
   });
 }
 
+/* --- Evidence rail ------------------------------------------------------- */
+/* The rail is working memory, not a second transcript. Newest first, so the
+ * fact that just landed never needs scrolling to; that one card is open and
+ * emphasised, the rest collapse to a single summary line the candidate can
+ * scan; identifiers are demoted into the expanded detail. */
+
+const factCategory = (id) => titleCase(String(id).split(".")[0]);
+
+function factSummary(content) {
+  const text = String(content).replace(/\s+/g, " ").trim();
+  const sentence = text.match(/^.*?[.!?](?=\s|$)/);
+  const summary = (sentence ? sentence[0] : text).trim();
+  return summary.length > 96 ? `${summary.slice(0, 95).trimEnd()}…` : summary;
+}
+
+function buildFact(fact, position, total) {
+  const item = el.factTemplate.content.firstElementChild.cloneNode(true);
+  const toggle = item.querySelector(".fact-toggle");
+  const detail = item.querySelector(".fact-detail");
+  const isLatest = position === total - 1;
+  const expanded = isLatest || state.expandedFactIds.has(fact.id);
+
+  item.dataset.factId = fact.id;
+  item.classList.toggle("is-latest", isLatest);
+  item.classList.toggle("is-new", state.newFactIds.has(fact.id));
+
+  item.querySelector(".fact-category").textContent = isLatest
+    ? `Latest · ${factCategory(fact.id)}`
+    : factCategory(fact.id);
+  item.querySelector(".fact-summary").textContent = factSummary(fact.content);
+  item.querySelector(".fact-content").textContent = fact.content;
+  item.querySelector(".fact-index").textContent = `${String(position + 1).padStart(2, "0")} · ${humanise(fact.id)}`;
+
+  toggle.setAttribute("aria-expanded", String(expanded));
+  detail.hidden = !expanded;
+  toggle.addEventListener("click", () => {
+    const open = toggle.getAttribute("aria-expanded") !== "true";
+    toggle.setAttribute("aria-expanded", String(open));
+    detail.hidden = !open;
+    if (open) state.expandedFactIds.add(fact.id);
+    else state.expandedFactIds.delete(fact.id);
+  });
+
+  return item;
+}
+
 function renderFacts(facts, isNewAttempt) {
-  if (isNewAttempt) state.knownFactIds = new Set();
+  if (isNewAttempt) {
+    state.knownFactIds = new Set();
+    state.newFactIds = new Set();
+    state.expandedFactIds = new Set();
+  }
+
+  const released = facts.filter((fact) => !state.knownFactIds.has(fact.id));
+  if (released.length && !isNewAttempt) {
+    state.newFactIds = new Set(released.map((fact) => fact.id));
+  }
+  state.knownFactIds = new Set(facts.map((fact) => fact.id));
 
   el.factsCounter.textContent = String(facts.length);
   el.factsCounter.classList.toggle("is-live", facts.length > 0);
+  if (el.railEvidenceCount) el.railEvidenceCount.textContent = String(facts.length);
+  if (el.railTabEvidence) {
+    el.railTabEvidence.classList.toggle("has-new", state.newFactIds.size > 0);
+  }
+
+  /* A voice call resyncs every 1.5s. Rebuilding the list each time would
+   * collapse whatever the candidate had just opened, so only the signature
+   * changing earns a rebuild. */
+  const signature = `${facts.map((fact) => fact.id).join("|")}#${[...state.newFactIds].join("|")}`;
+  if (signature === state.factsSignature && !isNewAttempt) return;
+  state.factsSignature = signature;
 
   if (!facts.length) {
     const empty = node("div", "facts-empty");
     empty.append(
       node("strong", null, "Nothing released yet"),
-      node("span", null, "Ask a sharp, specific question and Leo will hand over what it earns."),
+      node("span", null, "Ask a sharp, specific question and Leo hands over what it earns."),
     );
     el.facts.replaceChildren(empty);
     return;
   }
 
-  el.facts.replaceChildren(
-    ...facts.map((fact, position) => {
-      const isNew = !state.knownFactIds.has(fact.id) && !isNewAttempt;
-      const card = node("article", `fact${isNew ? " is-new" : ""}`);
-      card.append(
-        node("span", "fact-index", `${String(position + 1).padStart(2, "0")} · ${humanise(fact.id)}`),
-        node("p", "fact-content", fact.content),
-      );
-      return card;
-    }),
-  );
-
-  state.knownFactIds = new Set(facts.map((fact) => fact.id));
+  const cards = facts.map((fact, position) => buildFact(fact, position, facts.length)).reverse();
+  if (released.length && !isNewAttempt) cards[0]?.classList.add("is-entering");
+  el.facts.replaceChildren(...cards);
+  el.rail.scrollTop = 0;
 }
 
 function buildMessage(message, index) {
@@ -285,13 +450,19 @@ function buildMessage(message, index) {
   item.classList.add(message.role);
   if (index === 0 && message.role === "interviewer") item.classList.add("is-opening");
   item.querySelector(".message-role").textContent = message.role === "candidate" ? "You" : "Leo";
-  item.querySelector(".message-content").textContent = message.content;
+  // Hide legacy delivery annotations from transcripts created before the
+  // Custom LLM speech path stopped treating them as literal words.
+  item.querySelector(".message-content").textContent = String(message.content).replace(AUDIO_CUE, "");
   return item;
 }
 
 /* Append-only sync so existing bubbles never re-animate or flicker. */
 function syncMessages(attempt, isNewAttempt) {
-  const stale = isNewAttempt || attempt.messages.length < state.renderedCount;
+  const changedMessage = state.renderedMessages.some((message, index) => {
+    const current = attempt.messages[index];
+    return !current || current.role !== message.role || current.content !== message.content;
+  });
+  const stale = isNewAttempt || attempt.messages.length < state.renderedCount || changedMessage;
   /* Measured before the DOM grows, otherwise a long reply always reads as
    * "the candidate has scrolled away" and the transcript stops following. */
   const wasFollowing = isNearBottom();
@@ -310,6 +481,7 @@ function syncMessages(attempt, isNewAttempt) {
     el.messages.append(...pending.map((message, offset) => buildMessage(message, state.renderedCount + offset)));
     state.renderedCount = attempt.messages.length;
   }
+  state.renderedMessages = attempt.messages.map(({ role, content }) => ({ role, content }));
   if (stale) {
     /* A fresh brief is read top-down; a resumed transcript resumes at the end. */
     if (attempt.messages.length <= 1) el.scroll.scrollTop = 0;
@@ -341,6 +513,7 @@ function clearPending() {
 function showTranscriptState(text, { spinner = true, retry = false } = {}) {
   el.messages.replaceChildren();
   state.renderedCount = 0;
+  state.renderedMessages = [];
   const wrap = node("div", "transcript-state");
   if (spinner) wrap.append(node("span", "orbit"));
   wrap.append(node("p", null, text));
@@ -402,6 +575,14 @@ el.form.addEventListener("submit", (event) => {
   sendTurn(content, crypto.randomUUID());
 });
 
+/* This is an explicit UI decision, not an inference from a keyword. The
+ * onboarding model still owns the server-side readiness transition; the button
+ * simply sends the same clear go-ahead a candidate would otherwise type. */
+el.beginCase?.addEventListener("click", () => {
+  if (!state.attempt || state.sending || state.attempt.ended || state.attempt.case_started) return;
+  sendTurn("I'm ready to begin.", crypto.randomUUID());
+});
+
 function setSending(sending) {
   state.sending = sending;
   el.send.classList.toggle("is-sending", sending);
@@ -457,7 +638,6 @@ async function recoverSession() {
     try {
       const attempt = await startAttempt();
       persistSession(attempt.id, Date.now(), attempt.case.id);
-      startTimer(Date.now());
       renderAttempt(attempt);
       toast("Your previous session expired, so a fresh case has started.", "warning");
       return true;
@@ -474,9 +654,140 @@ function setEndedState(ended) {
   el.endedBar.classList.toggle("hidden", !ended);
   el.endButton.classList.toggle("hidden", Boolean(ended));
   el.input.disabled = Boolean(ended);
+  if (state.attempt) {
+    const debriefUrl = `/attempts/${state.attempt.id}/debrief`;
+    if (el.viewDebriefBtn) el.viewDebriefBtn.href = debriefUrl;
+    if (el.dialogDebriefBtn) el.dialogDebriefBtn.href = debriefUrl;
+  }
   if (ended) stopTimer();
   syncSendState();
 }
+
+/* --- Voice mode --------------------------------------------------------- */
+
+function updateVoiceCaption() {
+  if (!el.captionText || !state.attempt?.messages?.length) return;
+  const last = state.attempt.messages[state.attempt.messages.length - 1];
+  if (last) {
+    const isUser = last.role === "candidate";
+    el.captionText.innerHTML = `<strong>${isUser ? "You" : "Leo"}:</strong> ${last.content}`;
+  }
+}
+
+function setVoiceState(status = "chat") {
+  const active = ["connecting", "listening", "speaking"].includes(status);
+  const labels = {
+    chat: "Chat",
+    connecting: "Connecting...",
+    listening: "Leo is listening",
+    speaking: "Leo is speaking",
+    reconnecting: "Reconnecting...",
+  };
+  const guidance = {
+    connecting: "Establishing encrypted WebRTC audio channel with Leo...",
+    listening: "Speak naturally · Formulate hypotheses · Ask for facts",
+    speaking: "Listen closely to the released evidence and interviewer steer",
+    chat: "Chat mode",
+  };
+
+  el.voiceStatus.textContent = labels[status] || "Chat";
+  el.voiceToggle.textContent = active ? "Return to chat" : "Start voice";
+  el.form.classList.toggle("is-voice-active", active);
+
+  const hud = el.voiceHud || el.voiceStage;
+  if (hud) {
+    hud.classList.toggle("hidden", !active);
+    hud.className = `voice-hud ${active ? "" : "hidden"} is-${status}`;
+  }
+  if (el.voiceStateLabel) {
+    el.voiceStateLabel.textContent = labels[status] || "Connecting with Leo...";
+  }
+  if (el.voiceGuidance && guidance[status]) {
+    el.voiceGuidance.textContent = guidance[status];
+  }
+
+  updateVoiceCaption();
+  if (active) {
+    scrollToLatest({ force: true });
+  }
+}
+
+async function loadVoiceAvailability() {
+  try {
+    const voice = await request("/api/voice/status");
+    el.voiceControls.classList.toggle("hidden", !voice.ready);
+    if (!voice.ready) setVoiceState("chat");
+  } catch {
+    // Voice is progressive enhancement. A failed capability check must never
+    // prevent the established text room from loading.
+    el.voiceControls.classList.add("hidden");
+  }
+}
+
+async function returnToChat() {
+  try {
+    await window.LeoVoice?.end?.();
+  } finally {
+    setVoiceState("chat");
+    if (!state.attempt?.ended) el.input.focus();
+  }
+}
+
+el.voiceReturnChat?.addEventListener("click", returnToChat);
+
+el.voiceToggle.addEventListener("click", async () => {
+  if (window.LeoVoice?.active) {
+    await returnToChat();
+    return;
+  }
+  if (typeof el.voiceConsent.showModal === "function") el.voiceConsent.showModal();
+  else await startVoice();
+});
+
+el.voiceCancel.addEventListener("click", () => el.voiceConsent.close());
+el.voiceStart.addEventListener("click", async () => {
+  el.voiceConsent.close();
+  await startVoice();
+});
+
+async function startVoice() {
+  if (!state.attempt || state.attempt.ended || !window.LeoVoice) return;
+  setVoiceState("connecting");
+  el.voiceToggle.disabled = true;
+  try {
+    await window.LeoVoice.start(state.attempt.id);
+  } catch (error) {
+    setVoiceState("chat");
+    toast(error.message || "Voice could not start. You can continue in chat.", "error");
+  } finally {
+    el.voiceToggle.disabled = false;
+  }
+}
+
+window.addEventListener("leo:voice-status", (event) => {
+  const status = event.detail?.status;
+  const errorReason = event.detail?.error;
+  if (status === "disconnected") {
+    setVoiceState("chat");
+    if (!state.attempt?.ended) {
+      toast(errorReason ? `Voice disconnected: ${errorReason}` : "Voice ended. You can continue in chat.", "warning");
+    }
+    return;
+  }
+  if (status === "connected") setVoiceState("listening");
+  if (status === "speaking" || status === "listening" || status === "connecting") setVoiceState(status);
+});
+
+window.addEventListener("leo:voice-sync", async () => {
+  if (!state.attempt || state.attempt.ended) return;
+  try {
+    const updated = await request(`/api/attempts/${state.attempt.id}`);
+    renderAttempt(updated);
+    updateVoiceCaption();
+  } catch {
+    // The provider can disconnect independently; the chat UI remains usable.
+  }
+});
 
 function disarmEndButton() {
   window.clearTimeout(state.endArmedTimer);
@@ -498,21 +809,49 @@ el.endButton.addEventListener("click", async () => {
   disarmEndButton();
   el.endButton.disabled = true;
   try {
+    await returnToChat();
     const data = await request(`/api/attempts/${state.attempt.id}/end`, { method: "POST" });
-    renderAttempt(data.attempt);
-    scrollToLatest({ force: true, instant: true });
-    renderScorecard(data.scorecard);
+    const debriefUrl = data.debrief_url || `/attempts/${state.attempt.id}/debrief`;
+
+    // Immediately display completion dialog and forward candidate to debrief
+    if (el.dialogDebriefBtn) el.dialogDebriefBtn.href = debriefUrl;
+    if (el.viewDebriefBtn) el.viewDebriefBtn.href = debriefUrl;
+    
+    if (el.caseCompleteDialog) {
+      el.caseCompleteDialog.showModal();
+      window.setTimeout(() => {
+        window.location.href = debriefUrl;
+      }, 750);
+    } else {
+      window.location.href = debriefUrl;
+    }
   } catch (error) {
     toast(error.message || "The practice could not be ended.", "error");
-  } finally {
     el.endButton.disabled = false;
   }
 });
 
 function renderScorecard(scorecard) {
+  const debriefUrl = `/attempts/${state.attempt.id}/debrief`;
   const complete = scorecard.status === "complete";
   el.scorecardStatus.textContent = complete ? "Complete" : "Partial";
   el.scorecardStatus.classList.toggle("is-partial", !complete);
+
+  const ctaWrap = node("div", "debrief-rail-cta");
+  ctaWrap.style.padding = "10px";
+  ctaWrap.style.margin = "10px 0";
+  ctaWrap.style.background = "var(--brand-tint)";
+  ctaWrap.style.borderRadius = "var(--r-md)";
+  ctaWrap.style.border = "1px solid var(--line-base)";
+
+  const ctaBtn = node("a", "btn btn-primary btn-sm", "View 10x Debrief Report →");
+  ctaBtn.href = debriefUrl;
+  ctaBtn.style.display = "block";
+  ctaBtn.style.textAlign = "center";
+  ctaBtn.style.width = "100%";
+  ctaBtn.style.background = "var(--brand-primary)";
+  ctaBtn.style.color = "#ffffff";
+  ctaWrap.append(ctaBtn);
 
   const rows = scorecard.dimensions.map((dimension) => {
     const row = node("div", "score-row");
@@ -528,7 +867,7 @@ function renderScorecard(scorecard) {
   const drill = node("div", "next-drill");
   drill.append(node("p", "micro-label", "Next drill"), node("p", null, scorecard.next_drill));
 
-  el.scorecardBody.replaceChildren(...rows, drill);
+  el.scorecardBody.replaceChildren(ctaWrap, ...rows, drill);
   el.scorecard.classList.remove("hidden");
   el.rail.prepend(el.scorecard);
   el.rail.scrollTop = 0;
@@ -542,7 +881,6 @@ el.restart.addEventListener("click", async () => {
   try {
     const attempt = await startAttempt();
     persistSession(attempt.id, Date.now(), attempt.case.id);
-    startTimer(Date.now());
     renderAttempt(attempt);
     el.input.focus();
   } catch (error) {
@@ -584,14 +922,17 @@ function setMenuOpen(open) {
   el.userChip.setAttribute("aria-expanded", String(open));
 }
 
-el.userChip.addEventListener("click", (event) => {
-  event.stopPropagation();
-  setMenuOpen(el.userSheet.classList.contains("hidden"));
-});
+if (el.userChip && !el.userChip.dataset.navBound) {
+  el.userChip.dataset.navBound = "true";
+  el.userChip.addEventListener("click", (event) => {
+    event.stopPropagation();
+    setMenuOpen(el.userSheet.classList.contains("hidden"));
+  });
 
-document.addEventListener("click", (event) => {
-  if (!el.userMenu.contains(event.target)) setMenuOpen(false);
-});
+  document.addEventListener("click", (event) => {
+    if (!el.userMenu.contains(event.target)) setMenuOpen(false);
+  });
+}
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") setMenuOpen(false);
@@ -625,13 +966,34 @@ function readSession() {
 
 /* --- Boot --------------------------------------------------------------- */
 
-async function boot() {
-  showTranscriptState("Connecting you to Leo…");
+async function boot() {  showTranscriptState("Connecting you to Leo…");
   syncSendState();
   await loadViewer();
+  await loadVoiceAvailability();
 
   const requestedCaseId = new URLSearchParams(window.location.search).get("case");
+  const requestedAttemptId = new URLSearchParams(window.location.search).get("attempt");
   if (requestedCaseId) state.selectedCaseId = requestedCaseId;
+
+  // The Case Library supplies this durable attempt ID for an in-progress case.
+  // It takes precedence over browser-local state, so a candidate can resume on
+  // another device without accidentally creating a duplicate attempt.
+  if (requestedAttemptId) {
+    try {
+      const attempt = await request(`/api/attempts/${requestedAttemptId}`);
+      const startedAt = Date.now();
+      persistSession(attempt.id, startedAt, attempt.case.id);
+      renderAttempt(attempt);
+      if (attempt.ended) {
+        window.location.href = `/attempts/${attempt.id}/debrief`;
+        return;
+      }
+      el.input.focus();
+      return;
+    } catch (error) {
+      toast(error.message || "That saved case could not be resumed.", "error");
+    }
+  }
 
   const stored = readSession();
   // A direct catalogue selection intentionally starts a new attempt. A reload
@@ -641,10 +1003,14 @@ async function boot() {
       const attempt = await request(`/api/attempts/${stored.id}`);
       const startedAt = Number(stored.startedAt) || Date.now();
       persistSession(attempt.id, startedAt, attempt.case.id);
-      startTimer(startedAt);
       renderAttempt(attempt);
-      if (attempt.ended) await restoreScorecard(attempt.id);
-      else toast("Picked up where you left off.");
+      if (attempt.ended) {
+        // An ended attempt lives on its debrief page; that page handles
+        // generating a missing report and falling back gracefully.
+        window.location.href = `/attempts/${attempt.id}/debrief`;
+        return;
+      }
+      toast("Picked up where you left off.");
       el.input.focus();
       return;
     } catch {
@@ -655,21 +1021,11 @@ async function boot() {
   try {
     const attempt = await startAttempt();
     persistSession(attempt.id, Date.now(), attempt.case.id);
-    startTimer(Date.now());
     renderAttempt(attempt);
     el.input.focus();
   } catch (error) {
     el.title.textContent = "Case unavailable";
     showTranscriptState(error.message || "The case could not be loaded.", { spinner: false, retry: true });
-  }
-}
-
-async function restoreScorecard(attemptId) {
-  try {
-    const data = await request(`/api/attempts/${attemptId}/end`, { method: "POST" });
-    renderScorecard(data.scorecard);
-  } catch {
-    /* The transcript still stands on its own without the summary. */
   }
 }
 

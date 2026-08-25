@@ -1,14 +1,110 @@
 schema_version: reservoir-facts-v1
 facts:
-  - {id: company.model, domain: company, release_level: broad_context, content: "Harvest Table earns revenue from dine-in, takeaway, and delivery orders across 180 company-operated stores."}
-  - {id: financials.scope, domain: financials, release_level: sharp_question, content: "Comparable-store sales grew 5 percent, so the margin decline is not explained by a broad fall in demand."}
-  - {id: channels.mix, domain: customers, release_level: sharp_question, content: "Delivery grew from 20 to 46 percent of sales over two years; dine-in and takeaway sales were broadly stable."}
-  - {id: channels.economics, domain: economics, release_level: hypothesis_backed, content: "A 500-rupee dine-in order contributes about 110 rupees after food, labour, and occupancy. The same basket through an aggregator contributes about 35 rupees after commission, packaging, and promotions."}
-  - {id: commercial.promotions, domain: commercial, release_level: hypothesis_backed, content: "Harvest Table funds roughly two thirds of delivery discounts, even when the promotion is initiated by the aggregator."}
-  - {id: operations.kitchen, domain: operations, release_level: broad_context, content: "Stores kept peak-hour staffing designed for dine-in service, while delivery orders now arrive in shorter, less predictable bursts."}
-  - {id: operations.utilisation, domain: operations, release_level: hypothesis_backed, content: "Kitchen utilisation is acceptable at lunch and dinner peaks but falls below 45 percent during most of the afternoon."}
-  - {id: benchmark, domain: market, release_level: sharp_question, content: "Peer chains with similar food concepts held margins where delivery represents less than one third of sales or where delivery prices cover commission."}
-  - {id: pricing.flexibility, domain: commercial, release_level: sharp_question, content: "Harvest Table can set channel-specific menu prices and can change its own-app loyalty offers within eight weeks."}
-  - {id: recommendation.channel-price, domain: recommendation, release_level: synthesis_support, content: "Reprice selected delivery items or redesign bundles so contribution covers aggregator commission and packaging without raising every headline price."}
-  - {id: recommendation.loyalty, domain: recommendation, release_level: synthesis_support, content: "Use the owned app for repeat customers and target promotions to incremental demand rather than funding blanket discounts."}
-  - {id: recommendation.labour, domain: recommendation, release_level: synthesis_support, content: "Adjust off-peak staffing and production routines only after protecting peak-time food quality and delivery reliability."}
+  - id: company.model
+    domain: company
+    release_level: broad_context
+    content: "Harvest Table earns revenue from dine-in, takeaway, and delivery orders across 180 company-operated stores."
+    candidate_purpose: "Establish multi-channel restaurant operating structure."
+    question_examples:
+      - "What is Harvest Table's store footprint and operating model?"
+      - "What channels does Harvest Table operate across?"
+
+  - id: financials.scope
+    domain: financials
+    release_level: sharp_question
+    content: "Comparable-store sales grew 5 percent, so the margin decline is not explained by a broad fall in demand."
+    candidate_purpose: "Rule out overall sales volume decline as the cause."
+    question_examples:
+      - "How have total revenue and same-store sales trended?"
+      - "Are customer transaction volumes declining across stores?"
+
+  - id: channels.mix
+    domain: customers
+    release_level: sharp_question
+    content: "Delivery grew from 20 to 46 percent of sales over two years; dine-in and takeaway sales were broadly stable."
+    dependencies: [financials.scope]
+    candidate_purpose: "Reveal significant channel mix shift toward delivery aggregators."
+    question_examples:
+      - "What is the breakdown of sales by channel (dine-in, takeaway, delivery)?"
+      - "How has channel mix changed over the past two years?"
+
+  - id: channels.economics
+    domain: economics
+    release_level: hypothesis_backed
+    content: "A 500-rupee dine-in order contributes about 110 rupees after food, labour, and occupancy. The same basket through an aggregator contributes about 35 rupees after commission, packaging, and promotions."
+    dependencies: [channels.mix]
+    candidate_purpose: "Demonstrate stark unit economic divergence between dine-in (₹110 contribution) and delivery (₹35 contribution)."
+    question_examples:
+      - "What are the unit economics and contribution margins by channel?"
+      - "How does profit contribution per ₹500 basket compare across dine-in and delivery?"
+
+  - id: commercial.promotions
+    domain: commercial
+    release_level: hypothesis_backed
+    content: "Harvest Table funds roughly two thirds of delivery discounts, even when the promotion is initiated by the aggregator."
+    dependencies: [channels.economics]
+    candidate_purpose: "Highlight margin leakage from brand-funded aggregator discounts."
+    question_examples:
+      - "Who funds discounts and promotional offers on aggregator apps?"
+      - "What proportion of delivery discounts are paid by Harvest Table?"
+
+  - id: operations.kitchen
+    domain: operations
+    release_level: broad_context
+    content: "Stores kept peak-hour staffing designed for dine-in service, while delivery orders now arrive in shorter, less predictable bursts."
+    candidate_purpose: "Identify kitchen labor misalignment with delivery order arrival patterns."
+    question_examples:
+      - "How is kitchen staffing scheduled across different hours?"
+      - "How do delivery order patterns affect kitchen operations?"
+
+  - id: operations.utilisation
+    domain: operations
+    release_level: hypothesis_backed
+    content: "Kitchen utilisation is acceptable at lunch and dinner peaks but falls below 45 percent during most of the afternoon."
+    candidate_purpose: "Show operational slack and off-peak labor inefficiency."
+    question_examples:
+      - "What is the kitchen capacity utilization throughout the day?"
+      - "Are stores experiencing off-peak labor under-utilization?"
+
+  - id: benchmark
+    domain: market
+    release_level: sharp_question
+    content: "Peer chains with similar food concepts held margins where delivery represents less than one third of sales or where delivery prices cover commission."
+    candidate_purpose: "Provide industry benchmark showing channel pricing discipline preserves margin."
+    question_examples:
+      - "How are competitor restaurant chains performing in terms of EBITDA margin?"
+      - "How do peer chains manage delivery aggregator commissions?"
+
+  - id: pricing.flexibility
+    domain: commercial
+    release_level: sharp_question
+    content: "Harvest Table can set channel-specific menu prices and can change its own-app loyalty offers within eight weeks."
+    candidate_purpose: "Establish pricing flexibility and direct-channel loyalty levers."
+    question_examples:
+      - "Does Harvest Table have contractual freedom to differentiate delivery menu pricing?"
+      - "Can Harvest Table offer channel-specific combos or loyalty rewards?"
+
+  - id: diagnosis.hidden
+    domain: diagnosis
+    release_level: interviewer_only
+    provenance: source_derived
+    content: "EBITDA margin compression (14% to 7%) is driven by a channel mix shift to delivery aggregators (20% to 46% of sales) where contribution is 68% lower (₹35 vs ₹110 per ₹500 basket) due to 20%+ commissions, special packaging, and brand-funded discounts, exacerbated by inflexible kitchen staffing; recovery requires differential delivery menu pricing, driving direct-app orders, and flex-staffing."
+    candidate_purpose: "Never disclose directly. Benchmark for evaluator answer-key comparison and interviewer recovery."
+
+  - id: recommendation.channel-price
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Reprice selected delivery items or redesign bundles so contribution covers aggregator commission and packaging without raising every headline price."
+    candidate_purpose: "Pillar 1: Delivery-specific bundle pricing and commission recovery."
+
+  - id: recommendation.loyalty
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Use the owned app for repeat customers and target promotions to incremental demand rather than funding blanket discounts."
+    candidate_purpose: "Pillar 2: Direct-to-consumer app migration and targeted promotions."
+
+  - id: recommendation.labour
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Adjust off-peak staffing and production routines only after protecting peak-time food quality and delivery reliability."
+    candidate_purpose: "Pillar 3: Flexible kitchen labor scheduling and off-peak prep."

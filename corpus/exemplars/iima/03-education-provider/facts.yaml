@@ -1,0 +1,44 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: enrollment.growth
+  domain: commercial
+  release_level: broad_context
+  content: Total student enrollment grew 12% across 40 physical centers in North and West India.
+- id: cost.inflation
+  domain: financials
+  release_level: sharp_question
+  content: Faculty compensation expenses surged 52% YoY, consuming 68% of total student fee revenue compared to historical
+    42%.
+- id: poaching.threat
+  domain: market
+  release_level: hypothesis_backed
+  content: Venture-funded online edtech players offered star physics and math faculty 2-3x salaries with equity bonuses, forcing
+    client into defensive bidding.
+  dependencies:
+  - cost.inflation
+- id: curriculum.structure
+  domain: operations
+  release_level: hypothesis_backed
+  content: Teaching methodology relied on bespoke handwritten notes by star teachers rather than standardized, institutional
+    digital problem sets.
+  dependencies:
+  - poaching.threat
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Profit collapse is driven by faculty payroll surging from 42% to 68% of revenue due to defensive retention bidding
+    against edtechs, caused by lack of institutionalized teaching IP.
+- id: recommendation.ip
+  domain: recommendation
+  release_level: synthesis_support
+  content: Institutionalize master curriculum modules, AI-graded practice problem banks, and recorded masterclasses to decouple
+    brand from individual faculty.
+- id: recommendation.tenure
+  domain: recommendation
+  release_level: synthesis_support
+  content: Restructure compensation into multi-year vesting equity bonuses, non-compete covenants, and co-authorship royalties.
+- id: recommendation.pipeline
+  domain: recommendation
+  release_level: synthesis_support
+  content: Establish internal teacher training academy to train junior faculty on standardized delivery.

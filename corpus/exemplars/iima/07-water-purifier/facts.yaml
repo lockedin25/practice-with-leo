@@ -1,0 +1,41 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: subscription.growth
+  domain: commercial
+  release_level: broad_context
+  content: "Rental subscriber base reached 100,000 users paying \u20B9499/month with zero upfront security deposit."
+- id: hardware.capex
+  domain: financials
+  release_level: sharp_question
+  content: "Each IoT purifier costs \u20B99,000 to manufacture and install, funded entirely by client working capital debt."
+- id: churn.rate
+  domain: customers
+  release_level: hypothesis_backed
+  content: "32% of subscribers cancel within 6 months, generating only \u20B92,994 against \u20B99,000 hardware cost."
+  dependencies:
+  - hardware.capex
+- id: refurbish.cost
+  domain: operations
+  release_level: hypothesis_backed
+  content: "Retrieved purifiers cost \u20B92,500 to de-install, sanitize, and repackage, resulting in net negative asset recovery."
+  dependencies:
+  - churn.rate
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Subscription model burns cash because \u20B99k hardware capex requires 18 months to breakeven, but 32% of users\
+    \ churn within 6 months with zero deposit or contract commitment."
+- id: recommendation.deposit
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Require a \u20B92,500 refundable security deposit and a mandatory 12-month minimum contract lock-in."
+- id: recommendation.iot_lock
+  domain: recommendation
+  release_level: synthesis_support
+  content: Enforce digital DRM on filter cartridges via IoT chips, disabling machine if unauthorized counterfeit filters are
+    inserted.
+- id: recommendation.rent_to_own
+  domain: recommendation
+  release_level: synthesis_support
+  content: Introduce rent-to-own pathway where 24 monthly payments transfer ownership to customer, eliminating reverse logistics.

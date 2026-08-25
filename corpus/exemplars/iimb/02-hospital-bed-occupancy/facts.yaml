@@ -1,0 +1,45 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: hospital.capacity
+  domain: company
+  release_level: broad_context
+  content: 'Hospital has 450 beds: 350 general/semi-private, 60 step-down, 40 ICU beds, and 12 Operating Rooms (ORs).'
+- id: occupancy.split
+  domain: operations
+  release_level: sharp_question
+  content: General beds average 64% occupancy; ICU runs at 96% occupancy with an average wait time of 6 hours for post-op
+    admissions.
+- id: discharge.lag
+  domain: operations
+  release_level: hypothesis_backed
+  content: Patients medically cleared for ICU step-down wait an average of 14.2 hours in ICU beds due to slow ward cleaning,
+    billing clearance, and insurance TPA approvals.
+  dependencies:
+  - occupancy.split
+- id: or.cancellations
+  domain: financials
+  release_level: hypothesis_backed
+  content: 18% of scheduled high-margin elective surgeries are postponed because no guaranteed post-op ICU bed is available
+    on surgery morning.
+  dependencies:
+  - discharge.lag
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Surgeries are cancelled because ICU beds are blocked by medically cleared patients waiting 14+ hours for ward transfers
+    due to administrative and TPA insurance bottlenecks.
+- id: recommendation.discharge_lounge
+  domain: recommendation
+  release_level: synthesis_support
+  content: Establish a dedicated Transit Discharge Lounge with pharmacy and billing desks to free up inpatient beds by 11
+    AM.
+- id: recommendation.icu_stepdown
+  domain: recommendation
+  release_level: synthesis_support
+  content: Convert 20 under-utilized general beds into a High Dependency Unit (HDU) with continuous monitoring to bypass full
+    ICU for routine recoveries.
+- id: recommendation.tpa_automation
+  domain: recommendation
+  release_level: synthesis_support
+  content: Implement automated pre-authorization with health insurance TPAs 24 hours prior to scheduled discharge.

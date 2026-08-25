@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: platform.volume
+  domain: company
+  release_level: broad_context
+  content: Platform handles 400 MT of fresh tomatoes, potatoes, onions, and leafy greens daily across 4 metros.
+- id: wastage.rate
+  domain: financials
+  release_level: sharp_question
+  content: "Total produce wastage is 22.5% of purchased weight, destroying \u20B914 Cr in gross margin monthly."
+- id: sorting.location
+  domain: operations
+  release_level: hypothesis_backed
+  content: Vegetables are bought in un-graded bulk lots at farmgate and sorted only upon arrival at city distribution centers
+    14 hours later.
+  dependencies:
+  - wastage.rate
+- id: grading.impact
+  domain: operations
+  release_level: hypothesis_backed
+  content: Testing computer-vision grading tables at village collection centers reduced transit freight weight by 24% and
+    cut urban DC wastage to 4.2%.
+  dependencies:
+  - sorting.location
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Wastage is 22.5% because un-graded bulk produce is transported 14 hours in ambient heat before sorting in cities;
+    grading at village centers cuts freight cost by 24% and slashes urban wastage to 4%.
+- id: recommendation.farmgate_grading
+  domain: recommendation
+  release_level: synthesis_support
+  content: Deploy standardized digital grading and optical sorting booths at all village collection centers.
+- id: recommendation.secondary_channel
+  domain: recommendation
+  release_level: synthesis_support
+  content: Sell Grade-B produce to institutional food processors (ketchup/chips) and Grade-C to cattle feed directly at farmgate.
+- id: recommendation.crate_logistics
+  domain: recommendation
+  release_level: synthesis_support
+  content: Replace loose gunny bags with ventilated plastic foldable crates to eliminate transit pressure bruising.

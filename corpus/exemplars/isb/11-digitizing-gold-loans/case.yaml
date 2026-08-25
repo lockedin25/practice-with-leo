@@ -1,0 +1,72 @@
+schema_version: reservoir-v1
+case_id: 11-digitizing-gold-loans-v1
+title: Doorstep Digital Gold Loan Underwriting
+school: ISB
+status: approved
+rights_status: original
+category: digital_transformation
+industry: banking_and_financial_services
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is a leading Indian gold loan NBFC with \u20B925,000 Cr AUM. It launched a '30-minute doorstep digital\
+    \ gold loan' product, but experienced collateral purity assay fraud and loan turnaround times stretching to 3 hours."
+  objective: Diagnose doorstep gold assay vulnerabilities and design an automated digital appraisal and secure logistics workflow.
+  opening_requirements:
+  - Name Doorstep Digital Gold Loan Underwriting and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Loan Turnaround Time (TAT in minutes) and Collateral Assay Deficit (%)) and time horizon (six
+    months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Loan Turnaround Time (TAT in minutes) and Collateral Assay Deficit (%)
+  decision_question: How should the gold loan NBFC eliminate doorstep assay fraud and achieve a genuine 30-minute loan disbursement
+    SLA?
+  time_horizon: six months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Subjective manual acid-touchstone assay testing in customer homes vulnerable to gold-plated jewelry fraud,
+    combined with delayed manual branch verification and secure transit custody handoffs.
+  what_the_case_wanted_to_test: Secured lending operations, portable non-destructive gold assay technology (XRF spectrometers),
+    anti-fraud field controls, and instant digital loan disbursement rails.
+  pivotal_insight: Traditional nitric acid testing by field loan officers fails to detect tungsten/copper core gold-plated
+    jewelry; equipping loan officers with portable X-Ray Fluorescence (XRF) analyzers and GPS-locked tamper-evident smart
+    pouches cuts fraud to 0.01% and enables instant UPI disbursal in 28 minutes.
+  common_traps:
+  - Requiring customers to travel to physical branches, which destroys the unique 'doorstep loan' value proposition.
+  - Relying on jeweler hallmarking stamps which can be easily counterfeited.
+  - Eliminating doorstep gold lending entirely.
+  takeaway_lesson: In collateral-backed asset lending, scaling mobile doorstep delivery requires replacing subjective manual
+    human appraisal with automated non-destructive IoT hardware verification.
+  suggested_readings:
+  - knowledge_base/industries/04_banking_and_financial_services.md
+  - knowledge_base/case_types/growth_strategy.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

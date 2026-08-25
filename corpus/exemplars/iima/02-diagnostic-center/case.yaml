@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 02-diagnostic-center-v1
+title: Diagnostic Center Network
+school: IIM-A
+status: approved
+rights_status: original
+category: profitability
+industry: pharma_and_healthcare
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is an established diagnostic center network in Mumbai. Profitability has slipped by 400 bps over the
+    last 18 months despite a 15% increase in total patient footfall.
+  objective: Identify the root cause of margin erosion and recommend strategic corrective measures.
+  opening_requirements:
+  - Name Diagnostic Center Network and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (EBITDA margin) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: EBITDA margin
+  decision_question: Why has diagnostic center profitability fallen despite growing patient volume, and how can margins be
+    restored?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Channel mix shift toward physician-referred B2C patients with escalating referral commissions (35-40% payouts)
+    vs direct walk-ins and corporate wellness packages that carry zero commission.
+  what_the_case_wanted_to_test: Healthcare revenue cycle dynamics, doctor kickback/referral commission inflation, and customer
+    acquisition channel economics.
+  pivotal_insight: Footfall growth is entirely driven by doctor referrals where physician commission rates increased from
+    20% to 38% due to intense lab competition, destroying gross margins.
+  common_traps:
+  - Assuming reagent consumable price inflation without checking test gross margins.
+  - Recommending an immediate ban on doctor referral fees causing patient collapse.
+  - Failing to segment patient traffic between direct walk-in, institutional B2B, and physician-referred channels.
+  takeaway_lesson: In referral-driven service healthcare, volume growth through intermediary commissions is margin-dilutive
+    if commission take-rates outpace operating scale efficiencies.
+  suggested_readings:
+  - knowledge_base/industries/03_pharma_and_healthcare.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

@@ -1,0 +1,89 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+
+root:
+  id: objective.retention-turnaround
+  label: Diagnose 90-day repeat rate collapse and recommend highest-value retention intervention over 12 months.
+
+nodes:
+  - id: marketing-and-pricing
+    type: branch
+    label: Marketing spend, retargeting, and discount pricing
+    status: valid_branch
+    evidence:
+      - marketing.spend
+      - repeat.profile
+    conclusion: Marketing discounts and retargeting ads fail to generate durable repeat conversions.
+
+  - id: category-decomposition
+    type: branch
+    label: Retention and repeat rate by category
+    status: valid_branch
+    evidence:
+      - category.mix
+      - repeat.profile
+    conclusion: Small accessories have healthy repeat rates; bulky furniture accounts for 100% of the retention drop.
+
+  - id: fulfillment-friction
+    type: mechanism
+    label: Test delivery experience and logistics model in bulky goods
+    status: pivotal_test
+    evidence:
+      - fulfillment.split
+      - customer.satisfaction
+    conclusion: Bulky 3P seller delivery averages 9 days with 8% damage and zero assembly, creating post-purchase defection.
+
+  - id: ltv-sensitivity
+    type: mechanism
+    label: Test LTV sensitivity of bulky retention vs marketing CAC
+    status: pivotal_test
+    evidence:
+      - economics.ltv
+      - seller.economics
+    conclusion: 5pp lift in bulky repeat delivers higher cumulative contribution than a 20% CAC reduction; sellers support certified logistics.
+
+  - id: diagnosis
+    type: diagnosis
+    label: Synthesize root cause and strategic intervention
+    status: hidden_target
+    evidence:
+      - fulfillment-friction
+      - ltv-sensitivity
+    conclusion: >-
+      Repeat purchase deterioration is an operational fulfillment failure in bulky goods, not a marketing issue;
+      ClearCart must enforce certified white-glove logistics SLAs with assembly support to fix customer churn.
+
+  - id: actions
+    type: recommendation
+    label: 3-Pillar 12-Month Retention Strategy
+    status: synthesis
+    evidence:
+      - recommendation.logistics
+      - recommendation.sla
+      - recommendation.post_purchase
+    conclusion: Partner with specialized bulky logistics providers, establish seller delivery SLAs tied to search rank, and redirect discount budgets to post-delivery care.
+
+edges:
+  - { from: objective.retention-turnaround, to: marketing-and-pricing, relation: investigate }
+  - { from: objective.retention-turnaround, to: category-decomposition, relation: investigate }
+  - { from: category-decomposition, to: fulfillment-friction, relation: motivates }
+  - { from: fulfillment-friction, to: ltv-sensitivity, relation: motivates }
+  - { from: ltv-sensitivity, to: diagnosis, relation: supports }
+  - { from: marketing-and-pricing, to: diagnosis, relation: rules_out_discounting }
+  - { from: diagnosis, to: actions, relation: determines }
+
+acceptable_routes:
+  - id: category-first
+    sequence: [category-decomposition, fulfillment-friction, ltv-sensitivity, diagnosis, actions]
+    interviewer_behaviour: Guide candidate directly into category-level cohort retention breakdown and fulfillment logistics.
+
+  - id: marketing-audit-first
+    sequence: [marketing-and-pricing, category-decomposition, fulfillment-friction, diagnosis, actions]
+    interviewer_behaviour: Confirm marketing discounts are ineffective, then push candidate to dissect product categories.
+
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+    - Ask candidate to state hypothesis behind marketing performance vs category cohort retention.
+    - Clarify that small accessories perform well while bulky furniture cohorts are collapsing.
+    - Redirect candidate toward post-delivery fulfillment experience (lead times, damage rates, assembly).

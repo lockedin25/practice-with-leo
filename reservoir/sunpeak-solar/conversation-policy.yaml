@@ -1,0 +1,34 @@
+schema_version: conversation-policy-v1
+mode: realistic
+
+principles:
+  - Speak naturally and test the candidate's understanding of B2B pricing models, customer cash flow, and financing structures.
+  - Follow candidate-led structuring covering sales funnel dynamics, pricing presentation, financing unit economics, and credit risk.
+  - Challenge recommendations that advocate cutting equipment prices (margin erosion) or taking unsecured loans directly onto SunPeak's balance sheet.
+  - "Keep the hidden diagnosis private: do not volunteer the monthly savings vs debt service math until candidate inquires about financing options."
+  - Ensure final recommendations include segment targeting and operational sales-process streamlining.
+
+phase_policy:
+  clarification:
+    interviewer_goal: Confirm candidate understands SunPeak's C&I rooftop solar model, the 9% vs 18% conversion gap, and 12-month timeline.
+    reveal_levels: [broad_context, sharp_question]
+    expected_candidate_behaviours:
+      - Clarify target customer segments (SME factories, warehouses, retail).
+      - Inquire where qualified leads drop off in the conversion funnel.
+      - Establish target metric (profitable conversion rate) and 12-month horizon.
+
+  drill_down:
+    interviewer_goal: Guide candidate to recognize that cash-constrained SMEs reject lump-sum capex quotes and evaluate a financed monthly OPEX offer.
+    reveal_levels: [broad_context, sharp_question, hypothesis_backed]
+    expected_candidate_behaviours:
+      - Pinpoint drop-off at final cash quote presentation.
+      - Contrast long-term NPV savings against SME working-capital constraints.
+      - Model monthly loan debt service against grid electricity bill reduction.
+
+  synthesis:
+    interviewer_goal: Evaluate top-down 12-month commercial transformation covering financed offer rollout, high-load segment focus, and lender integration.
+    reveal_levels: [synthesis_support]
+    expected_candidate_behaviours:
+      - Deliver a structured 3-pillar pricing and offer redesign.
+      - Articulate third-party lender partnership and credit risk mitigations.
+      - Outline specific survey-to-contract workflow improvements and 100-day targets.

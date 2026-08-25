@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.meal-voucher-pivot
+  label: Rebuild meal voucher business model post-digitization.
+nodes:
+- id: revenue-stream-collapse
+  type: branch
+  label: Legacy vs Digital Revenue Streams
+  status: valid_branch
+  evidence: []
+  conclusion: Digitization eliminated 8% breakage and compressed merchant MDR from 2.5% to 1.0%.
+- id: regulatory-mandates
+  type: branch
+  label: RBI Prepaid Payment Instrument Rules
+  status: valid_branch
+  evidence: []
+  conclusion: Mandated digital cards with non-expiring balances and interoperability.
+- id: enterprise-benefit-expansion
+  type: branch
+  label: B2B HR Suite & Multi-Benefit Wallets
+  status: valid_branch
+  evidence: []
+  conclusion: Corporates want unified tax-saving allowances beyond food.
+- id: diagnosis
+  type: diagnosis
+  label: Loss of Breakage & MDR Compression
+  status: hidden_target
+  evidence:
+  - revenue-stream-collapse
+  - regulatory-mandates
+  - enterprise-benefit-expansion
+  conclusion: The paper-to-digital transition wiped out 8% breakage profit and eroded merchant MDR; survival requires pivoting
+    to a B2B employee benefits SaaS suite.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Enterprise Fintech Pivot
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Launch multi-benefit tax allowance wallet, charge PEPM enterprise SaaS subscription, and capture merchant affiliate
+    discounts.
+edges:
+- from: objective.meal-voucher-pivot
+  to: revenue-stream-collapse
+  relation: investigate
+- from: objective.meal-voucher-pivot
+  to: regulatory-mandates
+  relation: investigate
+- from: objective.meal-voucher-pivot
+  to: enterprise-benefit-expansion
+  relation: investigate
+- from: revenue-stream-collapse
+  to: diagnosis
+  relation: supports
+- from: regulatory-mandates
+  to: diagnosis
+  relation: supports
+- from: enterprise-benefit-expansion
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: regulatory-first
+  sequence:
+  - revenue-stream-collapse
+  - regulatory-mandates
+  - enterprise-benefit-expansion
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from revenue breakdown to regulatory impact on breakage.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what happened to unused paper vouchers vs digital balances.
+  - Highlight that unredeemed voucher breakage accounted for 50%+ of net profits.
+  - Redirect toward enterprise employee benefit SaaS monetization.

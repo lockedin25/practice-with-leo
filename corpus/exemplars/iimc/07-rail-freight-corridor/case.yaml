@@ -1,0 +1,72 @@
+schema_version: reservoir-v1
+case_id: 07-rail-freight-corridor-v1
+title: Freight Corridor Logistics Park
+school: IIM-C
+status: approved
+rights_status: original
+category: operations
+industry: logistics_and_cold_chain
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client operates a Private Freight Terminal and Multi-Modal Logistics Park (MMLP) connected to the Western
+    Dedicated Freight Corridor (DFC). Container dwell time in the rail yard averages 48 hours, failing the promised 12-hour
+    express delivery SLA.
+  objective: Diagnose rail-to-road transshipment delays and engineer a 12-hour container turnaround workflow.
+  opening_requirements:
+  - Name Freight Corridor Logistics Park and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Container Yard Dwell Time (hours) and Reach Stacker Moves/Hour) and time horizon (six months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Container Yard Dwell Time (hours) and Reach Stacker Moves/Hour
+  decision_question: What is causing 48-hour container dwell times at the DFC logistics park and how can rail-to-road transshipment
+    be streamlined?
+  time_horizon: six months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Customs EDI electronic gateway synchronization failures and rail wagon uncoupling delays. Double-stack container
+    trains require simultaneous customs bond clearances before any container can be offloaded, creating whole-train blockages
+    when a single container has paperwork discrepancies.
+  what_the_case_wanted_to_test: Intermodal rail freight, double-stack container train operations, customs dry-port (ICD) compliance,
+    and reach stacker yard planning.
+  pivotal_insight: A 90-container double-stack train cannot be partially unloaded; if 2 containers have customs documentation
+    holds, the entire train waits on the rail siding, blocking incoming freight trains.
+  common_traps:
+  - Assuming rail locomotive engine speed is slow.
+  - Blaming highway truck drivers for not arriving at the logistics park.
+  - Purchasing more reach stackers when the bottleneck is customs train-level clearance.
+  takeaway_lesson: In unit-train intermodal logistics, administrative clearance must be decoupled from physical asset discharge
+    to prevent single-unit exceptions from holding up entire trains.
+  suggested_readings:
+  - knowledge_base/industries/01_logistics_and_cold_chain.md
+  - knowledge_base/case_types/unconventional_and_abstract.md
+  - knowledge_base/methodology/02_issue_tree_structuring.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

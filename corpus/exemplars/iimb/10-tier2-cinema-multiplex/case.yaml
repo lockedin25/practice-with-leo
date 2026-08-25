@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 10-tier2-cinema-multiplex-v1
+title: Tier-2 Cinema Multiplex Revenue
+school: IIM-B
+status: approved
+rights_status: original
+category: profitability
+industry: telecom_and_media
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a major Indian multiplex cinema operator with 600 screens. Revenue Per Patron (RPP) in Tier-2 city
+    multiplexes is 35% below metros, and weekday occupancy averages only 18%.
+  objective: Diagnose low Tier-2 multiplex profitability and recommend dynamic F&B pricing and alternate content monetization.
+  opening_requirements:
+  - Name Tier-2 Cinema Multiplex Revenue and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Revenue Per Patron (RPP) and Weekday Occupancy (%)) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Revenue Per Patron (RPP) and Weekday Occupancy (%)
+  decision_question: How can the cinema operator boost weekday occupancy and food & beverage spend in Tier-2 markets?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "Metro-style pricing copy-paste. Operator priced popcorn/colas at metro rates (\u20B9450/combo), leading\
+    \ Tier-2 patrons to buy movie tickets but completely boycott concession stands, while relying 100% on Bollywood theatrical\
+    \ releases for weekday footfall."
+  what_the_case_wanted_to_test: Entertainment unit economics, cinema F&B concession gross margins (80%+), price elasticity
+    in non-metro markets, and non-theatrical screen monetization (esports, live cricket, regional festivals).
+  pivotal_insight: "F&B has an 82% gross margin; lowering popcorn pricing from \u20B9450 to a localized \u20B9199 combo lifts\
+    \ concession spend per patron by 140%, while screening live cricket matches on weekdays raises occupancy from 18% to 52%."
+  common_traps:
+  - Slashing ticket prices below distributor minimum revenue share thresholds.
+  - Assuming Tier-2 audiences only watch pirated movies on smartphones.
+  - Closing down multiplex screens on weekdays.
+  takeaway_lesson: In experiential entertainment, high concession margins allow aggressive local price tiering to drive volume;
+    under-utilized real estate can be monetized via non-theatrical community events.
+  suggested_readings:
+  - knowledge_base/industries/07_telecom_and_media.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/04_data_gathering_and_notes.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

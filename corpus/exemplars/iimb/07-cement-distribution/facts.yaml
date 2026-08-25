@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: production.footprint
+  domain: company
+  release_level: broad_context
+  content: Client operates 3 integrated plants in Andhra Pradesh producing 15M MT cement annually.
+- id: logistics.spend
+  domain: financials
+  release_level: sharp_question
+  content: "Total logistics spend is \u20B92,100 Cr (\u20B91,400/MT); road transport accounts for 62% of dispatches."
+- id: modal.costs
+  domain: economics
+  release_level: hypothesis_backed
+  content: "Road freight is \u20B93.2/MT-km; Rail is \u20B91.4/MT-km; Coastal shipping is \u20B90.6/MT-km for long-haul routes."
+  dependencies:
+  - logistics.spend
+- id: terminal.bottleneck
+  domain: operations
+  release_level: hypothesis_backed
+  content: Coastal plants are 25 km from deep-water ports, but destination markets in Kerala and Tamil Nadu lack bulk cement
+    terminals.
+  dependencies:
+  - modal.costs
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Logistics cost is uncompetitive because 62% of cement moves by expensive road trucks (\u20B93.2/MT-km); shifting\
+    \ coastal demand (4M MT) to sea shipping (\u20B90.6/MT-km) reduces freight cost by \u20B9180 Cr annually."
+- id: recommendation.coastal
+  domain: recommendation
+  release_level: synthesis_support
+  content: Charter 2 coastal bulk cement vessels and build automated silo bagging terminals at Cochin and Tuticorin ports.
+- id: recommendation.rail_siding
+  domain: recommendation
+  release_level: synthesis_support
+  content: Procure 6 private freight railway rakes under Indian Railways GPWIS scheme to secure dedicated wagon availability.
+- id: recommendation.dynamic_dispatch
+  domain: recommendation
+  release_level: synthesis_support
+  content: Deploy AI freight optimization engine to route orders dynamically based on plant lead distance and real-time modal
+    costs.

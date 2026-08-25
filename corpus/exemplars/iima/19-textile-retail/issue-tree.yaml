@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.ethnic-retail-margin
+  label: Restore ethnic wear gross margins and eliminate bridal markdown losses.
+nodes:
+- id: markdown-by-category
+  type: branch
+  label: Markdown Concentration Across Product Lines
+  status: valid_branch
+  evidence: []
+  conclusion: "Clearance discounts are 85% concentrated in heavy bridal lehengas (>\u20B91.5L)."
+- id: bridal-sell-through
+  type: branch
+  label: Bridal Inventory Sell-Through & Buying Cycle
+  status: valid_branch
+  evidence: []
+  conclusion: Bridal sell-through is only 38% on 9-month advance pre-stitched buys.
+- id: made-to-order-feasibility
+  type: branch
+  label: Sample Showrooming & Tailoring Lead Times
+  status: valid_branch
+  evidence: []
+  conclusion: Sample master pieces with 21-day tailoring eliminate finished inventory obsolescence.
+- id: diagnosis
+  type: diagnosis
+  label: Pre-Stitched Bridal Inventory Obsolescence
+  status: hidden_target
+  evidence:
+  - markdown-by-category
+  - bridal-sell-through
+  - made-to-order-feasibility
+  conclusion: Gross margin dropped 800 bps because high-ticket bridal sets were ordered as finished inventory 9 months ahead,
+    suffering 62% unsold stock and heavy markdowns.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Merchandising Overhaul
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Adopt sample showroom made-to-order model, centralize open-to-buy governance, and liquidate aged stock via VIP
+    trunk shows.
+edges:
+- from: objective.ethnic-retail-margin
+  to: markdown-by-category
+  relation: investigate
+- from: objective.ethnic-retail-margin
+  to: bridal-sell-through
+  relation: investigate
+- from: objective.ethnic-retail-margin
+  to: made-to-order-feasibility
+  relation: investigate
+- from: markdown-by-category
+  to: diagnosis
+  relation: supports
+- from: bridal-sell-through
+  to: diagnosis
+  relation: supports
+- from: made-to-order-feasibility
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: category-first
+  sequence:
+  - markdown-by-category
+  - bridal-sell-through
+  - made-to-order-feasibility
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from overall markdowns to category-specific sell-through.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to compare sell-through between everyday ethnic wear and luxury bridal lehengas.
+  - Clarify that customer footfall in stores is steady.
+  - Redirect inquiry toward made-to-order sample models vs pre-stitched inventory.

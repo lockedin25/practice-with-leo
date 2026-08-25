@@ -1,0 +1,89 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+
+root:
+  id: objective.entry-strategy
+  label: Determine whether and how Aster Diagnostics should enter tier-two cities to maximize risk-adjusted ROIC over 3 years.
+
+nodes:
+  - id: market-attractiveness
+    type: branch
+    label: Market size, growth, and customer demand
+    status: valid_branch
+    evidence:
+      - market.size
+      - demand.mix
+    conclusion: Tier-2 market is large (₹1,200 Cr) and growing at 12%, with organized penetration at only 25%.
+
+  - id: competitive-landscape
+    type: branch
+    label: Competitive structure and local barriers
+    status: valid_branch
+    evidence:
+      - competition
+      - customer.trust
+    conclusion: Local standalone labs lack quality systems; doctors and patients are willing to pay for reliable reports.
+
+  - id: standalone-hub-economics
+    type: mechanism
+    label: Test standalone full-service metro hub economics
+    status: pivotal_test
+    evidence:
+      - economics.hub
+      - risk.regulation
+    conclusion: Full metro hubs require high imaging volume that individual tier-2 cities cannot generate in years 1-2, creating negative ROIC.
+
+  - id: hub-and-spoke-network
+    type: mechanism
+    label: Test asset-light regional hub-and-spoke model
+    status: pivotal_test
+    evidence:
+      - economics.network
+      - operations.logistics
+    conclusion: Regional hub-and-spoke collection network reaches profitability at 30% volume within 4-hour logistics radius.
+
+  - id: diagnosis
+    type: diagnosis
+    label: Synthesize optimal entry model
+    status: hidden_target
+    evidence:
+      - standalone-hub-economics
+      - hub-and-spoke-network
+    conclusion: >-
+      Standalone full-service hubs destroy ROIC in tier-2 cities; Aster must deploy an asset-light
+      collection center network linked to a regional central lab, gating high-capex radiology on demonstrated demand.
+
+  - id: actions
+    type: recommendation
+    label: 3-Pillar 3-Year Implementation Roadmap
+    status: synthesis
+    evidence:
+      - recommendation.entry
+      - recommendation.expand
+      - recommendation.metrics
+    conclusion: Launch branded collection centers within 4-hour logistics radius, partner with local clinicians, and gate imaging capex on referral volume.
+
+edges:
+  - { from: objective.entry-strategy, to: market-attractiveness, relation: investigate }
+  - { from: objective.entry-strategy, to: competitive-landscape, relation: investigate }
+  - { from: market-attractiveness, to: standalone-hub-economics, relation: motivates }
+  - { from: standalone-hub-economics, to: hub-and-spoke-network, relation: alternative }
+  - { from: hub-and-spoke-network, to: diagnosis, relation: supports }
+  - { from: competitive-landscape, to: diagnosis, relation: supports }
+  - { from: diagnosis, to: actions, relation: determines }
+
+acceptable_routes:
+  - id: economic-first
+    sequence: [market-attractiveness, standalone-hub-economics, hub-and-spoke-network, diagnosis, actions]
+    interviewer_behaviour: Validate market attractiveness quickly, then probe unit economics of standalone vs spoke network.
+
+  - id: operational-first
+    sequence: [competitive-landscape, hub-and-spoke-network, standalone-hub-economics, diagnosis, actions]
+    interviewer_behaviour: Acknowledge competitive quality gap, then guide candidate to evaluate logistics and capex feasibility.
+
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+    - Ask the candidate to state their hypothesis on capital efficiency and unit economics.
+    - Highlight that standalone hubs carry high fixed depreciation costs.
+    - Redirect inquiry toward comparing collection network logistics vs standalone imaging capex.

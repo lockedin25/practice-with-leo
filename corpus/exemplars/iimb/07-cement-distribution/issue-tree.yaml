@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.cement-freight
+  label: Reduce cement distribution logistics cost per MT by 15%.
+nodes:
+- id: modal-share-split
+  type: branch
+  label: Current Modal Share (Road vs Rail vs Sea)
+  status: valid_branch
+  evidence: []
+  conclusion: "62% is moved by road (\u20B93.2/MT-km), driving high freight costs on >400 km hauls."
+- id: modal-cost-benchmarks
+  type: branch
+  label: Freight Cost per Ton-Km Comparison
+  status: valid_branch
+  evidence: []
+  conclusion: "Coastal shipping is \u20B90.6/MT-km (80% cheaper than road) for coastal markets."
+- id: terminal-infrastructure
+  type: branch
+  label: Port Handling & Destination Bagging Silos
+  status: valid_branch
+  evidence: []
+  conclusion: Lack of bulk bagging silos at destination ports currently blocks sea transit.
+- id: diagnosis
+  type: diagnosis
+  label: Road Over-Reliance & Unutilized Coastal Waterways
+  status: hidden_target
+  evidence:
+  - modal-share-split
+  - modal-cost-benchmarks
+  - terminal-infrastructure
+  conclusion: Distribution spend is excessive because 62% of volume travels by expensive road; building destination port bagging
+    silos enables an 80% cheaper coastal shipping modal shift.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Multimodal Logistics Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy coastal shipping to Kerala/Tamil Nadu, invest in GPWIS private rail rakes, and implement dynamic AI dispatch
+    routing.
+edges:
+- from: objective.cement-freight
+  to: modal-share-split
+  relation: investigate
+- from: objective.cement-freight
+  to: modal-cost-benchmarks
+  relation: investigate
+- from: objective.cement-freight
+  to: terminal-infrastructure
+  relation: investigate
+- from: modal-share-split
+  to: diagnosis
+  relation: supports
+- from: modal-cost-benchmarks
+  to: diagnosis
+  relation: supports
+- from: terminal-infrastructure
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: modal-first
+  sequence:
+  - modal-share-split
+  - modal-cost-benchmarks
+  - terminal-infrastructure
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate to compare cost per ton-km across transport modes.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to compare freight cost per ton-km across road, rail, and sea.
+  - Clarify that the manufacturing plants are located near the eastern coastline.
+  - Redirect toward coastal shipping and destination port bagging terminals.

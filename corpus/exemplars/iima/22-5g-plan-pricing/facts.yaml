@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: capex.scale
+  domain: company
+  release_level: broad_context
+  content: Operator deployed 150,000 5G base stations covering 80% of urban India.
+- id: arpu.trend
+  domain: financials
+  release_level: sharp_question
+  content: "ARPU is \u20B9182; 5G data consumption is 32 GB/month (vs 11 GB on 4G), but 5G users pay the same \u20B9299 monthly\
+    \ recharge."
+- id: consumer.perception
+  domain: customers
+  release_level: hypothesis_backed
+  content: Consumers see no willingness to pay extra for mobile 5G speed on social media/video, but 45% of households lack
+    high-speed fiber home broadband.
+  dependencies:
+  - arpu.trend
+- id: fwa.opportunity
+  domain: market
+  release_level: hypothesis_backed
+  content: "5G Fixed Wireless Access (FWA) routers can deliver 100 Mbps home Wi-Fi at \u20B9599/month, generating 3.2x mobile\
+    \ ARPU with zero last-mile fiber digging."
+  dependencies:
+  - consumer.perception
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Mobile 5G ARPU is stagnant because unlimited free data was bundled into standard plans; monetization must be captured\
+    \ through high-ARPU 5G FWA home broadband (\u20B9599/mo) and premium speed-tiered OTT bundles."
+- id: recommendation.fwa
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Aggressively scale 5G FWA home broadband routers targeting 20M non-fiber homes at \u20B9599-\u20B9999/month."
+- id: recommendation.speed_tier
+  domain: recommendation
+  release_level: synthesis_support
+  content: End unlimited free mobile 5G; introduce tiered speed plans (100 Mbps standard vs 1 Gbps ultra-HD gaming bundle).
+- id: recommendation.enterprise_slicing
+  domain: recommendation
+  release_level: synthesis_support
+  content: Monetize private 5G network slicing for enterprise manufacturing, ports, and hospital robotics.

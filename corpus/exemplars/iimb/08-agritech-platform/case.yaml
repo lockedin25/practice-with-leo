@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 08-agritech-platform-v1
+title: Farm-to-Fork Agritech Wastage
+school: IIM-B
+status: approved
+rights_status: original
+category: growth_strategy
+industry: ecommerce_and_marketplaces
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a B2B farm-to-retail agritech platform sourcing fresh vegetables from 10,000 farmers and supplying
+    4,000 urban kirana stores. Gross margin is negative (-6%) due to high post-harvest wastage.
+  objective: Diagnose post-harvest vegetable wastage and redesign the collection and sorting supply chain to achieve positive
+    gross margins.
+  opening_requirements:
+  - Name Farm-to-Fork Agritech Wastage and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Post-Harvest Wastage (%) and Fulfillment Contribution Margin) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Post-Harvest Wastage (%) and Fulfillment Contribution Margin
+  decision_question: Why is post-harvest vegetable wastage eroding agritech margins and how can farmgate sorting and cold
+    supply chain be restructured?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Un-graded bulk farmgate purchasing resulting in 22% spoilage at urban fulfillment centers, compounded by
+    ambient temperature truck transport during 14-hour transit.
+  what_the_case_wanted_to_test: Agritech supply chain economics, farmgate grading vs central sorting, cold chain handling,
+    and secondary market clearance channels.
+  pivotal_insight: Grading vegetables at village collection centers (rejecting Grade-C at farmgate for local cattle feed)
+    eliminates 80% of urban fulfillment center dumping and reduces freight weight by 25%.
+  common_traps:
+  - Assuming farmers are intentionally supplying rotten produce.
+  - Blaming kirana store retailers for rejecting deliveries.
+  - Purchasing fully refrigerated reefer trucks for all rural routes.
+  takeaway_lesson: In fresh farm produce distribution, grading and sorting must occur at the point of harvest; transporting
+    un-graded bulk crops transports waste and multiplies freight costs.
+  suggested_readings:
+  - knowledge_base/industries/02_ecommerce_and_marketplaces.md
+  - knowledge_base/case_types/growth_strategy.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

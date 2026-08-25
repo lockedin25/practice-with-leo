@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.edtech-cac
+  label: "Reduce EdTech customer acquisition cost from \u20B922,000 to under \u20B98,000."
+nodes:
+- id: outbound-sales-efficiency
+  type: branch
+  label: Cold Outbound Tele-Sales Conversion
+  status: valid_branch
+  evidence: []
+  conclusion: "Outbound tele-sales conversion is 0.8% at \u20B922,500 CAC, generating high spam fatigue."
+- id: inbound-diagnostic-funnels
+  type: branch
+  label: School Diagnostic Olympiads & Inbound Leads
+  status: valid_branch
+  evidence: []
+  conclusion: "School diagnostic assessments convert at 14.5% with \u20B93,200 CAC."
+- id: word-of-mouth-referrals
+  type: branch
+  label: Parent & Teacher Referral Advocacy Loops
+  status: valid_branch
+  evidence: []
+  conclusion: Teacher-referred students have 2.5x higher 12-month retention rates.
+- id: diagnosis
+  type: diagnosis
+  label: Outbound Tele-Sales Burn & Inbound Academic Authority
+  status: hidden_target
+  evidence:
+  - outbound-sales-efficiency
+  - inbound-diagnostic-funnels
+  - word-of-mouth-referrals
+  conclusion: CAC is unsustainable due to 0.8% outbound cold-calling conversion; pivoting to school diagnostic gap assessments
+    and teacher referrals cuts CAC by 70%.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Academic Growth Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy school diagnostic test funnels, launch teacher ambassador program, and restructure sales force into academic
+    advisors.
+edges:
+- from: objective.edtech-cac
+  to: outbound-sales-efficiency
+  relation: investigate
+- from: objective.edtech-cac
+  to: inbound-diagnostic-funnels
+  relation: investigate
+- from: objective.edtech-cac
+  to: word-of-mouth-referrals
+  relation: investigate
+- from: outbound-sales-efficiency
+  to: diagnosis
+  relation: supports
+- from: inbound-diagnostic-funnels
+  to: diagnosis
+  relation: supports
+- from: word-of-mouth-referrals
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: funnel-first
+  sequence:
+  - outbound-sales-efficiency
+  - inbound-diagnostic-funnels
+  - word-of-mouth-referrals
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from sales team cost breakdown to conversion rates across acquisition channels.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what the conversion rate is on cold outbound phone calls.
+  - Clarify that parents trust school teachers over telemarketers.
+  - Redirect toward diagnostic academic testing funnels.

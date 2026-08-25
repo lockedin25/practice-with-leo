@@ -1,0 +1,139 @@
+schema_version: checklist-v2
+
+# The indexed tips-and-tricks catalogue. Entries are pure data: adding one
+# requires no code change. IDs are stable forever; reports reference items by
+# ID so historical evaluations stay interpretable after edits. Severity drives
+# whether a miss enters priority_improvements / areas_for_development.
+
+items:
+  - id: structure.restate-objective-first
+    title: Restate the objective, metrics, and time horizon before structuring
+    applies_to_phases: [clarification]
+    severity: medium
+    detection:
+      markers:
+        - candidate paraphrases the decision question in their own words
+        - candidate confirms the metric, target magnitude, or scope before proposing a tree
+      counter_markers:
+        - candidate requests data before confirming what decision the analysis serves
+
+  - id: structure.mece-by-construction
+    title: Use a cut that is MECE by construction (formula, segments, process, or segmentation with a catch-all)
+    applies_to_phases: [clarification, drill_down]
+    severity: high
+    detection:
+      markers:
+        - candidate splits by formula such as profit into revenue and cost, or revenue into price and volume
+        - candidate splits along one clean dimension and names the dimension
+        - candidate adds an explicit catch-all or other bucket to close gaps
+      counter_markers:
+        - candidate lists ad-hoc buckets where one item plausibly belongs to two of them
+        - candidate mixes levels, placing a formula component beside a sub-component of another bucket
+
+  - id: structure.tailor-to-case
+    title: Tailor the structure to this client and industry economics rather than reciting a generic framework
+    applies_to_phases: [clarification, drill_down]
+    severity: high
+    detection:
+      markers:
+        - structure references the industry, business model, or constraint surfaced earlier in the conversation
+        - candidate drops irrelevant generic textbook buckets once context is known
+      counter_markers:
+        - candidate walks through a generic textbook framework (4Ps, 3Cs) verbatim with no reference to case facts
+
+  - id: problem-solving.hypothesis-before-data
+    title: State an ex-ante hypothesis before requesting evidence or data
+    applies_to_phases: [drill_down]
+    severity: high
+    detection:
+      markers:
+        - candidate names a suspected driver and explains why before requesting its value
+        - candidate frames a request as testing a specific commercial belief
+      counter_markers:
+        - candidate asks for data breakdowns with no stated hypothesis or reason to suspect any particular answer
+
+  - id: problem-solving.prioritise-drivers
+    title: Attack the highest-leverage branch first and justify the 80/20 order
+    applies_to_phases: [drill_down]
+    severity: high
+    detection:
+      markers:
+        - candidate ranks branches by economic materiality and justifies the order before diving in
+        - candidate explicitly deprioritises a branch as unlikely to move the needle
+      counter_markers:
+        - candidate works through branches in arbitrary listed order regardless of what early evidence suggests
+
+  - id: problem-solving.agility-and-hints
+    title: Respond gracefully to interviewer hints and pivot when hypotheses are disproven
+    applies_to_phases: [drill_down]
+    severity: medium
+    detection:
+      markers:
+        - candidate immediately picks up on interviewer steering or clarifying remarks
+        - candidate acknowledges disproven hypotheses without defensiveness and updates their approach
+      counter_markers:
+        - candidate ignores interviewer hints and stubbornly stays on dead-end branches
+
+  - id: quantitative.state-formula-and-units
+    title: State the formula and units before computing, then sanity-check the magnitude
+    applies_to_phases: [drill_down]
+    severity: medium
+    detection:
+      markers:
+        - candidate writes or speaks the relationship (numerator, denominator, units) before arithmetic
+        - candidate checks whether the result passes a commercial reasonableness test
+      counter_markers:
+        - candidate produces a bare number with no formula trail and no reaction to its size
+
+  - id: quantitative.interpret-the-number
+    title: Interpret every computed number for the case question ("so what?"), not just report it
+    applies_to_phases: [drill_down, synthesis]
+    severity: medium
+    detection:
+      markers:
+        - after a calculation the candidate states what it means for the hypothesis or recommendation
+      counter_markers:
+        - calculations end at the result and the conversation moves on unchanged
+
+  - id: synthesis.pyramid-principle-answer-first
+    title: Lead the synthesis with a clear, definitive recommendation (Answer First)
+    applies_to_phases: [synthesis]
+    severity: high
+    detection:
+      markers:
+        - synthesis opens in the first 10 seconds with a direct, unambiguous strategic recommendation
+        - candidate avoids chronological narratives or wishy-washy menus of options
+      counter_markers:
+        - candidate narrates a chronological timeline of the interview before stating any conclusion
+
+  - id: synthesis.4-part-closing
+    title: Deliver a complete 4-part synthesis (Recommendation, 2-3 Pillars, Risks/Mitigations, 100-Day Plan)
+    applies_to_phases: [synthesis]
+    severity: high
+    detection:
+      markers:
+        - covers all 4 components: recommendation, quantified pillars, risk-mitigation pairs, and next steps
+      counter_markers:
+        - omits risks or next steps, or delivers only vague qualitative bullet points
+
+  - id: communication.top-down-density
+    title: Maintain high information density and top-down structure across turns
+    applies_to_phases: [clarification, drill_down, synthesis]
+    severity: medium
+    detection:
+      markers:
+        - turns open with the core takeaway and follow with concise supporting rationale
+        - low use of verbal fillers or repetitive phrases
+      counter_markers:
+        - turns are long, rambling, or unfocused relative to their substance
+
+  - id: communication.signpost-and-close-loops
+    title: Signpost transitions between branches and close analytical loops cleanly
+    applies_to_phases: [drill_down, synthesis]
+    severity: low
+    detection:
+      markers:
+        - candidate announces which branch they are entering and why they are leaving the current one
+        - summarizes intermediate findings before transitioning
+      counter_markers:
+        - candidate jumps between unrelated branches without signposting or explanation

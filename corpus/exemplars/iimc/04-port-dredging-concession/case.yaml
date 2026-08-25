@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 04-port-dredging-concession-v1
+title: Port Capital Dredging Concession
+school: IIM-C
+status: approved
+rights_status: original
+category: mergers_and_acquisitions
+industry: logistics_and_cold_chain
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is an infrastructure fund bidding for a 20-year concession to deepen the navigation channel of a major\
+    \ Indian port from 14m to 18m draft. Capital capex is \u20B91,800 Cr with annual maintenance dredging commitments."
+  objective: Value the dredging concession and determine whether incremental vessel tariff premiums cover maintenance dredging
+    risk.
+  opening_requirements:
+  - Name Port Capital Dredging Concession and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Concession Project IRR and Annual Maintenance Dredging Cost) and time horizon (twenty years).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Concession Project IRR and Annual Maintenance Dredging Cost
+  decision_question: What is the net present value (NPV) of the dredging concession and how should siltation risk be hedged?
+  time_horizon: twenty years
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Tidal siltation rate volatility vs Cape-size vessel draft premiums. Deepening the channel to 18m attracts
+    deep-draft 150,000 DWT Cape-size bulk vessels paying 35% higher vessel charges, but monsoon siltation requires 4M cubic
+    meters of annual maintenance dredging.
+  what_the_case_wanted_to_test: Maritime infrastructure concession valuation, capital dredging capex vs maintenance dredging
+    opex, hydrological siltation modeling, and vessel draft elasticity.
+  pivotal_insight: The concession delivers 16% IRR only if the concession agreement includes a 'Variable Siltation Band' tariff
+    adjustment mechanism where port authorities co-fund dredging if monsoon siltation exceeds 3.5M m3/year.
+  common_traps:
+  - Treating capital dredging as a one-time capex without budgeting for massive annual maintenance dredging.
+  - Assuming small Handymax vessels will pay higher tariffs for deep water they don't need.
+  - Ignoring environmental coastal dumping permit clearances.
+  takeaway_lesson: In maritime navigation concessions, annual maintenance dredging to maintain draft depth is an ongoing operational
+    liability that must be contractually hedged against monsoon hydrological anomalies.
+  suggested_readings:
+  - knowledge_base/industries/01_logistics_and_cold_chain.md
+  - knowledge_base/case_types/mergers_and_acquisitions.md
+  - knowledge_base/methodology/04_data_gathering_and_notes.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

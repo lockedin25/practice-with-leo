@@ -1,0 +1,44 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: portfolio.lines
+  domain: company
+  release_level: broad_context
+  content: "Motor portfolio generates \u20B93,000 Cr GWP; Own Damage (OD) loss ratio is healthy at 62%, but Third Party (TP)\
+    \ is 118%."
+- id: geographic.anomaly
+  domain: risk
+  release_level: sharp_question
+  content: 70% of the loss ratio surge originates from claims filed across 4 specific rural districts in North India.
+- id: claim.pattern
+  domain: operations
+  release_level: hypothesis_backed
+  content: Average delay between alleged accident date and court notice filing is 22 months; 85% of claims involve commercial
+    trucks.
+  dependencies:
+  - geographic.anomaly
+- id: syndicate.nexus
+  domain: risk
+  release_level: hypothesis_backed
+  content: Investigation reveals organized legal syndicates colluding with local police stations to substitute insured commercial
+    trucks into hit-and-run cases.
+  dependencies:
+  - claim.pattern
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: TP loss ratio surged to 118% due to staged legal syndicate fraud in 4 rural district tribunals, filing delayed
+    hit-and-run bodily injury claims with substituted insured vehicles.
+- id: recommendation.special_investigation
+  domain: recommendation
+  release_level: synthesis_support
+  content: Form a dedicated Special Investigation Unit (SIU) in high-risk districts to conduct forensic on-site accident verifications
+    within 7 days.
+- id: recommendation.telematics
+  domain: recommendation
+  release_level: synthesis_support
+  content: Use commercial vehicle GPS and FASTag toll data to prove vehicle absence from accident locations during court defense.
+- id: recommendation.compromise_settlement
+  domain: recommendation
+  release_level: synthesis_support
+  content: Fast-track genuine claims through Lok Adalat out-of-court settlements to avoid compounding legal interest penalties.

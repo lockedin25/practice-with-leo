@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 03-renewable-ipp-bidding-v1
+title: Renewable IPP Tariff Bidding
+school: IIM-B
+status: approved
+rights_status: original
+category: pricing
+industry: energy_and_renewables
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is a leading Independent Power Producer (IPP) in India bidding for a 1,200 MW SECI Solar-Wind Hybrid\
+    \ tender with 4-hour Battery Energy Storage (BESS). Competitors are bidding aggressive tariffs below \u20B93.40/kWh."
+  objective: Determine the bidding tariff floor and optimize the generation asset mix to achieve a 14% equity IRR.
+  opening_requirements:
+  - Name Renewable IPP Tariff Bidding and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Levelized Cost of Electricity (LCOE) and Equity IRR (%)) and time horizon (three years).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Levelized Cost of Electricity (LCOE) and Equity IRR (%)
+  decision_question: What is the lowest sustainable bid tariff for the hybrid storage tender and how should the generation/storage
+    capacity be sized?
+  time_horizon: three years
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Transmission curtailment risk and battery degradation cycling vs peak-hour tariff arbitrage. Over-sizing
+    solar capacity leads to daytime clipping losses unless matched with wind generation whose peak production matches evening
+    peak power demand.
+  what_the_case_wanted_to_test: Renewable tariff modeling, hybrid generation correlation (solar diurnal curve vs wind evening
+    peak), BESS sizing optimization, and inter-state transmission system (ISTS) waiver economics.
+  pivotal_insight: A 60:40 Solar-Wind hybrid balance reduces required battery storage capacity by 45% compared to pure solar-plus-storage,
+    because coastal wind generation peaks between 6 PM and 10 PM during the mandatory delivery window.
+  common_traps:
+  - "Modeling the bid as pure solar + massive battery storage, which drives capex too high to compete with \u20B93.40 tariffs."
+  - Ignoring battery degradation replacement capex in year 8.
+  - Assuming 100% transmission availability during peak solar noon.
+  takeaway_lesson: In round-the-clock renewable bidding, optimizing generation resource complementarity (solar + wind) drastically
+    reduces expensive battery storage capex requirements.
+  suggested_readings:
+  - knowledge_base/industries/11_energy_and_renewables.md
+  - knowledge_base/case_types/pricing_strategy.md
+  - knowledge_base/methodology/04_data_gathering_and_notes.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

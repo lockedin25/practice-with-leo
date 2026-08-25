@@ -1,0 +1,46 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: saas.scale
+  domain: company
+  release_level: broad_context
+  content: Client provides TMS software tracking 120,000 monthly truckloads ($1.2B annual freight spend) across 200 enterprise
+    FMCG/Auto shippers.
+- id: growth.plateau
+  domain: financials
+  release_level: sharp_question
+  content: SaaS ARR growth slowed to 11% as enterprise TMS market penetration matured in top-tier accounts.
+- id: spot_market.leakage
+  domain: market
+  release_level: hypothesis_backed
+  content: Enterprise shippers fail to fulfill 18% of contracted truckloads, dumping $210M annually into chaotic offline spot
+    freight markets at 15% price premiums.
+  dependencies:
+  - growth.plateau
+- id: embedded.economics
+  domain: economics
+  release_level: hypothesis_backed
+  content: Enabling 1-click spot load bidding within the TMS software captures 5% marketplace take-rate on $210M GMV ($10.5M
+    high-margin net revenue) with zero sales CAC.
+  dependencies:
+  - spot_market.leakage
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: SaaS growth plateaued because software fees are capped; embedding an autonomous spot-freight marketplace on top
+    of existing TMS workflow captures $10.5M in high-margin transactional take-rates on unfulfilled spot loads with zero customer
+    acquisition cost.
+- id: recommendation.spot_engine
+  domain: recommendation
+  release_level: synthesis_support
+  content: Launch an embedded 'Spot Freight Exchange' inside the TMS workflow allowing shippers to auction unfulfilled loads
+    in 1 click.
+- id: recommendation.carrier_fintech
+  domain: recommendation
+  release_level: synthesis_support
+  content: Partner with supply chain NBFCs to offer instant fuel cards and 24-hour invoice factoring to participating carriers.
+- id: recommendation.dual_monetization
+  domain: recommendation
+  release_level: synthesis_support
+  content: Maintain recurring TMS SaaS subscription fees while layering transactional marketplace commissions for total revenue
+    acceleration.

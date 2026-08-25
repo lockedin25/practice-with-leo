@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: dairy.scale
+  domain: company
+  release_level: broad_context
+  content: Cooperative collects milk from 18,000 village societies twice daily, feeding into 120 Bulk Milk Coolers (BMCs).
+- id: sour.losses
+  domain: financials
+  release_level: sharp_question
+  content: Sour milk write-offs rose to 3.4% of procurement volume, concentrated during summer morning collections.
+- id: bmc.power
+  domain: operations
+  release_level: hypothesis_backed
+  content: 40% of rural BMCs face morning power cuts of 2-3 hours; diesel backup generators suffered a 35% breakdown rate.
+  dependencies:
+  - sour.losses
+- id: tanker.queue
+  domain: operations
+  release_level: hypothesis_backed
+  content: "Insulated road tankers arrive uncoordinated between 10 AM and 12 PM, creating a 3-hour queue in 42\xB0C ambient\
+    \ heat before unloading."
+  dependencies:
+  - bmc.power
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Milk sourage reached 3.4% because rural BMC power cuts delayed initial chilling past the 3.5-hour threshold, compounded
+    by 3-hour tanker unloading queues at central dairies.
+- id: recommendation.solar_bmc
+  domain: recommendation
+  release_level: synthesis_support
+  content: Install rooftop solar with thermal ice-bank storage at all 120 rural BMC centers for instant off-grid chilling.
+- id: recommendation.tanker_slotting
+  domain: recommendation
+  release_level: synthesis_support
+  content: Implement GPS-based tanker dispatch appointment slots to eliminate unloading bottlenecks at central processing
+    plants.
+- id: recommendation.farmer_incentive
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Introduce MBRT quality testing premiums paying farmers \u20B91.5/liter extra for milk chilled within 90 minutes."

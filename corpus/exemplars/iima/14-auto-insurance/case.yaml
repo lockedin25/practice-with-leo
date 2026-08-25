@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 14-auto-insurance-v1
+title: Motor Insurance Loss Ratio
+school: IIM-A
+status: approved
+rights_status: original
+category: profitability
+industry: insurance
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a top-5 Indian general insurance company. Motor third-party (TP) claim loss ratios surged from 82%
+    to 118% in North India, erasing underwriting profits.
+  objective: Diagnose the root cause of the motor third-party loss ratio spike and recommend fraud containment measures.
+  opening_requirements:
+  - Name Motor Insurance Loss Ratio and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Motor Third-Party Claims Loss Ratio) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Motor Third-Party Claims Loss Ratio
+  decision_question: Why did motor third-party claim loss ratios exceed 100% and how can fraudulent claims be detected and
+    prevented?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Organized syndicate fraud exploiting rural Motor Accident Claims Tribunals (MACT), staging delayed fake
+    vehicular accident liability claims with fabricated police reports on uninsured commercial trucks.
+  what_the_case_wanted_to_test: P&C insurance claims underwriting, third-party bodily injury liability legal dynamics, fraud
+    syndicate mechanics, and telemetry investigation.
+  pivotal_insight: Claims loss spike is not driven by higher road accidents, but by staged legal tribunal claims filed 18-24
+    months post-incident in 4 specific rural district courts with falsified police FIRs.
+  common_traps:
+  - Assuming own-damage vehicle repair costs increased due to spare parts inflation.
+  - Proposing raising retail insurance premium rates which are strictly regulated and capped by IRDAI.
+  - Assuming young urban drivers caused the spike.
+  takeaway_lesson: In statutory liability insurance where pricing is regulated by state authorities, underwriting profitability
+    depends entirely on aggressive legal defense and early fraud analytics at the tribunal level.
+  suggested_readings:
+  - knowledge_base/industries/16_insurance.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

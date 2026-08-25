@@ -1,0 +1,69 @@
+schema_version: reservoir-v1
+case_id: 05-toll-road-yield-v1
+title: Highway Concession Toll Yield
+school: IIM-B
+status: approved
+rights_status: original
+category: operations
+industry: logistics_and_cold_chain
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is an infrastructure investment trust (InvIT) owning a 140 km 4-lane toll highway concession in Western
+    India. Annual toll collection is 18% below projected revenue despite a 10% increase in regional freight traffic.
+  objective: Diagnose toll revenue underperformance and recommend operational and enforcement measures to recover lost yield.
+  opening_requirements:
+  - Name Highway Concession Toll Yield and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Toll Collection Efficiency (%) and Average Plaza Dwell Time) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Toll Collection Efficiency (%) and Average Plaza Dwell Time
+  decision_question: Why is toll revenue lagging traffic growth and how can toll leakage be eliminated?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: 'Toll avoidance leakage: overloaded multi-axle commercial trucks using an unmonitored 12 km rural state
+    highway bypass road to avoid electronic FASTag toll plazas and weigh-in-motion overload penalties.'
+  what_the_case_wanted_to_test: Infrastructure asset yield, toll plaza leakage, FASTag electronic toll collection (ETC) compliance,
+    and heavy commercial vehicle route elasticity.
+  pivotal_insight: "Traffic is growing, but 30% of high-paying multi-axle commercial trucks divert onto a narrow state bypass\
+    \ road 5 km before the toll plaza to evade the \u20B9850 toll and statutory axle-overload fines."
+  common_traps:
+  - Assuming toll plaza cashier cash theft (FASTag is 98% digital).
+  - Blaming macroeconomic economic slowdown in industrial manufacturing.
+  - Proposing raising toll tariffs which would push even more trucks to the bypass.
+  takeaway_lesson: In infrastructure concessions, traffic demand elasticity is highly sensitive to the availability of un-tolled
+    parallel alternative routes; yield protection requires route enforcement or joint concession integration.
+  suggested_readings:
+  - knowledge_base/industries/01_logistics_and_cold_chain.md
+  - knowledge_base/case_types/unconventional_and_abstract.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

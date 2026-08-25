@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.tower-tenancy
+  label: Restore telecom tower company tenancy yield and operating profitability.
+nodes:
+- id: tenancy-consolidation
+  type: branch
+  label: Telco Consolidation & Macro-Tower Redundancy
+  status: valid_branch
+  evidence: []
+  conclusion: Telco mergers eliminated 70,000 co-located tenancies, dropping tenancy to 1.6x.
+- id: energy-cost-pass-through
+  type: branch
+  label: Diesel Fuel Operations & Green Power Conversion
+  status: valid_branch
+  evidence: []
+  conclusion: "Fixed diesel billing created a \u20B9220 Cr energy loss; solar conversion secures profit."
+- id: 5g-small-cells-and-fiber
+  type: branch
+  label: 5G Small Cells, Street Furniture & Fiber Sharing
+  status: valid_branch
+  evidence: []
+  conclusion: Massive demand for 5G micro-sites and fiber sharing offers next growth wave.
+- id: diagnosis
+  type: diagnosis
+  label: Macro-Tenancy Loss & Diesel Power Bleed
+  status: hidden_target
+  evidence:
+  - tenancy-consolidation
+  - energy-cost-pass-through
+  - 5g-small-cells-and-fiber
+  conclusion: "EBITDA fell because telco consolidation reduced tenancy to 1.6x while diesel fuel contracts lost \u20B9220\
+    \ Cr; recovery requires solarizing sites and deploying 5G small-cells."
+- id: actions
+  type: recommendation
+  label: 3-Pillar Passive Infrastructure Pivot
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Solarize tower energy operations, build municipal 5G street-pole small cells, and expand shared fiber infrastructure.
+edges:
+- from: objective.tower-tenancy
+  to: tenancy-consolidation
+  relation: investigate
+- from: objective.tower-tenancy
+  to: energy-cost-pass-through
+  relation: investigate
+- from: objective.tower-tenancy
+  to: 5g-small-cells-and-fiber
+  relation: investigate
+- from: tenancy-consolidation
+  to: diagnosis
+  relation: supports
+- from: energy-cost-pass-through
+  to: diagnosis
+  relation: supports
+- from: 5g-small-cells-and-fiber
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: tenancy-first
+  sequence:
+  - tenancy-consolidation
+  - energy-cost-pass-through
+  - 5g-small-cells-and-fiber
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from tenancy ratio drop to energy contract leakage and 5G micro-cells.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what happened to tower tenancies when telecom operators merged.
+  - Clarify that tower rent per tenant has a high 80% flow-through margin.
+  - Redirect toward power and fuel solarization and 5G small-cell infrastructure.

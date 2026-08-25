@@ -1,0 +1,75 @@
+schema_version: reservoir-v1
+case_id: 04-d2c-personal-care-v1
+title: D2C Skincare Omnichannel Expansion
+school: IIM-B
+status: approved
+rights_status: original
+category: growth_strategy
+industry: fmcg_and_cpg
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is a venture-backed D2C organic skincare brand with \u20B9120 Cr online revenue. Online Customer Acquisition\
+    \ Cost (CAC) doubled in 18 months, stalling growth."
+  objective: Evaluate offline retail channel expansion (Modern Trade vs General Trade vs Exclusive Brand Outlets) to restore
+    profitable growth.
+  opening_requirements:
+  - Name D2C Skincare Omnichannel Expansion and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Contribution margin after distribution cost and retail store payback) and time horizon (eighteen
+    months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Contribution margin after distribution cost and retail store payback
+  decision_question: Which offline retail channels should the D2C skincare brand prioritize and how should unit economics
+    be managed?
+  time_horizon: eighteen months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "Rising digital CAC (\u20B9850 on a \u20B91,100 basket) making pure online scaling unviable, while expanding\
+    \ into Modern Trade supermarkets (supermarket chains) requires high listing fees, 35% retailer margins, and 90-day payment\
+    \ credit."
+  what_the_case_wanted_to_test: Omnichannel distribution economics, digital-to-offline brand migration, trade margin structures,
+    and beauty advisor in-store conversion.
+  pivotal_insight: Modern Trade supermarkets generate high volume but destroy margin with 38% distributor/retailer take-rates
+    and slotting fees; opening small footprint Exclusive Brand Outlets (EBOs) in premium malls achieves 28% EBITDA margin
+    by leveraging existing online brand awareness.
+  common_traps:
+  - "Assuming traditional general trade mom-and-pop stores are the right starting channel for premium \u20B91,100 organic\
+    \ serums."
+  - Continuing to pump digital performance marketing spend on Facebook/Google.
+  - Treating offline retail as purely transactional without trained beauty advisors.
+  takeaway_lesson: When a digital-native D2C brand exhausts online CAC efficiency, expanding via high-margin Exclusive Brand
+    Outlets (EBOs) captures brand equity better than margin-squeezing supermarket modern trade.
+  suggested_readings:
+  - knowledge_base/industries/05_fmcg_and_cpg.md
+  - knowledge_base/case_types/growth_strategy.md
+  - knowledge_base/methodology/01_preliminary_questions.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <defs>
+    <linearGradient id="leoGrad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0e453a"/>
+      <stop offset="100%" stop-color="#072b24"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="10" y1="8" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f3d082"/>
+      <stop offset="50%" stop-color="#d4963f"/>
+      <stop offset="100%" stop-color="#a86e24"/>
+    </linearGradient>
+    <linearGradient id="facetLight" x1="16" y1="6" x2="16" y2="20" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+  <!-- Base tile with subtle rounded squircle -->
+  <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#leoGrad)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+  <!-- Faceted Analytical Leo Monogram: Precision L + Strategy Prism Diamond -->
+  <path d="M9 8.5C9 7.67 9.67 7 10.5 7H13V19H22.5C23.33 19 24 19.67 24 20.5V23C24 23.83 23.33 24.5 22.5 24.5H10.5C9.67 24.5 9 23.83 9 23V8.5Z" fill="url(#facetLight)"/>
+  <!-- Ascending Strategy Prism Gem / Topaz Compass Core -->
+  <path d="M18.5 7.5L23.5 12.5L18.5 17.5L13.5 12.5Z" fill="url(#goldGrad)"/>
+  <path d="M18.5 7.5L23.5 12.5H13.5Z" fill="#ffffff" fill-opacity="0.35"/>
+</svg>

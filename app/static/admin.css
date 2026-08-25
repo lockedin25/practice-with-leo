@@ -1,40 +1,41 @@
 /* ==========================================================================
-   Admin console. Inherits every token, bubble and fact style from styles.css
-   so an administrator reads a transcript exactly as the candidate saw it.
+   Leo — admin console (/admin)
+
+   Cohort metrics, per-candidate rollups, and the full transcript of any
+   attempt rendered the way the candidate saw it. Cards, buttons, counters and
+   the transcript primitives come from tokens.css; everything here is layout
+   this page owns.
+
+   Breakpoints, literal everywhere: 1200px, 900px, 640px. Nothing else.
    ========================================================================== */
 
 .console-body {
   min-height: 100dvh;
 }
 
-.admin-chip {
-  padding: 3px 9px;
-  border: 1px solid color-mix(in srgb, var(--brand) 28%, transparent);
-  border-radius: var(--r-pill);
-  background: var(--brand-tint);
-  font-size: 0.6875rem;
-  font-weight: 650;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--brand) 90%, var(--ink));
+.console {
+  padding: 28px 0 64px;
 }
 
-.console {
-  width: min(1400px, 100%);
-  margin: 0 auto;
-  padding: 26px clamp(16px, 3vw, 34px) 60px;
+.muted,
+.card-subtitle {
+  color: var(--ink-3);
+  font-size: 0.8125rem;
 }
+
+/* --- Page head ----------------------------------------------------------- */
 
 .console-head {
   display: flex;
   align-items: flex-end;
+  justify-content: space-between;
   gap: 18px;
   flex-wrap: wrap;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 
 .console-head h1 {
-  margin: 7px 0 4px;
+  margin: 0 0 4px;
   font-family: var(--serif);
   font-size: clamp(1.75rem, 2.4vw, 2.25rem);
   font-weight: 400;
@@ -43,28 +44,36 @@
 }
 
 .console-head .muted {
-  font-size: 0.8125rem;
-  color: var(--ink-3);
+  margin: 0;
 }
 
 .console-head-actions {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
+/* The nav slot shows who is looking. The e-mail is redundant beside the name
+   in a 64px bar, so only the name rides along. */
+.navbar .person-email {
+  display: none;
+}
+
 /* --- Metric tiles ------------------------------------------------------- */
+/* Six tiles in one row. The label reserves two lines and the note is pinned
+   to the bottom, so the numbers share a baseline even when one label wraps. */
 
 .tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 16px;
 }
 
 .tile {
-  padding: 16px 17px 15px;
+  display: flex;
+  flex-direction: column;
+  padding: 15px 16px 14px;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   background: var(--surface);
@@ -72,17 +81,20 @@
 }
 
 .tile-label {
+  min-height: 2.2em;
+  margin: 0;
   font-size: 0.6875rem;
   font-weight: 600;
   letter-spacing: 0.08em;
+  line-height: 1.1;
   text-transform: uppercase;
   color: var(--ink-4);
 }
 
 .tile-value {
-  margin: 8px 0 2px;
+  margin: 10px 0 4px;
   font-family: var(--serif);
-  font-size: 2.125rem;
+  font-size: 2rem;
   font-weight: 400;
   line-height: 1;
   letter-spacing: -0.015em;
@@ -91,6 +103,8 @@
 }
 
 .tile-note {
+  margin: auto 0 0;
+  padding-top: 6px;
   font-size: 0.75rem;
   line-height: 1.45;
   color: var(--ink-3);
@@ -100,24 +114,29 @@
 
 .panel-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
   gap: 12px;
   margin-bottom: 16px;
-  align-items: start;
 }
 
+/* A fortnight of low volume leaves most of a tall chart empty, so the plot is
+   short and every day draws a mark: a quiet day is a trace on the baseline,
+   not a hole. */
 .bars {
   display: flex;
   align-items: flex-end;
-  gap: 5px;
-  height: 108px;
+  gap: 4px;
+  height: 76px;
   margin-top: 18px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--line);
 }
 
 .bar {
   position: relative;
   flex: 1;
-  min-height: 3px;
+  min-height: 2px;
   border-radius: 3px 3px 1px 1px;
   background: color-mix(in srgb, var(--brand) 32%, transparent);
   transition: background 0.18s;
@@ -125,6 +144,10 @@
 
 .bar.is-peak {
   background: var(--brand);
+}
+
+.bar.is-zero {
+  background: var(--line-strong);
 }
 
 .bar:hover {
@@ -154,13 +177,13 @@
 }
 
 .breakdown-label {
+  margin: 0;
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--ink-2);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-transform: capitalize;
 }
 
 .breakdown-count {
@@ -173,9 +196,9 @@
 .breakdown-track {
   grid-column: 1 / -1;
   height: 5px;
+  overflow: hidden;
   border-radius: var(--r-pill);
   background: var(--sunken);
-  overflow: hidden;
 }
 
 .breakdown-fill {
@@ -198,16 +221,19 @@
 }
 
 .select {
+  max-width: 240px;
+  min-height: 44px;
   padding: 6px 10px;
   border: 1px solid var(--line-strong);
   border-radius: var(--r-sm);
   background: var(--surface);
   color: var(--ink-2);
+  font-family: var(--sans);
   font-size: 0.8125rem;
-  max-width: 240px;
 }
 
 .table-scroll {
+  /* Eight columns scroll inside this box; the page never moves sideways. */
   overflow-x: auto;
   margin-top: 14px;
 }
@@ -256,6 +282,13 @@
   white-space: nowrap;
 }
 
+.table-empty {
+  padding: 26px 12px 30px;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--ink-3);
+}
+
 .person {
   display: flex;
   align-items: center;
@@ -267,10 +300,10 @@
   width: 28px;
   height: 28px;
   flex: none;
+  border: 1px solid var(--line);
   border-radius: 50%;
   object-fit: cover;
   background: var(--brand-tint);
-  border: 1px solid var(--line);
 }
 
 .person-avatar.is-letter {
@@ -282,16 +315,20 @@
 }
 
 .person-name {
+  margin: 0;
   font-weight: 550;
   color: var(--ink);
   white-space: nowrap;
 }
 
 .person-email {
+  margin: 0;
   font-size: 0.75rem;
   color: var(--ink-4);
   white-space: nowrap;
 }
+
+/* --- Pills and tags ----------------------------------------------------- */
 
 .pill {
   display: inline-block;
@@ -301,7 +338,6 @@
   font-weight: 650;
   letter-spacing: 0.04em;
   white-space: nowrap;
-  text-transform: capitalize;
 }
 
 .pill-live {
@@ -320,11 +356,45 @@
   color: var(--ink-3);
 }
 
-.table-empty {
-  padding: 26px 12px 30px;
-  text-align: center;
-  font-size: 0.875rem;
+/* Same treatment as the profile drawer's meta pills, so both drawers read as
+   one product. */
+.tag {
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--sunken);
   color: var(--ink-3);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tag-accent {
+  border-color: color-mix(in srgb, var(--brand) 28%, transparent);
+  background: var(--brand-tint);
+  color: color-mix(in srgb, var(--brand) 90%, var(--ink));
+}
+
+.band {
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  background: var(--sunken);
+  color: var(--ink-2);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.band-strong {
+  background: var(--brand-tint);
+  color: color-mix(in srgb, var(--brand) 90%, var(--ink));
+}
+
+.band-developing {
+  background: var(--amber-tint);
+  color: var(--amber);
 }
 
 /* --- Transcript drawer -------------------------------------------------- */
@@ -345,9 +415,9 @@
 .drawer {
   position: fixed;
   inset: 0 0 0 auto;
-  z-index: 41;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
   width: min(620px, 100%);
   border-left: 1px solid var(--line-strong);
   background: var(--paper);
@@ -360,13 +430,18 @@
 }
 
 .drawer-head {
-  padding: 20px 22px 16px;
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px 16px;
   border-bottom: 1px solid var(--line);
   background: var(--surface);
 }
 
 .drawer-title {
-  margin: 7px 0 0;
+  margin: 6px 0 0;
   font-family: var(--serif);
   font-size: 1.5rem;
   font-weight: 400;
@@ -374,17 +449,16 @@
 }
 
 .drawer-close {
-  position: absolute;
-  top: 16px;
-  right: 18px;
-  width: 30px;
-  height: 30px;
   display: grid;
   place-items: center;
-  padding: 8px;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  padding: 11px;
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
   background: var(--surface);
+  background-clip: content-box;
   color: var(--ink-3);
   cursor: pointer;
 }
@@ -392,22 +466,27 @@
 .drawer-close:hover {
   color: var(--ink);
   background: var(--sunken);
+  background-clip: content-box;
 }
 
 .drawer-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 13px;
+  margin-top: 12px;
 }
 
 .drawer-body {
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
-  padding: 20px 22px 34px;
+  padding: 20px 20px 34px;
 }
 
-.drawer-section {
-  margin-bottom: 24px;
+.drawer-section + .drawer-section {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
 }
 
 .drawer-section > .eyebrow {
@@ -423,10 +502,6 @@
 .drawer-transcript .message {
   max-width: 92%;
   animation: none;
-}
-
-.drawer .facts {
-  margin-top: 0;
 }
 
 .scorecard-grid {
@@ -451,16 +526,137 @@
   color: var(--ink);
 }
 
-/* --- Responsive --------------------------------------------------------- */
-
-@media (max-width: 1080px) {
-  .panel-grid { grid-template-columns: 1fr 1fr; }
-  .panel-grid > :first-child { grid-column: 1 / -1; }
+.next-drill {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line-dashed);
 }
 
-@media (max-width: 700px) {
-  .panel-grid { grid-template-columns: 1fr; }
-  .panel-grid > :first-child { grid-column: auto; }
-  .console-head-actions { margin-left: 0; }
-  .drawer { width: 100%; }
+.next-drill .micro-label {
+  margin: 0 0 4px;
+}
+
+.next-drill p:last-child {
+  margin: 0;
+  font-size: 0.8438rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* Released evidence, shown the way the candidate received it. */
+.facts {
+  display: grid;
+  gap: 10px;
+}
+
+.fact {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--sunken);
+}
+
+.fact-index {
+  display: block;
+  margin-bottom: 5px;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.fact-content {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.facts-empty {
+  display: grid;
+  gap: 4px;
+  padding: 18px;
+  border: 1px dashed var(--line-dashed);
+  border-radius: var(--r-md);
+  color: var(--ink-3);
+  font-size: 0.8438rem;
+}
+
+/* --- Responsive --------------------------------------------------------- */
+
+@media (max-width: 1200px) {
+  .tiles {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .panel-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chart-card {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .console {
+    padding-top: 22px;
+  }
+
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .panel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card {
+    grid-column: auto;
+  }
+
+  .console-head-actions {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .tiles {
+    grid-template-columns: 1fr;
+  }
+
+  .tile {
+    flex-flow: row wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 12px;
+    padding: 14px 16px;
+  }
+
+  .tile-label {
+    min-height: 0;
+    order: 1;
+  }
+
+  .tile-value {
+    order: 2;
+    margin: 0;
+    font-size: 1.5rem;
+    text-align: right;
+  }
+
+  .tile-note {
+    order: 3;
+    flex-basis: 100%;
+    padding-top: 2px;
+  }
+
+  .drawer {
+    width: 100%;
+  }
+
+  .select {
+    max-width: 100%;
+  }
 }

@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.5g-pricing
+  label: Restructure 5G tariff architecture to accelerate ARPU growth.
+nodes:
+- id: mobile-arpu-leakage
+  type: branch
+  label: Mobile 5G Pricing & Data Consumption
+  status: valid_branch
+  evidence: []
+  conclusion: "Data usage tripled to 32 GB/mo but free promotional bundling kept ARPU flat at \u20B9182."
+- id: willingness-to-pay
+  type: branch
+  label: 'Consumer WTP: Mobile vs Home Broadband'
+  status: valid_branch
+  evidence: []
+  conclusion: Mobile consumers resist paying extra for speed; massive unmet demand exists for home Wi-Fi.
+- id: fwa-and-enterprise
+  type: branch
+  label: 5G FWA & Enterprise Network Slicing
+  status: valid_branch
+  evidence: []
+  conclusion: "5G FWA generates \u20B9599 ARPU (3.2x mobile) and enterprise slicing provides high-margin B2B contracts."
+- id: diagnosis
+  type: diagnosis
+  label: Promotional Cannibalization & Unlocked FWA Potential
+  status: hidden_target
+  evidence:
+  - mobile-arpu-leakage
+  - willingness-to-pay
+  - fwa-and-enterprise
+  conclusion: Free 5G promotional bundles stalled mobile ARPU; 5G capex must be monetized through 5G FWA home broadband and
+    speed-tiered premium bundles.
+- id: actions
+  type: recommendation
+  label: 3-Pillar 5G Monetization Architecture
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Scale 5G FWA home broadband, sunset unlimited free mobile data in favor of speed tiers, and launch enterprise
+    network slicing.
+edges:
+- from: objective.5g-pricing
+  to: mobile-arpu-leakage
+  relation: investigate
+- from: objective.5g-pricing
+  to: willingness-to-pay
+  relation: investigate
+- from: objective.5g-pricing
+  to: fwa-and-enterprise
+  relation: investigate
+- from: mobile-arpu-leakage
+  to: diagnosis
+  relation: supports
+- from: willingness-to-pay
+  to: diagnosis
+  relation: supports
+- from: fwa-and-enterprise
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: pricing-first
+  sequence:
+  - mobile-arpu-leakage
+  - willingness-to-pay
+  - fwa-and-enterprise
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from flat mobile ARPU to home FWA broadband economics.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate how much revenue the operator makes per GB on 5G vs 4G.
+  - Clarify that 5G network coverage is comprehensive.
+  - Redirect toward home broadband 5G FWA and enterprise network slicing.

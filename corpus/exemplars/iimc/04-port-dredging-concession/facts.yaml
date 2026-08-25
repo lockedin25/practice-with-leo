@@ -1,0 +1,46 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: project.scope
+  domain: company
+  release_level: broad_context
+  content: "Project involves dredging 22 km access channel from 14m to 18m draft, requiring \u20B91,800 Cr upfront capital\
+    \ dredging."
+- id: vessel.traffic
+  domain: commercial
+  release_level: sharp_question
+  content: "18m draft allows 150,000 DWT Cape-size bulk carriers to berth fully laden, eliminating \u20B9400/MT lighterage\
+    \ transshipment costs for steel/power plants."
+- id: siltation.risk
+  domain: operations
+  release_level: hypothesis_backed
+  content: "Monsoon oceanographic siltation deposits 3.5M to 5.2M cubic meters of silt annually, requiring \u20B990 Cr-\u20B9\
+    140 Cr annual maintenance dredging."
+  dependencies:
+  - vessel.traffic
+- id: tariff.structure
+  domain: financials
+  release_level: hypothesis_backed
+  content: "Vessel-related charges (VRC) yield \u20B9320 Cr annually from deep-draft vessels, but high siltation years reduce\
+    \ equity IRR from 16% to 7.8% without tariff indexation."
+  dependencies:
+  - siltation.risk
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Concession is highly accretive (16% IRR) due to Cape-size vessel demand, but annual monsoon siltation (up to 5.2M
+    m3) threatens debt service; concession must include a risk-sharing siltation collar with the port authority.
+- id: recommendation.siltation_collar
+  domain: recommendation
+  release_level: synthesis_support
+  content: 'Incorporate a contractual Siltation Collar: port authority compensates 100% of maintenance dredging costs when
+    annual silt volume exceeds 3.8M m3.'
+- id: recommendation.hopper_dredger
+  domain: recommendation
+  release_level: synthesis_support
+  content: Purchase a dedicated 10,000 m3 Trailing Suction Hopper Dredger (TSHD) on long-term lease to reduce maintenance
+    dredging cost by 30% vs spot chartering.
+- id: recommendation.anchor_contracts
+  domain: recommendation
+  release_level: synthesis_support
+  content: Sign 10-year Minimum Volume Guarantee (MVG) contracts with regional coastal steel and thermal power plants.

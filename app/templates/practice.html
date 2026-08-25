@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% set nav_active = "practice" %}
+{% set header_partial = "_room_header.html" %}
+{% block title %}Leo · Case Interview Practice{% endblock %}
+{% block description %}Consulting case interview practice with Leo and evidence-based feedback.{% endblock %}
+{% block body_class %}room{% endblock %}
+{% block stylesheets %}
+<link rel="stylesheet" href="/static/room.css" />
+{% endblock %}
+{% block content %}
+  {# The room is a fixed-height workspace: the toolbar above, this grid below,
+     and only the transcript and the rail scroll. `body.room` supplies the
+     shell so the layout does not depend on a wrapper base.html cannot give. #}
+  <main class="workspace">
+    <!-- ── Conversation column ─────────────────────────────────── -->
+    <section class="transcript" id="transcript" aria-label="Case interview conversation">
+      <div class="case-header" id="case-header">
+        <p class="eyebrow">
+          <span class="eyebrow-mark" aria-hidden="true"></span>
+          <span id="case-stage-label">Case brief</span>
+        </p>
+        <h1 id="case-title">Loading case…</h1>
+        <div class="case-tags" id="case-tags"></div>
+      </div>
+
+      <!-- ── Voice HUD, shown only while a voice call is live ───── -->
+      <div class="voice-hud hidden" id="voice-hud" aria-label="Voice practice status">
+        <div class="voice-hud-inner">
+          <div class="voice-visualizer" id="voice-visualizer" aria-hidden="true">
+            <div class="voice-orb">
+              <div class="orb-core"></div>
+            </div>
+            <div class="voice-aura"></div>
+          </div>
+
+          <div class="voice-hud-details">
+            <div class="voice-status-line">
+              <div class="voice-state-pill" id="voice-state-pill">
+                <span class="voice-state-dot"></span>
+                <span id="voice-state-label">Connecting with Leo…</span>
+              </div>
+              <div class="sound-wave-bars" aria-hidden="true">
+                <span class="bar b1"></span>
+                <span class="bar b2"></span>
+                <span class="bar b3"></span>
+                <span class="bar b4"></span>
+                <span class="bar b5"></span>
+              </div>
+            </div>
+            <p class="voice-guidance" id="voice-guidance">Think aloud, form a hypothesis, and ask for the facts you need.</p>
+          </div>
+
+          <div class="voice-hud-actions">
+            <button class="btn-voice-action" id="voice-return-chat" type="button" title="Mute the microphone and type instead">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span>Mute and type</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="transcript-scroll" id="transcript-scroll">
+        <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+      </div>
+
+      <form class="composer" id="message-form">
+        {# Pre-case, this strip is the only call to action in the room. app.js
+           adds .is-pre-case to #transcript, which swaps the two states. #}
+        <div class="composer-lead" aria-hidden="false">
+          <p class="composer-lead-copy">Leo is waiting for your go-ahead. Nothing is timed until the case opens.</p>
+          <button class="btn btn-primary composer-lead-action" id="begin-case" type="button">
+            <span>Start the case</span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+
+        <div class="composer-field">
+          <label class="sr-only" for="candidate-message">Your response</label>
+          <textarea
+            id="candidate-message"
+            rows="1"
+            placeholder="Ask Leo a question or talk through your reasoning…"
+            autocomplete="off"
+          ></textarea>
+          <div class="composer-foot">
+            <p class="composer-hint">
+              <span><kbd>Enter</kbd> to send</span>
+              <span class="hint-sep" aria-hidden="true">·</span>
+              <span class="hint-extra"><kbd>Shift</kbd><kbd>Enter</kbd> for a new line</span>
+            </p>
+            <button class="send-button" id="send-message" type="submit" aria-label="Send response">
+              <svg viewBox="0 0 24 24" aria-hidden="true" class="icon icon-send">
+                <path d="M12 19V5.6M12 5.6 6.4 11.2M12 5.6l5.6 5.6" />
+              </svg>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- ── Completion: one calm panel, one dominant action ────── -->
+      <div class="completion hidden" id="ended-bar" aria-live="polite">
+        <p class="eyebrow">
+          <span class="eyebrow-mark" aria-hidden="true"></span>
+          Practice complete
+        </p>
+        <h2 class="completion-title">Your debrief is ready</h2>
+        <p class="completion-note" id="completion-note">
+          Leo scored this attempt against the MBB rubric and wrote up where the reasoning held and where it slipped.
+        </p>
+
+        <section class="card card-summary completion-summary hidden" id="scorecard">
+          <header class="card-head">
+            <p class="eyebrow">Outcome snapshot</p>
+            <span class="status-chip" id="scorecard-status"></span>
+          </header>
+          <div id="scorecard-content"></div>
+        </section>
+
+        <div class="completion-actions">
+          <a class="btn btn-primary btn-lg completion-primary" id="view-debrief-btn" href="#">
+            <span>Review your debrief</span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </a>
+          <button class="completion-secondary" id="restart-attempt" type="button">Start another case</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Side rail ───────────────────────────────────────────── -->
+    <aside class="rail" id="rail" data-tab="progress" aria-label="Interview state">
+      {# Below 900px the rail is too narrow to hold two stacked transcripts, so
+         it becomes a tab strip. Above it, both panels are simply visible. #}
+      <div class="rail-tabs" role="tablist" aria-label="Interview panels">
+        <button
+          class="rail-tab is-active"
+          id="rail-tab-progress"
+          type="button"
+          role="tab"
+          aria-selected="true"
+          aria-controls="progress-card"
+          data-tab="progress"
+        >Progress</button>
+        <button
+          class="rail-tab"
+          id="rail-tab-evidence"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="evidence-card"
+          data-tab="evidence"
+        >
+          <span>Evidence</span>
+          <span class="rail-tab-count" id="rail-evidence-count">0</span>
+        </button>
+      </div>
+
+      <section class="card rail-card" id="progress-card" data-panel="progress" role="tabpanel" aria-labelledby="rail-tab-progress">
+        <header class="card-head">
+          <p class="eyebrow">Interview progress</p>
+          <span class="counter" id="stage-counter">1/4</span>
+        </header>
+
+        <ol class="stepper" id="stepper"></ol>
+
+        <div class="assessed">
+          <p class="micro-label">Assessed on</p>
+          <ul class="tag-list" id="skills-list"></ul>
+        </div>
+      </section>
+
+      <section class="card rail-card" id="evidence-card" data-panel="evidence" role="tabpanel" aria-labelledby="rail-tab-evidence">
+        <header class="card-head">
+          <p class="eyebrow">Evidence released</p>
+          <span class="counter" id="facts-counter">0</span>
+        </header>
+        <div class="facts" id="facts"></div>
+      </section>
+    </aside>
+  </main>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+  <dialog class="voice-dialog" id="voice-consent" aria-labelledby="voice-consent-title">
+    <form method="dialog" class="voice-dialog-body">
+      <div class="voice-dialog-header">
+        <span class="voice-icon-badge">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+        </span>
+        <div>
+          <p class="eyebrow">Voice practice</p>
+          <h2 id="voice-consent-title">Speak with Leo</h2>
+        </div>
+      </div>
+      <p>Leo will use your microphone to listen to your voice and run the case in real time. Chat stays available whenever you prefer to type.</p>
+      <div class="voice-dialog-actions">
+        <button class="button button-ghost" id="voice-cancel" value="cancel" type="submit">Keep chatting</button>
+        <button class="button button-solid" id="voice-start" value="start" type="button">Start voice</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ── Templates ───────────────────────────────────────────────── -->
+  <template id="message-template">
+    <article class="message">
+      <span class="avatar" aria-hidden="true">
+        <svg viewBox="0 0 32 32" class="avatar-glyph" fill="none">
+          <rect width="32" height="32" rx="8" fill="var(--brand-primary)"/>
+          <path d="M9 8.5C9 7.67 9.67 7 10.5 7H13V19H22.5C23.33 19 24 19.67 24 20.5V23C24 23.83 23.33 24.5 22.5 24.5H10.5C9.67 24.5 9 23.83 9 23V8.5Z" fill="#ffffff"/>
+          <path d="M18.5 7.5L23.5 12.5L18.5 17.5L13.5 12.5Z" fill="var(--gold-primary)"/>
+        </svg>
+      </span>
+      <div class="message-body">
+        <p class="message-role"></p>
+        <div class="bubble"><p class="message-content"></p></div>
+      </div>
+    </article>
+  </template>
+
+  <template id="typing-template">
+    <article class="message interviewer is-typing">
+      <span class="avatar" aria-hidden="true">
+        <svg viewBox="0 0 32 32" class="avatar-glyph" fill="none">
+          <rect width="32" height="32" rx="8" fill="var(--brand-primary)"/>
+          <path d="M9 8.5C9 7.67 9.67 7 10.5 7H13V19H22.5C23.33 19 24 19.67 24 20.5V23C24 23.83 23.33 24.5 22.5 24.5H10.5C9.67 24.5 9 23.83 9 23V8.5Z" fill="#ffffff"/>
+          <path d="M18.5 7.5L23.5 12.5L18.5 17.5L13.5 12.5Z" fill="var(--gold-primary)"/>
+        </svg>
+      </span>
+      <div class="message-body">
+        <p class="message-role">Leo</p>
+        <div class="bubble">
+          <span class="typing" aria-label="Leo is thinking">
+            <i></i><i></i><i></i>
+          </span>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <template id="fact-template">
+    <article class="fact">
+      <button class="fact-toggle" type="button" aria-expanded="false">
+        <span class="fact-main">
+          <span class="fact-meta">
+            <span class="fact-category"></span>
+            <span class="fact-new">New</span>
+          </span>
+          <span class="fact-summary"></span>
+        </span>
+        <svg viewBox="0 0 24 24" class="icon fact-caret" aria-hidden="true"><path d="M7 10l5 5 5-5" /></svg>
+      </button>
+      <div class="fact-detail" hidden>
+        <p class="fact-content"></p>
+        <p class="fact-index"></p>
+      </div>
+    </article>
+  </template>
+{% endblock %}
+{% block scripts %}<script src="/static/app.js"></script>{% endblock %}

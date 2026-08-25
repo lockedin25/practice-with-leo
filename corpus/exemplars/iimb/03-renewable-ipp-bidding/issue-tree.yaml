@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.renewable-bidding
+  label: Determine optimal tariff bid and asset configuration for hybrid tender.
+nodes:
+- id: tender-mandates
+  type: branch
+  label: Tender Performance Mandates & Peak Hours
+  status: valid_branch
+  evidence: []
+  conclusion: Requires 85% availability during 6-9 AM and 6-11 PM peak windows.
+- id: generation-resource-mix
+  type: branch
+  label: Solar vs Wind Generation Profiles
+  status: valid_branch
+  evidence: []
+  conclusion: Wind generation peaks in evening, perfectly covering the 6-11 PM peak window.
+- id: storage-capex-optimization
+  type: branch
+  label: BESS Sizing & Lifecycle Degradation
+  status: valid_branch
+  evidence: []
+  conclusion: Solar-wind complementarity cuts BESS storage requirement from 600 MWh to 250 MWh.
+- id: diagnosis
+  type: diagnosis
+  label: Solar-Wind Complementarity Storage Reduction
+  status: hidden_target
+  evidence:
+  - tender-mandates
+  - generation-resource-mix
+  - storage-capex-optimization
+  conclusion: "Target 14% IRR at \u20B93.34/kWh is achievable only by leveraging evening wind generation to downsize expensive\
+    \ battery storage by 45%."
+- id: actions
+  type: recommendation
+  label: 3-Pillar Bidding & Asset Sizing Plan
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: "Bid \u20B93.34/kWh on 60:40 Solar:Wind + 250 MWh BESS, hedge module procurement, and lock battery degradation\
+    \ warranties."
+edges:
+- from: objective.renewable-bidding
+  to: tender-mandates
+  relation: investigate
+- from: objective.renewable-bidding
+  to: generation-resource-mix
+  relation: investigate
+- from: objective.renewable-bidding
+  to: storage-capex-optimization
+  relation: investigate
+- from: tender-mandates
+  to: diagnosis
+  relation: supports
+- from: generation-resource-mix
+  to: diagnosis
+  relation: supports
+- from: storage-capex-optimization
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: generation-first
+  sequence:
+  - tender-mandates
+  - generation-resource-mix
+  - storage-capex-optimization
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from tender peak-hour mandates to solar-wind generation curves.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what time of day solar vs wind generation peaks.
+  - Clarify that batteries are the single most expensive capex component per MWh.
+  - Redirect toward reducing battery size through wind generation.

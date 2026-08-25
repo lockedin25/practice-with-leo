@@ -1,0 +1,72 @@
+schema_version: reservoir-v1
+case_id: 08-ott-vernacular-tiering-v1
+title: Regional OTT Streaming Churn
+school: ISB
+status: approved
+rights_status: original
+category: pricing
+industry: telecom_and_media
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a leading South Indian regional vernacular OTT streaming service with 5M paid subscribers. Annual
+    subscriber churn is 58%, and customer acquisition cost via digital ads is exceeding customer lifetime value.
+  objective: Diagnose subscriber churn drivers and redesign subscription tiers and telco distribution bundles.
+  opening_requirements:
+  - Name Regional OTT Streaming Churn and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Annual Subscriber Churn Rate (%) and Average Revenue Per Paying User (ARPPU)) and time horizon
+    (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Annual Subscriber Churn Rate (%) and Average Revenue Per Paying User (ARPPU)
+  decision_question: How should the regional OTT platform restructure subscription packaging to cut churn and expand Tier-2/3
+    penetration?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "Spike-and-churn behavior around tentpole movie releases. Users buy a \u20B9199 monthly pass to watch a\
+    \ single blockbuster movie and immediately cancel subscription, while credit card auto-renewal fails due to RBI e-mandate\
+    \ friction."
+  what_the_case_wanted_to_test: Subscription video-on-demand (SVOD) economics, tentpole content decay curves, telco carrier
+    bundling, and UPI recurring autopay integration.
+  pivotal_insight: "70% of churn occurs because users subscribe for one movie; introducing a low-cost annual mobile-only plan\
+    \ (\u20B9299/year) bundled into regional broadband/telco prepaid packs converts churners into locked annual subscribers."
+  common_traps:
+  - Doubling content production capex on expensive original web series without distribution lock-in.
+  - "Cutting monthly subscription prices to \u20B949 without solving payment auto-renewal."
+  - Ignoring telco prepaid bundle distribution.
+  takeaway_lesson: In regional entertainment where content consumption is episodic, monthly subscription models suffer high
+    churn; platform stability requires annual mobile-only pricing and telco prepaid integration.
+  suggested_readings:
+  - knowledge_base/industries/07_telecom_and_media.md
+  - knowledge_base/case_types/pricing_strategy.md
+  - knowledge_base/methodology/04_data_gathering_and_notes.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

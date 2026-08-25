@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.cost-reduction
+  label: Diagnose uncompetitive processing costs and recommend turnaround plan.
+nodes:
+- id: cost-structure
+  type: branch
+  label: Value Chain Cost Breakdown
+  status: valid_branch
+  evidence: []
+  conclusion: Processing is the sole cost head exceeding international benchmarks.
+- id: capacity-diagnostics
+  type: branch
+  label: Actual vs Potential Capacity
+  status: valid_branch
+  evidence: []
+  conclusion: Actual utilization is 100%; potential capacity per machine is restricted to 30k vs 80k bottles.
+- id: procurement-barriers
+  type: branch
+  label: Internal vs External Barriers
+  status: valid_branch
+  evidence: []
+  conclusion: Import restrictions on Chinese machinery prevent direct equipment upgrades.
+- id: diagnosis
+  type: diagnosis
+  label: Sub-scale Machine Scale under Regulatory Ban
+  status: hidden_target
+  evidence:
+  - cost-structure
+  - capacity-diagnostics
+  - procurement-barriers
+  conclusion: Processing cost disadvantage stems from sub-scale 30k machines running at 100% capacity due to regulatory import
+    barriers on Chinese high-speed equipment.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Turnaround Plan
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Source alternative German/Japanese equipment, secure contract bottling capacity, and petition for capital goods
+    import clearances.
+edges:
+- from: objective.cost-reduction
+  to: cost-structure
+  relation: investigate
+- from: objective.cost-reduction
+  to: capacity-diagnostics
+  relation: investigate
+- from: objective.cost-reduction
+  to: procurement-barriers
+  relation: investigate
+- from: cost-structure
+  to: diagnosis
+  relation: supports
+- from: capacity-diagnostics
+  to: diagnosis
+  relation: supports
+- from: procurement-barriers
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: value-chain-first
+  sequence:
+  - cost-structure
+  - capacity-diagnostics
+  - procurement-barriers
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from value chain breakdown to capacity analysis.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to evaluate machine capacity vs actual utilization.
+  - Clarify that workers are operating at full capacity.
+  - Redirect inquiry to competitor equipment specifications and import regulations.

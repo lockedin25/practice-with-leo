@@ -1,0 +1,69 @@
+schema_version: reservoir-v1
+case_id: 11-zoomcar-mobility-v1
+title: Self-Drive Car Rental Platform
+school: IIM-A
+status: approved
+rights_status: original
+category: profitability
+industry: logistics_and_cold_chain
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is an Indian self-drive car sharing marketplace with 8,000 host vehicles. Fleet EBITDA margin turned
+    negative (-12%) despite 90% weekend booking occupancy.
+  objective: Diagnose the drivers of negative fleet EBITDA and recommend a vehicle maintenance and asset protection strategy.
+  opening_requirements:
+  - Name Self-Drive Car Rental Platform and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Fleet EBITDA margin and Average Repair Downtime (days)) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Fleet EBITDA margin and Average Repair Downtime (days)
+  decision_question: Why is the car rental marketplace losing money despite high booking occupancy?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Severe vehicle accident repair downtime (averaging 24 days per incident) and unrecovered damage costs caused
+    by reckless customer driving and delayed insurance surveyor approvals.
+  what_the_case_wanted_to_test: Asset utilization economics, damage repair cycle time, customer risk scoring, and insurance
+    claim friction.
+  pivotal_insight: 'High booking demand mask a fatal utilization leak: 22% of the fleet is stranded in partner garages waiting
+    for accident repairs and insurance sign-offs, earning zero revenue while incurring lease costs.'
+  common_traps:
+  - Assuming customer demand or trip pricing is too low.
+  - Blaming vehicle depreciation accounting rules.
+  - Proposing buying all cars onto balance sheet.
+  takeaway_lesson: In peer-to-peer asset sharing, vehicle downtime from maintenance and unrecovered accident damage erodes
+    fleet profitability faster than high utilization can generate revenue.
+  suggested_readings:
+  - knowledge_base/industries/01_logistics_and_cold_chain.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

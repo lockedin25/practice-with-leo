@@ -31,12 +31,28 @@ flowchart LR
 
 ## Frontend files
 
+Every page is a Jinja2 template rendered by a route in `app/main.py`. There is
+one shell and one design system; a page owns only what is unique to it.
+
 | Location | Responsibility |
 |---|---|
-| `app/static/landing.html`, `landing.css`, `landing.js` | The public product explanation and candidate-safe case library. It fetches metadata only and creates no attempt. |
-| `app/static/index.html`, `styles.css`, `app.js` | The interview workspace: transcript, timer, evidence rail, resilient turn submission, and attempt restoration. |
-| `app/static/login.html` | The sign-in screen and OAuth handoff. |
-| `app/static/admin.html` | The protected administration screen. |
+| `app/templates/base.html` | The document shell: head, fonts, stylesheet and script slots, body class. |
+| `app/templates/_site_header.html` | The single site header for every page except the interview room, including the phone navigation sheet. |
+| `app/templates/_room_header.html` | The interview room's session toolbar: timer, voice, end practice. A HUD, not site navigation. |
+| `app/templates/_brand.html`, `_theme_toggle.html`, `_user_menu.html` | Shell pieces that used to be copied into each page. The account chip is filled server side from the request session. |
+| `app/static/tokens.css` | The design system: one palette with one set of dark overrides, three breakpoints (640, 900, 1200), and every shared primitive. No other stylesheet may define a shell primitive. |
+| `app/templates/landing.html`, `app/static/landing.css`, `landing.js` | The public product explanation and a curated case preview. It fetches metadata only and creates no attempt. |
+| `app/templates/cases.html`, `app/static/cases.css`, `cases.js` | The full case library, its filters, and per-case progress. |
+| `app/templates/practice.html`, `app/static/room.css`, `app.js` | The interview workspace: transcript, timer, evidence rail, resilient turn submission, and attempt restoration. |
+| `app/templates/profile.html`, `debrief.html`, `admin.html` and their stylesheets | Candidate progress, the post-case debrief, and the protected administration screen. |
+| `app/templates/login.html`, `app/static/auth.css`, `login.js` | The sign-in screen and OAuth handoff. It renders no site navigation on purpose. |
+
+Two rules keep the shell from drifting apart again, because it already did once:
+the header markup was duplicated across seven pages and `.navbar`, `.btn` and
+`.brand` were each restyled in three or four stylesheets.
+
+1. Shared markup lives in a partial, never copied into a page.
+2. Shared styling lives in `tokens.css`, never redefined in a page stylesheet.
 
 ## Case content
 

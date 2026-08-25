@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.agritech-wastage
+  label: Reduce fresh produce wastage and achieve positive gross margin.
+nodes:
+- id: wastage-point-of-origin
+  type: branch
+  label: 'Wastage Points: Farmgate vs Transit vs DC'
+  status: valid_branch
+  evidence: []
+  conclusion: Bulk of wastage occurs at central urban DCs during delayed sorting.
+- id: farmgate-grading-economics
+  type: branch
+  label: Village Level Grading & Weight Elimination
+  status: valid_branch
+  evidence: []
+  conclusion: Sorting at village centers eliminates 24% dead weight from transit freight.
+- id: packaging-and-transit-bruising
+  type: branch
+  label: Gunny Bags vs Ventilated Crates
+  status: valid_branch
+  evidence: []
+  conclusion: Gunny bags cause 12% transit crushing in heavy vegetables.
+- id: diagnosis
+  type: diagnosis
+  label: Un-Graded Bulk Transport & Transit Bruising
+  status: hidden_target
+  evidence:
+  - wastage-point-of-origin
+  - farmgate-grading-economics
+  - packaging-and-transit-bruising
+  conclusion: Gross margin is negative because un-graded bulk produce is transported in gunny bags, generating 22.5% wastage
+    and paying freight on unusable Grade-C produce.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Fresh Supply Chain Optimization
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Implement farmgate digital grading, monetize Grade-B/C locally, and transition to ventilated plastic crates.
+edges:
+- from: objective.agritech-wastage
+  to: wastage-point-of-origin
+  relation: investigate
+- from: objective.agritech-wastage
+  to: farmgate-grading-economics
+  relation: investigate
+- from: objective.agritech-wastage
+  to: packaging-and-transit-bruising
+  relation: investigate
+- from: wastage-point-of-origin
+  to: diagnosis
+  relation: supports
+- from: farmgate-grading-economics
+  to: diagnosis
+  relation: supports
+- from: packaging-and-transit-bruising
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: wastage-first
+  sequence:
+  - wastage-point-of-origin
+  - farmgate-grading-economics
+  - packaging-and-transit-bruising
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from wastage breakdown to farmgate grading feasibility.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate where vegetables are currently sorted in the supply chain.
+  - Clarify that kirana stores demand high-grade fresh produce.
+  - Redirect inquiry toward village collection center sorting and crate packaging.

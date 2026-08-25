@@ -1,0 +1,1467 @@
+/* ==========================================================================
+   Leo — Design System Tokens
+   Standardized color palettes, typography, elevations, and layout variables.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* --- Typography --- */
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: "Newsreader", Georgia, Cambria, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* --- Light Palette: Warm Luxury Editorial & Precision Emerald --- */
+  --bg-base: #fbfaf7;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f4f0e6;
+  --bg-sunken: #ede8dc;
+  --bg-elevated: #ffffff;
+
+  --ink-primary: #111a18;
+  --ink-secondary: #43514c;
+  --ink-muted: #6b7a74;
+  --ink-faint: #98a5a0;
+
+  --line-subtle: rgba(17, 26, 24, 0.07);
+  --line-base: rgba(17, 26, 24, 0.12);
+  --line-strong: rgba(17, 26, 24, 0.18);
+  --line-dashed: rgba(17, 26, 24, 0.14);
+
+  /* Primary Brand: Deep Prestigious Forest Emerald */
+  --brand-primary: #0e453a;
+  --brand-deep: #082e27;
+  --brand-lift: #185a4d;
+  --brand-light: #e6f3ee;
+  --brand-tint: rgba(14, 69, 58, 0.08);
+  --brand-tint-hover: rgba(14, 69, 58, 0.14);
+  --brand-glow: rgba(14, 69, 58, 0.22);
+  --brand-on: #ffffff;
+
+  /* Accent Gold: Champagne / Warm Bronze */
+  --gold-primary: #c98838;
+  --gold-deep: #9d6420;
+  --gold-light: #fdf6ec;
+  --gold-soft: #f4e3cd;
+  --gold-glow: rgba(201, 136, 56, 0.25);
+
+  /* Status Colors */
+  --status-success: #15803d;
+  --status-success-bg: #edfbf2;
+  --status-warning: #b45309;
+  --status-warning-bg: #fffbeb;
+  --status-danger: #b91c1c;
+  --status-danger-bg: #fef2f2;
+  --status-info: #0369a1;
+  --status-info-bg: #f0f9ff;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(17, 26, 24, 0.04);
+  --shadow-sm: 0 2px 4px rgba(17, 26, 24, 0.05), 0 1px 2px rgba(17, 26, 24, 0.03);
+  --shadow-md: 0 4px 12px rgba(17, 26, 24, 0.07), 0 2px 4px rgba(17, 26, 24, 0.04);
+  --shadow-lg: 0 12px 28px -6px rgba(17, 26, 24, 0.1), 0 4px 10px -2px rgba(17, 26, 24, 0.04);
+  --shadow-xl: 0 24px 48px -12px rgba(17, 26, 24, 0.15), 0 8px 16px -4px rgba(17, 26, 24, 0.06);
+  --shadow-card: 0 1px 3px rgba(17, 26, 24, 0.05), 0 12px 32px -8px rgba(14, 69, 58, 0.08);
+
+  /* Border Radii */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+  --r-2xl: 32px;
+  --r-pill: 9999px;
+
+  /* Animations & Transitions */
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-base: 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- Dark Mode Palette --- */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-base: #0b0f10;
+  --bg-surface: #121819;
+  --bg-subtle: #192123;
+  --bg-sunken: #070a0b;
+  --bg-elevated: #161e20;
+
+  --ink-primary: #f2f6f4;
+  --ink-secondary: #b3c0bc;
+  --ink-muted: #80908b;
+  --ink-faint: #5a6763;
+
+  --line-subtle: rgba(242, 246, 244, 0.06);
+  --line-base: rgba(242, 246, 244, 0.1);
+  --line-strong: rgba(242, 246, 244, 0.17);
+  --line-dashed: rgba(242, 246, 244, 0.13);
+
+  /* Primary Brand: Crisp Bioluminescent Emerald */
+  --brand-primary: #45bf9f;
+  --brand-deep: #2fa587;
+  --brand-lift: #61d1b3;
+  --brand-light: rgba(69, 191, 159, 0.15);
+  --brand-tint: rgba(69, 191, 159, 0.12);
+  --brand-tint-hover: rgba(69, 191, 159, 0.2);
+  --brand-glow: rgba(69, 191, 159, 0.35);
+  --brand-on: #051d18;
+
+  /* Accent Gold: Luminous Topaz */
+  --gold-primary: #e6b162;
+  --gold-deep: #c99344;
+  --gold-light: rgba(230, 177, 98, 0.15);
+  --gold-soft: rgba(230, 177, 98, 0.25);
+  --gold-glow: rgba(230, 177, 98, 0.35);
+
+  /* Status Colors */
+  --status-success: #4ade80;
+  --status-success-bg: rgba(74, 222, 128, 0.14);
+  --status-warning: #fbbf24;
+  --status-warning-bg: rgba(251, 191, 36, 0.14);
+  --status-danger: #f87171;
+  --status-danger-bg: rgba(248, 113, 113, 0.14);
+  --status-info: #38bdf8;
+  --status-info-bg: rgba(56, 189, 248, 0.14);
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 12px 28px -6px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 24px 48px -12px rgba(0, 0, 0, 0.8);
+  --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.3), 0 12px 32px -8px rgba(0, 0, 0, 0.6);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --bg-base: #0b0f10;
+    --bg-surface: #121819;
+    --bg-subtle: #192123;
+    --bg-sunken: #070a0b;
+    --bg-elevated: #161e20;
+
+    --ink-primary: #f2f6f4;
+    --ink-secondary: #b3c0bc;
+    --ink-muted: #80908b;
+    --ink-faint: #5a6763;
+
+    --line-subtle: rgba(242, 246, 244, 0.06);
+    --line-base: rgba(242, 246, 244, 0.1);
+    --line-strong: rgba(242, 246, 244, 0.17);
+    --line-dashed: rgba(242, 246, 244, 0.13);
+
+    --brand-primary: #45bf9f;
+    --brand-deep: #2fa587;
+    --brand-lift: #61d1b3;
+    --brand-light: rgba(69, 191, 159, 0.15);
+    --brand-tint: rgba(69, 191, 159, 0.12);
+    --brand-tint-hover: rgba(69, 191, 159, 0.2);
+    --brand-glow: rgba(69, 191, 159, 0.35);
+    --brand-on: #051d18;
+
+    --gold-primary: #e6b162;
+    --gold-deep: #c99344;
+    --gold-light: rgba(230, 177, 98, 0.15);
+    --gold-soft: rgba(230, 177, 98, 0.25);
+    --gold-glow: rgba(230, 177, 98, 0.35);
+
+    --status-success: #4ade80;
+    --status-success-bg: rgba(74, 222, 128, 0.14);
+    --status-warning: #fbbf24;
+    --status-warning-bg: rgba(251, 191, 36, 0.14);
+    --status-danger: #f87171;
+    --status-danger-bg: rgba(248, 113, 113, 0.14);
+    --status-info: #38bdf8;
+    --status-info-bg: rgba(56, 189, 248, 0.14);
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 12px 28px -6px rgba(0, 0, 0, 0.6), 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 24px 48px -12px rgba(0, 0, 0, 0.8);
+    --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.3), 0 12px 32px -8px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* --- Global User Profile Menu Styles --- */
+.user-menu {
+  position: relative;
+}
+
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 5px;
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-pill);
+  background: var(--bg-surface);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-fast);
+}
+
+.user-chip:hover {
+  border-color: var(--line-strong);
+  background: var(--bg-subtle);
+  transform: translateY(-1px);
+}
+
+.user-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--brand-tint) center / cover no-repeat;
+  color: var(--brand-primary);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  flex: none;
+}
+
+.user-caret {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  opacity: 0.6;
+}
+
+.user-sheet {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 2000;
+  min-width: 220px;
+  padding: 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  animation: userSheetFadeIn 0.16s var(--transition-fast) both;
+}
+
+@keyframes userSheetFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.user-sheet-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  margin: 0;
+}
+
+.user-sheet-email {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  margin: 0 0 8px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line-base);
+  overflow-wrap: anywhere;
+}
+
+.user-sheet-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.user-sheet-item:hover {
+  background: var(--brand-light);
+  color: var(--brand-primary);
+}
+
+/* --- Global Utility Classes --- */
+.hidden {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* --- Theme Toggle Icon Rules --- */
+.icon-button .icon-sun {
+  display: none;
+}
+.icon-button .icon-moon {
+  display: block;
+}
+
+:root[data-theme="dark"] .icon-button .icon-sun {
+  display: block;
+}
+:root[data-theme="dark"] .icon-button .icon-moon {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .icon-button .icon-sun {
+    display: block;
+  }
+  :root:not([data-theme="light"]) .icon-button .icon-moon {
+    display: none;
+  }
+}
+
+/* --- Global Unified Navbar Styles --- */
+.shell {
+  width: min(1200px, calc(100% - 48px));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  /* Same colour as the page canvas, just translucent, so the header can
+     never drift into being a different black or a different ivory. */
+  background-color: color-mix(in srgb, var(--bg-base) 88%, transparent);
+  border-bottom: 1px solid var(--line-base);
+  transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+.nav-inner {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+  color: var(--ink-primary);
+  text-decoration: none;
+}
+
+.brand-icon {
+  flex-shrink: 0;
+  border-radius: 8px;
+  transition: transform var(--transition-base);
+}
+
+.brand:hover .brand-icon {
+  transform: rotate(-4deg) scale(1.05);
+}
+
+.brand-name {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.brand-badge {
+  padding: 2px 7px;
+  border-radius: var(--r-pill);
+  background: var(--brand-tint);
+  color: var(--brand-primary);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid var(--line-base);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 1;
+}
+
+.nav-link {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  position: relative;
+  padding: 6px 0;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--brand-primary);
+}
+
+.nav-link.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--brand-primary);
+  border-radius: var(--r-pill);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-base);
+  background: var(--bg-surface);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.icon-button:hover {
+  background: var(--bg-subtle);
+  color: var(--ink-primary);
+  border-color: var(--line-strong);
+}
+
+.icon-button .icon {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Keep the visible control compact. Its 44px hit target is provided below
+     without making primary actions look like oversized pills. */
+  min-height: 40px;
+  gap: 8px;
+  padding: 7px 15px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 650;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.btn-sm {
+  min-height: 36px;
+  padding: 5px 12px;
+  font-size: 0.8125rem;
+}
+
+/* The persistent header action is navigation, not a page-level CTA. */
+.nav-cta {
+  min-height: 34px;
+  height: 34px;
+  padding: 0 13px;
+  font-size: 0.8125rem;
+  line-height: 1;
+}
+
+.btn-primary {
+  background: var(--brand-primary);
+  color: #ffffff;
+  border-color: var(--brand-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background: var(--brand-deep);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--bg-surface);
+  color: var(--ink-primary);
+  border-color: var(--line-base);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-subtle);
+  border-color: var(--line-strong);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-secondary);
+  border-color: transparent;
+}
+
+.btn-ghost:hover {
+  background: var(--brand-light);
+  color: var(--brand-primary);
+}
+
+
+
+/* ==========================================================================
+   Legacy token aliases.
+
+   styles.css used to carry a SECOND complete palette (--paper, --ink, --brand,
+   --surface, --sunken) beside the canonical one above, which is why marketing,
+   library, and workspace dark modes drew from unrelated blacks. The old names
+   now resolve to the canonical tokens, so there is one palette and one set of
+   dark overrides. Page stylesheets may keep using either name family.
+   ========================================================================== */
+
+:root {
+  /* Surface elevation, three tiers, used by every shell and card. */
+  --surface-canvas: var(--bg-base);
+  --surface-raised: var(--bg-surface);
+  --surface-card: var(--bg-elevated);
+
+  --paper: var(--bg-base);
+  --paper-deep: var(--bg-sunken);
+  --surface: var(--bg-surface);
+  --sunken: var(--bg-subtle);
+
+  --ink: var(--ink-primary);
+  --ink-2: var(--ink-secondary);
+  --ink-3: var(--ink-muted);
+  --ink-4: var(--ink-faint);
+
+  --line: var(--line-base);
+
+  --brand: var(--brand-primary);
+  --brand-tint-2: var(--brand-tint-hover);
+  --brand-ring: var(--brand-glow);
+
+  --leo-gold: var(--gold-primary);
+  --leo-gold-deep: var(--gold-deep);
+  --leo-gold-soft: var(--gold-soft);
+
+  --amber: var(--status-warning);
+  --amber-tint: var(--status-warning-bg);
+  --clay: var(--status-danger);
+  --clay-tint: var(--status-danger-bg);
+
+  --sans: var(--font-sans);
+  --serif: var(--font-serif);
+  --mono: var(--font-mono);
+
+  --shadow-pop: var(--shadow-xl);
+  --topbar-h: 60px;
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* ==========================================================================
+   Shared base and primitives: resets, focus, buttons, account menu, cards,
+   toasts. Every page depends on these, so they belong to the system rather
+   than to any one page's stylesheet.
+   ========================================================================== */
+
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(1100px 520px at 12% -10%, var(--brand-tint) 0%, transparent 62%),
+    radial-gradient(760px 420px at 96% 4%, var(--paper-deep) 0%, transparent 58%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+input {
+  font: inherit;
+  color: inherit;
+}
+
+ol {
+  margin: 0;
+}
+
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+.icon {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+::selection {
+  background: var(--brand-tint-2);
+  color: var(--ink);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border: 3px solid transparent;
+  border-radius: var(--r-pill);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-4);
+  background-clip: content-box;
+}
+
+.pulse-dot {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.pulse-dot::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid var(--brand);
+  opacity: 0;
+  animation: halo 2.6s var(--ease) infinite;
+}
+
+@keyframes halo {
+  0% { transform: scale(0.6); opacity: 0.55; }
+  70%, 100% { transform: scale(1.5); opacity: 0; }
+}
+
+.button {
+  border: 1px solid transparent;
+  white-space: nowrap;
+  border-radius: var(--r-sm);
+  padding: 8px 14px;
+  font-size: 0.8438rem;
+  font-weight: 550;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.12s;
+}
+
+.button:active {
+  transform: translateY(0.5px);
+}
+
+.button-ghost {
+  border-color: var(--line-strong);
+  background: transparent;
+  color: var(--ink-2);
+}
+
+.button-ghost:hover {
+  color: var(--ink);
+  background: var(--sunken);
+  border-color: var(--ink-4);
+}
+
+.button-ghost.is-armed {
+  color: var(--clay);
+  border-color: color-mix(in srgb, var(--clay) 45%, transparent);
+  background: var(--clay-tint);
+}
+
+.button-solid {
+  background: var(--brand);
+  color: var(--brand-on);
+  box-shadow: var(--shadow-sm);
+}
+
+.button-solid:hover {
+  background: var(--brand-lift);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.user-menu {
+  position: relative;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 5px 3px 3px;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.user-chip:hover {
+  background: var(--sunken);
+  border-color: var(--line);
+}
+
+.user-avatar {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--brand-tint) center / cover no-repeat;
+  font-size: 0.6875rem;
+  font-weight: 650;
+  color: color-mix(in srgb, var(--brand) 90%, var(--ink));
+}
+
+.user-caret {
+  width: 13px;
+  height: 13px;
+  color: var(--ink-4);
+}
+
+.user-sheet {
+  position: absolute;
+  top: calc(100% + 9px);
+  right: 0;
+  z-index: 2000;
+  min-width: 224px;
+  padding: 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-pop);
+  animation: riseIn 0.18s var(--ease) both;
+}
+
+.user-sheet-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.user-sheet-email {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--line-dashed);
+  font-size: 0.75rem;
+  color: var(--ink-4);
+  overflow-wrap: anywhere;
+}
+
+.user-sheet-item {
+  display: block;
+  width: 100%;
+  padding: 8px 9px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 0.8438rem;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.user-sheet-item:hover {
+  background: var(--sunken);
+  color: var(--ink);
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.eyebrow-mark {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-tint);
+}
+
+.card {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.counter {
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  background: var(--sunken);
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-3);
+  transition: color 0.3s, background 0.3s, border-color 0.3s;
+}
+
+.counter.is-live {
+  color: var(--brand);
+  background: var(--brand-tint);
+  border-color: color-mix(in srgb, var(--brand) 24%, transparent);
+}
+
+.card-note {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line-dashed);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ink-3);
+}
+
+.micro-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.card-summary {
+  border-color: color-mix(in srgb, var(--brand) 24%, transparent);
+  box-shadow: var(--shadow-pop);
+  animation: riseIn 0.45s var(--ease) both;
+}
+
+.toasts {
+  position: fixed;
+  inset: calc(var(--topbar-h) + 12px) 0 auto;
+  z-index: 60;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(460px, 100%);
+  padding: 11px 16px;
+  border-radius: var(--r-md);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.8438rem;
+  font-weight: 500;
+  line-height: 1.45;
+  box-shadow: var(--shadow-pop);
+  animation: toastIn 0.3s var(--ease) both;
+}
+
+.toast.is-leaving {
+  animation: toastOut 0.25s var(--ease) both;
+}
+
+.toast::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.toast.is-error::before { background: var(--clay); }
+
+.toast.is-warning::before { background: var(--amber); }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+}
+
+@keyframes toastOut {
+  to { opacity: 0; transform: translateY(-7px); }
+}
+
+
+/* ==========================================================================
+   Transcript primitives. The practice room owns the live transcript, but the
+   profile drawer, the admin transcript drawer, and the debrief all render the
+   same message markup, so these belong to the system.
+   ========================================================================== */
+
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 30px 28px;
+}
+
+.message {
+  display: flex;
+  gap: 11px;
+  /* Capped so a wide screen keeps a comfortable reading measure. */
+  max-width: min(82%, 680px);
+  animation: riseIn 0.42s var(--ease) both;
+}
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(7px); }
+}
+
+.message.candidate {
+  margin-left: auto;
+  flex-direction: row-reverse;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  flex: none;
+  margin-top: 21px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.avatar-glyph {
+  width: 12.5px;
+  height: 12.5px;
+  fill: var(--brand-on);
+}
+
+.message.candidate .avatar {
+  display: none;
+}
+
+.message-body {
+  min-width: 0;
+}
+
+.message-role {
+  margin: 0 0 5px 2px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.message.candidate .message-role {
+  text-align: right;
+  margin-right: 2px;
+}
+
+.bubble {
+  padding: 13px 16px;
+  border: 1px solid var(--line);
+  border-radius: 6px var(--r-lg) var(--r-lg) var(--r-lg);
+  background: var(--sunken);
+  box-shadow: var(--shadow-sm);
+}
+
+.message.candidate .bubble {
+  border-color: transparent;
+  border-radius: var(--r-lg) 6px var(--r-lg) var(--r-lg);
+  background: var(--brand);
+  color: var(--brand-on);
+  box-shadow: var(--shadow-md);
+}
+
+:root[data-theme="dark"] .message.candidate .bubble {
+  border-color: color-mix(in srgb, var(--brand) 30%, transparent);
+  background: color-mix(in srgb, var(--brand) 17%, var(--surface));
+  color: var(--ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .message.candidate .bubble {
+    border-color: color-mix(in srgb, var(--brand) 30%, transparent);
+    background: color-mix(in srgb, var(--brand) 17%, var(--surface));
+    color: var(--ink);
+  }
+}
+
+.message-content {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.62;
+  letter-spacing: -0.004em;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.message.interviewer .message-content {
+  color: var(--ink);
+}
+
+.message.is-opening .bubble {
+  background: var(--surface);
+  border-color: var(--line-strong);
+}
+
+.message.is-opening .message-content {
+  font-size: 1rem;
+  line-height: 1.66;
+}
+
+.typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+}
+
+.typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-4);
+  animation: blink 1.25s ease-in-out infinite;
+}
+
+.typing i:nth-child(2) { animation-delay: 0.16s; }
+
+.typing i:nth-child(3) { animation-delay: 0.32s; }
+
+@keyframes blink {
+  0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-2px); }
+}
+
+.orbit {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  border-top-color: var(--brand);
+  animation: spin 0.85s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+/* Shared inline bits used by more than one page. */
+
+.arrow {
+  transition: transform var(--transition-fast);
+}
+
+.card-subtitle { margin-top: 3px; line-height: 1.4; }
+
+
+/* ==========================================================================
+   Shell system: responsive scale, touch targets, and phone navigation.
+
+   Breakpoints. Custom properties are not valid inside a media query, so these
+   three values are written literally everywhere. Nothing else is used:
+     640px   phone  -> small tablet
+     900px   tablet -> laptop
+    1200px   laptop -> wide
+   ========================================================================== */
+
+/* --- Touch targets ------------------------------------------------------- */
+/* The audit measured a 38px theme toggle and 37px header actions against a
+   44px minimum. Controls keep their compact look and gain the target through a
+   pseudo element, so nothing in the design grows. */
+.nav-link,
+.btn,
+.icon-button {
+  position: relative;
+}
+
+.nav-link::before,
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto 0;
+  transform: translateY(-50%);
+  min-height: 44px;
+  height: 100%;
+}
+
+/* 36px of visible chrome, 44px of target. */
+.icon-button::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  border-radius: inherit;
+}
+
+/* --- Context badge (Admin console, Case debrief) -------------------------- */
+.context-badge {
+  flex: none;
+  padding: 4px 10px;
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-pill);
+  background: var(--brand-tint);
+  color: var(--brand-primary);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* --- Account chip -------------------------------------------------------- */
+.user-name-label {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sign-out-btn {
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* --- Button variants ----------------------------------------------------- */
+.btn-lg {
+  padding: 12px 22px;
+  font-size: 0.9375rem;
+}
+
+/* On a dark band the surface tokens invert, so these two variants are
+   explicit rather than token driven. */
+.btn-light {
+  background: var(--bg-surface);
+  color: var(--brand-primary);
+  border-color: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-light:hover {
+  background: var(--brand-light);
+  border-color: var(--brand-light);
+}
+
+.btn-ghost-light {
+  background: transparent;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.42);
+}
+
+.btn-ghost-light:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.btn:hover .arrow {
+  transform: translateX(3px);
+}
+
+/* --- Phone navigation ---------------------------------------------------- */
+/* Below the tablet breakpoint the inline nav collapses into this sheet.
+   Without it, Practice room and Your progress were simply unreachable. */
+.nav-menu-toggle {
+  display: none;
+}
+
+.nav-mobile {
+  display: none;
+  flex-direction: column;
+  padding: 8px clamp(16px, 4vw, 24px) 14px;
+  border-top: 1px solid var(--line-subtle);
+  background: var(--surface-raised);
+}
+
+.nav-mobile:not(.hidden) {
+  display: flex;
+}
+
+.nav-mobile-link {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink-secondary);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nav-mobile-link.active {
+  color: var(--brand-primary);
+}
+
+/* --- Responsive shell ---------------------------------------------------- */
+@media (max-width: 1200px) {
+  .shell {
+    width: min(1200px, calc(100% - 40px));
+  }
+}
+
+@media (max-width: 900px) {
+  .nav-links {
+    display: none;
+  }
+
+  .nav-menu-toggle {
+    display: inline-grid;
+    order: 9;
+  }
+
+  .nav-inner {
+    gap: 12px;
+  }
+
+  .nav-cta {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .shell {
+    width: calc(100% - 32px);
+  }
+
+  .nav-inner {
+    height: 58px;
+    gap: 8px;
+  }
+
+  .brand-badge,
+  .context-badge {
+    display: none;
+  }
+
+  .user-name-label {
+    display: none;
+  }
+
+  /* The action row was 412px wide in a 375px viewport, which pushed the menu
+     toggle off screen. On a phone the header carries the wordmark, the account
+     chip and the menu; the theme control and sign-in live in the menu sheet. */
+  .nav-actions #theme-toggle,
+  .nav-actions #auth-signin-link,
+  .nav-actions #transcript-link {
+    display: none;
+  }
+
+  .nav-mobile-foot {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line-subtle);
+  }
+}
+
+/* The phone menu's footer row only exists inside the sheet. */
+.nav-mobile-foot {
+  display: none;
+}
+
+/* The document must never scroll sideways: the audit measured a 385px wide
+   document in a 375px viewport. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+
+/* --- Header identity block (admin console's viewer chip) ------------------ */
+/* Rendered by the shared header, so it belongs to the system rather than to
+   admin.css, which is the only page stylesheet that used to define it. */
+.person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+
+/* ==========================================================================
+   Site footer. One implementation; landing and the library each had their own
+   near-identical copy under different class names.
+   ========================================================================== */
+
+.site-footer {
+  margin-top: 72px;
+  padding: 40px 0 32px;
+  border-top: 1px solid var(--line-subtle);
+}
+
+.site-footer-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.site-footer-brand {
+  display: grid;
+  gap: 10px;
+  max-width: 32ch;
+}
+
+.site-footer-motto {
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+}
+
+.site-footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.site-footer-links a:hover {
+  color: var(--brand-primary);
+}
+
+.site-footer-legal {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-subtle);
+  color: var(--ink-faint);
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 640px) {
+  .site-footer {
+    margin-top: 48px;
+    padding: 28px 0 24px;
+  }
+
+  .site-footer-top {
+    gap: 20px;
+  }
+
+  .site-footer-links {
+    gap: 0 24px;
+  }
+}

@@ -1,0 +1,34 @@
+schema_version: conversation-policy-v1
+mode: realistic
+
+principles:
+  - Speak naturally and test the candidate's commercial M&A instincts.
+  - Follow candidate-led structuring covering strategic fit, synergy feasibility, valuation, and integration risk.
+  - Challenge candidates who take seller synergy projections at face value without questioning customer qualification cycles.
+  - "Keep the hidden diagnosis private: never state that the asking price is value-destructive until the candidate calculates net synergy value."
+  - Require a structured transaction framework (pricing limits, earnouts, integration governance) in the final synthesis.
+
+phase_policy:
+  clarification:
+    interviewer_goal: Confirm candidate understands Forge's precision machining focus, AlloyWorks' casting business, exclusivity timeline, and 3-year value creation goal.
+    reveal_levels: [broad_context, sharp_question]
+    expected_candidate_behaviours:
+      - Inquire about buyer and target product lines, customer overlap, and strategic rationale.
+      - Clarify standalone profitability and revenue growth trends.
+      - Confirm deal timeline and board mandate.
+
+  drill_down:
+    interviewer_goal: Guide candidate to unbundle procurement savings from slow revenue synergies and identify plant automation capex.
+    reveal_levels: [broad_context, sharp_question, hypothesis_backed]
+    expected_candidate_behaviours:
+      - Quantify procurement synergies (4% metal purchasing) vs in-sourcing margins.
+      - Scrutinize 12-18 month OEM re-qualification delays on cross-sell revenue synergies.
+      - Uncover plant automation capex requirements and founder key-man dependency.
+
+  synthesis:
+    interviewer_goal: Evaluate definitive transaction recommendation with price ceilings, earnouts, and due diligence priorities.
+    reveal_levels: [synthesis_support]
+    expected_candidate_behaviours:
+      - Deliver a clear conditional recommendation (proceed only if purchase price is re-negotiated).
+      - Detail 3 structured pillars (disciplined valuation, staged integration with earnouts, confirmatory due diligence).
+      - Identify key execution risks and 100-day pre-close milestones.

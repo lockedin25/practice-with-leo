@@ -1,0 +1,44 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: port.infrastructure
+  domain: company
+  release_level: broad_context
+  content: Terminal has 2 berths, 6 Super Post-Panamax quay cranes, and an 8,000 TEU container yard.
+- id: crane.metrics
+  domain: operations
+  release_level: sharp_question
+  content: Quay cranes are rated for 30 moves/hr but average only 16 moves/hr due to waiting for yard prime movers.
+- id: yard.utilization
+  domain: operations
+  release_level: hypothesis_backed
+  content: Container yard utilization exceeded 92% (healthy threshold is <70%), causing re-handling moves per container to
+    jump from 1.4 to 4.2.
+  dependencies:
+  - crane.metrics
+- id: dwell.time
+  domain: operations
+  release_level: hypothesis_backed
+  content: Average import container dwell time increased from 3.2 days to 7.8 days because customs clearance agents batch
+    physical filings weekly.
+  dependencies:
+  - yard.utilization
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Turnaround time doubled because import dwell time surged to 7.8 days due to batch customs filing, pushing yard
+    density to 92% and forcing 4.2 unproductive re-handling moves per container lift.
+- id: recommendation.dpd
+  domain: recommendation
+  release_level: synthesis_support
+  content: Enforce Direct Port Delivery (DPD) for pre-cleared Tier-1 importers to evacuate containers straight to factory
+    gates.
+- id: recommendation.dwell_tariff
+  domain: recommendation
+  release_level: synthesis_support
+  content: Implement steep progressive demurrage tariffs for containers dwelling beyond 72 hours to incentivize rapid cargo
+    pickup.
+- id: recommendation.digital_gate
+  domain: recommendation
+  release_level: synthesis_support
+  content: Deploy RFID terminal appointment gate system to spread truck arrivals evenly across 24 hours.

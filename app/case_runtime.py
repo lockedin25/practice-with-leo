@@ -55,6 +55,7 @@ class CaseWorld:
     objective: str
     phases: tuple[Phase, ...]
     facts: tuple[Fact, ...]
+    school: str = "MBB Core"
 
     @classmethod
     def from_reservoir(cls, root: Path, case_id: str | None = None) -> "CaseWorld":
@@ -109,6 +110,7 @@ class CaseWorld:
             objective=case_data["objective_function"]["decision_question"],
             phases=phases,
             facts=facts,
+            school=case_data.get("school") or "MBB Core",
         )
 
     @property
@@ -120,9 +122,11 @@ class CaseWorld:
         return {
             "id": self.id,
             "title": self.title,
+            "summary": self.objective,
             "category": self.category,
             "industry": self.industry,
             "difficulty": self.difficulty,
+            "school": self.school,
             "supported_durations": self.supported_durations,
             "skills_tested": self.skills_tested,
             "phases": [phase.id for phase in self.phases],
@@ -183,12 +187,23 @@ class CaseCatalogue:
     @classmethod
     def from_reservoir(cls, root: Path) -> "CaseCatalogue":
         reservoir_root = root / "reservoir"
+        exemplars_root = root / "corpus" / "exemplars"
         shared_policy = reservoir_root / "_shared-policy.yaml"
-        case_directories = sorted(
-            path
-            for path in reservoir_root.iterdir()
-            if path.is_dir() and not path.name.startswith("_") and (path / "case.yaml").is_file()
-        )
+
+        case_directories: list[Path] = []
+        if reservoir_root.is_dir():
+            case_directories.extend(
+                path
+                for path in sorted(reservoir_root.iterdir())
+                if path.is_dir() and not path.name.startswith("_") and (path / "case.yaml").is_file()
+            )
+        if exemplars_root.is_dir():
+            for school_dir in sorted(exemplars_root.iterdir()):
+                if school_dir.is_dir() and not school_dir.name.startswith("."):
+                    for case_dir in sorted(school_dir.iterdir()):
+                        if case_dir.is_dir() and (case_dir / "case.yaml").is_file():
+                            case_directories.append(case_dir)
+
         if not case_directories:
             raise ValueError("No case reservoir was found")
         if not shared_policy.is_file():
@@ -224,6 +239,10 @@ class InterviewSession:
     disclosed_ids: set[str] = field(default_factory=set)
     messages: list[dict[str, str]] = field(default_factory=list)
     candidate_turns: int = 0
+    # The welcome is deliberately separate from the authored case brief.  This
+    # state is durable so a reload cannot accidentally start a case before the
+    # candidate has explicitly opted in.
+    case_started: bool = False
     ended: bool = False
     turn_results: dict[str, dict[str, object]] = field(default_factory=dict)
 
@@ -254,6 +273,7 @@ class InterviewSession:
                 for fact in self.case.facts
                 if fact.id in self.disclosed_ids
             ],
+            "case_started": self.case_started,
             "ended": self.ended,
         }
 

@@ -1,0 +1,69 @@
+schema_version: reservoir-v1
+case_id: 06-dairy-supply-chain-v1
+title: Dairy Cold Chain Milk Sourage
+school: IIM-B
+status: approved
+rights_status: original
+category: operations
+industry: fmcg_and_cpg
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is a state dairy cooperative in Gujarat processing 4M liters of milk daily. Milk sourage losses during\
+    \ transit from village collection centers to district processing dairies rose from 0.8% to 3.4%, costing \u20B945 Cr annually."
+  objective: Diagnose the operational drivers of milk sourage and recommend a cold-chain optimization plan.
+  opening_requirements:
+  - Name Dairy Cold Chain Milk Sourage and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Milk Sour Quality Loss (%) and Transit Turnaround Time) and time horizon (six months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Milk Sour Quality Loss (%) and Transit Turnaround Time
+  decision_question: What is causing milk sourage during transit and how can bulk milk chilling and logistics be optimized?
+  time_horizon: six months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Delayed Bulk Milk Chilling (BMC) turnaround and route transit delays exceeding the 4-hour microbial threshold,
+    caused by uncoordinated village collection schedules and power outages at rural chilling centers.
+  what_the_case_wanted_to_test: "Perishable dairy cold chain, microbial sourage kinetics (temperature vs time to chill to\
+    \ <4\xB0C), route routing optimization, and rural solar backup."
+  pivotal_insight: "Raw milk must be chilled to 4\xB0C within 3.5 hours of milking; rural grid power cuts delayed chilling\
+    \ at village centers, while un-routed milk tankers waited 3 hours in queues at processing dairies."
+  common_traps:
+  - Blaming adulteration by dairy farmers without testing microbial acidity (MBRT).
+  - Recommending purchasing refrigerated insulated tankers for every village (capex prohibitive).
+  - Assuming processing dairy pasteurizers were malfunctioning.
+  takeaway_lesson: In agricultural perishables, product degradation is a function of time-to-first-chill; decentralized solar-backed
+    chilling at the point of origin is far more effective than expensive refrigerated transport.
+  suggested_readings:
+  - knowledge_base/industries/05_fmcg_and_cpg.md
+  - knowledge_base/case_types/unconventional_and_abstract.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

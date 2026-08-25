@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.ev-charging-ebitda
+  label: Double EV charging station utilization and achieve EBITDA profitability.
+nodes:
+- id: fixed-demand-charges
+  type: branch
+  label: Grid Sanctioned Load Demand Charges vs Revenue
+  status: valid_branch
+  evidence: []
+  conclusion: "Fixed demand charges cost \u20B945k/mo per site, requiring >22% utilization to break even."
+- id: commercial-fleet-demand
+  type: branch
+  label: Commercial Taxi Fleets vs Retail Drivers
+  status: valid_branch
+  evidence: []
+  conclusion: "Commercial fleets seek high off-peak charging at \u20B914-16/kWh tariffs."
+- id: time-of-day-pricing
+  type: branch
+  label: Dynamic Time-of-Day Pricing Economics
+  status: valid_branch
+  evidence: []
+  conclusion: "Off-peak ToD tariffs lift utilization to 29% and revenue to \u20B978k/month per station."
+- id: diagnosis
+  type: diagnosis
+  label: Demand Charge Hurdle & Commercial Fleet Off-Peak Fill
+  status: hidden_target
+  evidence:
+  - fixed-demand-charges
+  - commercial-fleet-demand
+  - time-of-day-pricing
+  conclusion: Stations lost money because low 12% utilization could not cover fixed grid demand charges; dynamic ToD pricing
+    for commercial fleets fills off-peak hours and achieves profitability.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Charging Network Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy dynamic ToD tariffs, execute commercial fleet off-peak contracts, and co-locate QSR retail amenities.
+edges:
+- from: objective.ev-charging-ebitda
+  to: fixed-demand-charges
+  relation: investigate
+- from: objective.ev-charging-ebitda
+  to: commercial-fleet-demand
+  relation: investigate
+- from: objective.ev-charging-ebitda
+  to: time-of-day-pricing
+  relation: investigate
+- from: fixed-demand-charges
+  to: diagnosis
+  relation: supports
+- from: commercial-fleet-demand
+  to: diagnosis
+  relation: supports
+- from: time-of-day-pricing
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: cost-first
+  sequence:
+  - fixed-demand-charges
+  - commercial-fleet-demand
+  - time-of-day-pricing
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from fixed grid demand charges to fleet off-peak charging demand.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what fixed cost an EV charging station pays to the electricity board each month.
+  - Clarify that retail cars only charge during evening rush hours.
+  - Redirect toward commercial taxi fleet charging during off-peak hours.

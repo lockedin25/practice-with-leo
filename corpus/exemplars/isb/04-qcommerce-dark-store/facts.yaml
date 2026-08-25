@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: store.profile
+  domain: company
+  release_level: broad_context
+  content: Dark stores average 2,500 sq ft, carrying 3,200 SKUs and fulfilling 1,200 orders/day.
+- id: picker.productivity
+  domain: operations
+  release_level: sharp_question
+  content: Picker productivity is only 18 orders/man-hour; pickers spend 72% of their time walking aisles looking for items.
+- id: layout.slotting
+  domain: operations
+  release_level: hypothesis_backed
+  content: High-velocity dairy and snacks are placed at the back of the store, forcing pickers to traverse the entire 2,500
+    sq ft space for 80% of orders.
+  dependencies:
+  - picker.productivity
+- id: batching.impact
+  domain: operations
+  release_level: hypothesis_backed
+  content: Piloting dynamic 3-order batch picking with LED pick-to-light sorting carts cut order pick time from 210 seconds
+    to 65 seconds.
+  dependencies:
+  - layout.slotting
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Dark store losses are driven by low labor productivity (18 picks/hr) caused by suboptimal layout slotting and single-order
+    picking; high-velocity golden-zone layout and 3-order batching double throughput to 40 picks/hr.
+- id: recommendation.golden_zone
+  domain: recommendation
+  release_level: synthesis_support
+  content: Re-slot top-150 fastest-moving SKUs into a 'Golden Zone' 3 meters from the dispatch counter.
+- id: recommendation.batch_picking
+  domain: recommendation
+  release_level: synthesis_support
+  content: Deploy smart multi-order batch-picking carts equipped with barcode scanners and pick-to-light compartments.
+- id: recommendation.dispatch_sync
+  domain: recommendation
+  release_level: synthesis_support
+  content: Synchronize rider dispatch algorithms to assign riders only when order picking hits 80% completion, cutting rider
+    wait time to <90 seconds.

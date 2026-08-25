@@ -1,19 +1,76 @@
 schema_version: reservoir-v1
 case_id: northstar-bank-v1
 title: Northstar Bank
-status: draft
+status: approved
 rights_status: original
 category: growth_strategy
 industry: retail_banking
 difficulty: intermediate
 supported_durations: [30]
 skills_tested: [clarification, market sizing, segmentation, business judgement, synthesis]
+
 candidate_opening:
   context: >-
     Northstar Bank is a profitable Indian retail bank with a strong presence in
     large cities. Its board wants a growth plan that can add 25 percent more retail income in three years.
-  objective: Recommend where Northstar should focus its next growth investment.
+  objective: >-
+    Recommend where Northstar should focus its next growth investment and design an operating and distribution model to achieve 25 percent retail income growth over three years.
+  opening_requirements:
+    - Name Northstar Bank and describe its core retail franchise (8M customers, urban affluent strength).
+    - Identify the 25% incremental retail income target over 3 years without reckless credit expansion.
+    - Confirm the risk-adjusted profitability constraint and customer segmentation focus.
+    - Ask clarifying questions regarding customer segments (urban vs tier-2), distribution economics (branches vs digital), and product cross-sell.
+
 objective_function:
   primary_metric: incremental retail income
   decision_question: Which customer and distribution opportunity should Northstar prioritise?
   time_horizon: three years
+  expected_candidate_output:
+    - Target customer segment selection and market sizing.
+    - Distribution model architecture (digital onboarding + relationship hub vs full branches).
+    - Credit risk-gating and product cross-sell sequencing.
+    - 100-day execution milestones.
+  design_principle: >-
+    Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+
+case_essence:
+  core_mechanism: >-
+    Customer lifetime value across geographical tiers vs distribution unit economics. Urban affluent
+    market is saturated; tier-2 emerging affluent (12M households) have high savings/digital activity
+    but limited branch density. Traditional full branches are 4x too expensive to serve tier-2 unit
+    economics; a digital-onboarding + relationship-manager hub model captures salary accounts and enables low-risk cross-sell.
+  what_the_case_wanted_to_test: >-
+    Branch unit economics vs digital acquisition channels, customer segmentation in banking, CASA
+    (current and savings account) deposit acquisition, and credit risk-gating.
+  pivotal_insight: >-
+    Anchor emerging affluent households through corporate salary accounts and digital payments first;
+    extend unsecured credit only after observing 6–12 months of domestic cash-flow patterns.
+  common_traps:
+    - Proposing aggressive credit card and personal loan expansion in unvetted tier-2 customer segments, driving up NPA (non-performing asset) ratios.
+    - Building expensive brick-and-mortar full-service branches that require ₹300 Cr+ deposit bases to break even.
+    - Competing on deposit interest rates against aggressive regional cooperative banks instead of offering superior corporate payroll and wealth services.
+  takeaway_lesson: >-
+    Profitable retail banking expansion into emerging tiers requires asset-light distribution
+    (payroll/CASA anchors) and data-led credit seasoning before underwriting risk-weighted assets.
+  suggested_readings:
+    - knowledge_base/industries/04_banking_and_financial_services.md
+    - knowledge_base/case_types/growth_strategy.md
+    - knowledge_base/methodology/01_preliminary_questions.md
+
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+    - clarification
+    - drill_down
+    - synthesis
+
+reservoir_files:
+  - facts.yaml
+  - issue-tree.yaml
+  - conversation-policy.yaml
+  - validation.md

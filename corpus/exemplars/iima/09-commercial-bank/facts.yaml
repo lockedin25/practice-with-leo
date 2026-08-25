@@ -1,0 +1,45 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: portfolio.segment
+  domain: financials
+  release_level: broad_context
+  content: "SME export portfolio comprises \u20B94,200 Cr in working capital lines to garment and precision engineering exporters."
+- id: default.concentration
+  domain: risk
+  release_level: sharp_question
+  content: Defaults are concentrated specifically among European and US export corridors; domestic SME loan NPAs remained
+    stable at 2.1%.
+- id: supplychain.lag
+  domain: operations
+  release_level: hypothesis_backed
+  content: Maritime transit times doubled due to Cape of Good Hope rerouting, extending receivables collection from 60 to
+    140 days.
+  dependencies:
+  - default.concentration
+- id: monitoring.lag
+  domain: operations
+  release_level: hypothesis_backed
+  content: Bank credit officers reviewed borrower health using annual financial statements submitted 6 months after fiscal
+    year-end, missing real-time cash exhaustion.
+  dependencies:
+  - supplychain.lag
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Export loan NPAs spiked because maritime shipping delays stretched exporter cash conversion cycles from 60 to 140
+    days, causing liquidity defaults that the bank failed to anticipate due to reliance on lagging annual financial audits.
+- id: recommendation.factoring
+  domain: recommendation
+  release_level: synthesis_support
+  content: Provide bridge export invoice factoring and extend temporary working capital tenure from 90 to 150 days for verified
+    shipments.
+- id: recommendation.gst_ews
+  domain: recommendation
+  release_level: synthesis_support
+  content: Integrate live GST return filing and e-way bill APIs into an Early Warning System to detect cash-flow strain 60
+    days in advance.
+- id: recommendation.restructuring
+  domain: recommendation
+  release_level: synthesis_support
+  content: Restructure viable export loans before 90 DPD categorization to prevent unnecessary provisioning.

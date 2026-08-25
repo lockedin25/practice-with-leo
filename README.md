@@ -14,7 +14,7 @@ while the case runtime and feedback architecture mature ahead of voice.
 - Leo's LangChain interviewer layer converts only runtime-approved facts into the next natural-language turn.
 - A candidate-safe API projection: unreleased facts and the answer key never reach the browser or the LangChain prompt.
 - An end-attempt scorecard with evidence-based starter feedback.
-- SQLite-backed attempts and idempotent browser turns, so a development reload does not lose an active interview or duplicate a retried answer.
+- SQLite-backed, user-scoped practice records with canonical transcripts, versioned feedback, and idempotent browser turns, so a development reload does not lose an active interview or duplicate a retried answer.
 - Google sign-in, per-candidate attempt ownership, and an admin console over every transcript and the metrics across them.
 
 ## Architecture
@@ -67,6 +67,9 @@ pytest
 | `GET /api/attempts/{id}` | owner | Read the current candidate view |
 | `POST /api/attempts/{id}/turn` | owner | Submit a candidate response and get the interviewer reply |
 | `POST /api/attempts/{id}/end` | owner | End the attempt and return a starter scorecard |
+| `GET /api/me/practice-history` | candidate | Owned case history, completion, and latest performance summaries |
+| `GET /api/me/practice-history/{id}` | owner | One owned transcript with latest and versioned feedback |
+| `GET /api/me/profile` | candidate | Personal progress metrics, assessed skills, development areas, and recent cases |
 | `GET /api/admin/overview` | admin | Cohort totals, stage and case mix, 14-day activity |
 | `GET /api/admin/users` | admin | Per-candidate rollup of attempts and completion |
 | `GET /api/admin/attempts` | admin | Every attempt, filterable by candidate |
@@ -79,6 +82,7 @@ pytest
 | `/` | public | Landing page and case library |
 | `/login` | public | Google sign-in |
 | `/practice` | candidate | The interview workspace |
+| `/profile` | candidate | Personal progress, feedback themes, and transcript review |
 | `/admin` | admin | Transcripts and metrics across all candidates |
 
 ## Accounts and access
@@ -117,8 +121,17 @@ the interview API; `app/main.py` shares the store and catalogue through
 
 For an architectural tour, see [the codebase guide](docs/codebase-guide.md). The
 future checker-agent, feedback-agent, and voice roadmap is in
-[the implementation roadmap](docs/implementation-roadmap.md).
+[the implementation roadmap](docs/implementation-roadmap.md). The detailed
+dual-mode ElevenLabs voice migration plan is in
+[the voice migration plan](docs/elevenlabs-voice-migration-plan.md).
+The exact provider-side configuration for the implemented feature-gated voice
+path is in [the ElevenLabs agent setup guide](docs/elevenlabs-agent-setup.md).
+The low-latency hosted-model alternative, including its guarded fact-release
+tool and copy-paste workflow prompts, is in [the native ElevenLabs setup
+guide](docs/elevenlabs-native-agent-setup.md).
+The user-scoped transcript and feedback model is documented in
+[the practice-data architecture](docs/user-practice-data-architecture.md).
 
 ## Deployment boundary
 
-The current session store is SQLite-backed and is suitable for local development or one web instance. Before multi-instance deployment, replace it with a shared database or Redis, add rate limits, and move the API key and `SESSION_SECRET` into the host's secret manager. Set `SESSION_SECRET` explicitly in production: the generated `data/.session_secret` is per-host, so without it every instance would reject the others' cookies. The LLM director is trusted only to propose fact IDs and phase transitions; the runtime validates both before the voice model receives any fact content. Voice should be an adapter that sends final transcripts to the same `/turn` code path; it must not receive the private case reservoir.
+The current session store is SQLite-backed and is suitable for local development or one web instance. Before multi-instance deployment, replace it with a shared database or Redis, add rate limits, and move the API key and `SESSION_SECRET` into the host's secret manager. Set `SESSION_SECRET` explicitly in production: the generated `data/.session_secret` is per-host, so without it every instance would reject the others' cookies. In native ElevenLabs mode, the runtime releases facts only through the authenticated `get_case_facts` tool; the agent receives an ID index rather than the private case reservoir.

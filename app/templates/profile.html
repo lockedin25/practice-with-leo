@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% set signin_next = "/profile" %}
+{% set nav_active = "profile" %}
+{% block title %}Your Progress · Leo MBB Prep{% endblock %}
+{% block description %}Your Leo case interview practice history, competency profile, and debrief reports.{% endblock %}
+{% block body_class %}profile-body{% endblock %}
+{% block stylesheets %}
+<link rel="stylesheet" href="/static/profile.css" />
+{% endblock %}
+{% block content %}
+<main class="profile shell" aria-label="Your progress">
+  <header class="profile-head">
+    <div class="profile-identity-wrap">
+      <span class="profile-avatar-large" id="profile-avatar-large" aria-hidden="true">?</span>
+      <div class="profile-identity">
+        <p class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"></span> Your progress</p>
+        <h1 id="profile-title">Your progress, in focus.</h1>
+        <p class="muted" id="profile-subtitle">Loading your case history…</p>
+      </div>
+    </div>
+    <div class="profile-head-actions">
+      <a class="btn btn-primary btn-sm" href="/practice">Practice room <span class="arrow">→</span></a>
+    </div>
+  </header>
+
+  <section class="profile-next-step" id="profile-next-step" aria-labelledby="next-step-title">
+    <div class="next-step-marker" aria-hidden="true">01</div>
+    <div class="next-step-copy">
+      <p class="eyebrow">Your next best move</p>
+      <h2 id="next-step-title">Choose your next case</h2>
+      <p id="next-step-description">Leo will surface the most useful next step from your practice history.</p>
+    </div>
+    <a class="btn btn-primary" id="next-step-action" href="/cases">Browse cases <span class="arrow">→</span></a>
+  </section>
+
+  <section class="tiles" id="summary-tiles" aria-label="Practice summary"></section>
+
+  <section class="profile-grid">
+    <article class="card profile-performance">
+      <header class="card-head">
+        <div>
+          <p class="eyebrow">Competency profile</p>
+          <p class="card-subtitle">Your current baseline across the five MBB dimensions.</p>
+        </div>
+        {# Hidden until there is a sample size to report; a bare "0" beside an
+           empty card told the candidate nothing. #}
+        <span class="counter hidden" id="assessed-count">0</span>
+      </header>
+      <div class="skill-bars" id="performance-bars"></div>
+      <div class="profile-empty hidden" id="performance-empty">
+        <p>Leo scores all five dimensions from your transcript. Finish one case to open your profile.</p>
+        <a class="btn btn-secondary btn-sm" href="/cases">Browse cases <span class="arrow">→</span></a>
+      </div>
+    </article>
+
+    <article class="card profile-overview-card">
+      <header class="card-head">
+        <div>
+          <p class="eyebrow">Strengths and focus areas</p>
+          <p class="card-subtitle">Themes that repeat across your evaluated attempts.</p>
+        </div>
+      </header>
+      <div class="profile-overview-body" id="profile-overview">
+        <section class="profile-pillar">
+          <div class="pillar-head">
+            <p class="pillar-label pillar-label-strong">Strengths</p>
+            <span class="pillar-count" id="strength-count"></span>
+          </div>
+          <ul class="pillar-list" id="strength-list"></ul>
+          <details class="theme-disclosure hidden" id="strength-more">
+            <summary>Show more strengths</summary>
+            <ul class="pillar-list is-overflow" id="strength-more-list"></ul>
+          </details>
+        </section>
+        <section class="profile-pillar">
+          <div class="pillar-head">
+            <p class="pillar-label pillar-label-focus">Focus next</p>
+            <span class="pillar-count" id="development-count"></span>
+          </div>
+          <ul class="pillar-list" id="development-list"></ul>
+          <details class="theme-disclosure hidden" id="development-more">
+            <summary>Show more focus areas</summary>
+            <ul class="pillar-list is-overflow" id="development-more-list"></ul>
+          </details>
+        </section>
+      </div>
+      <div class="profile-empty hidden" id="development-empty">
+        <p>Feedback themes appear here once Leo has evaluated an attempt.</p>
+      </div>
+    </article>
+  </section>
+
+  <section class="card table-card profile-history-card">
+    <header class="card-head">
+      <div>
+        <p class="eyebrow">Practice history</p>
+        <p class="card-subtitle" id="history-summary">Your most recent case activity.</p>
+      </div>
+      <div class="history-head-controls">
+        <div class="history-filters" id="history-filters" role="group" aria-label="Filter practice history">
+          <button class="history-filter is-active" type="button" data-history-filter="all">All</button>
+          <button class="history-filter" type="button" data-history-filter="in_progress">Open</button>
+          <button class="history-filter" type="button" data-history-filter="completed">Completed</button>
+        </div>
+        <span class="counter" id="history-count">0</span>
+      </div>
+    </header>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Case</th>
+            <th>Stage</th>
+            <th class="numeric">Turns</th>
+            <th class="numeric">Score</th>
+            <th>Attempted</th>
+            <th class="actions">Report</th>
+          </tr>
+        </thead>
+        <tbody id="history-body"></tbody>
+      </table>
+    </div>
+    <button class="history-more hidden" id="history-more" type="button">Show all attempts</button>
+  </section>
+</main>
+
+<!-- ── Transcript and summary drawer ──────────────────────── -->
+<div class="drawer-veil hidden" id="drawer-veil"></div>
+<aside class="drawer hidden" id="drawer" aria-label="Practice transcript" tabindex="-1">
+  <header class="drawer-head">
+    <div>
+      <p class="eyebrow">Attempt</p>
+      <h2 class="drawer-title" id="drawer-title">Attempt</h2>
+      <div class="drawer-meta" id="drawer-meta"></div>
+    </div>
+    <button class="drawer-close" id="drawer-close" type="button" aria-label="Close transcript">
+      <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M6.6 6.6l10.8 10.8M17.4 6.6L6.6 17.4" /></svg>
+    </button>
+  </header>
+  {# Shown only for an ended attempt: an unfinished one has no report to open. #}
+  <div class="drawer-cta hidden" id="drawer-cta-wrap">
+    <p class="micro-label">Full debrief report</p>
+    <a class="btn btn-primary btn-sm" id="drawer-debrief-btn" href="#">Open debrief <span class="arrow">→</span></a>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+</aside>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<template id="message-template">
+  <article class="message">
+    <span class="avatar" aria-hidden="true">
+      <svg viewBox="0 0 32 32" class="avatar-glyph" fill="none">
+        <rect width="32" height="32" rx="8" fill="var(--brand-primary)"/>
+        <path d="M9 8.5C9 7.67 9.67 7 10.5 7H13V19H22.5C23.33 19 24 19.67 24 20.5V23C24 23.83 23.33 24.5 22.5 24.5H10.5C9.67 24.5 9 23.83 9 23V8.5Z" fill="#ffffff"/>
+        <path d="M18.5 7.5L23.5 12.5L18.5 17.5L13.5 12.5Z" fill="var(--gold-primary)"/>
+      </svg>
+    </span>
+    <div class="message-body">
+      <p class="message-role"></p>
+      <div class="bubble"><p class="message-content"></p></div>
+    </div>
+  </article>
+</template>
+{% endblock %}
+{% block scripts %}<script src="/static/profile.js"></script>{% endblock %}

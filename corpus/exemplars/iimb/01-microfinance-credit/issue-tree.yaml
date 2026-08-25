@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.mfi-recovery
+  label: Halt MFI default contagion and restore collection efficiency.
+nodes:
+- id: flood-impact-segmentation
+  type: branch
+  label: Direct Flood Damage vs Contagion
+  status: valid_branch
+  evidence: []
+  conclusion: 45% suffered physical crop loss, but default spread to 74% due to behavioral contagion.
+- id: jlg-peer-pressure-failure
+  type: branch
+  label: JLG Mutual Guarantee Breakdown
+  status: valid_branch
+  evidence: []
+  conclusion: Healthy borrowers refuse to pay when forced to cover insolvent group members.
+- id: field-operations-and-moratorium
+  type: branch
+  label: Center Meetings & Waiver Rumors
+  status: valid_branch
+  evidence: []
+  conclusion: Suspension of weekly meetings fueled political loan waiver speculation.
+- id: diagnosis
+  type: diagnosis
+  label: Joint Liability Breakdown & Moral Hazard Contagion
+  status: hidden_target
+  evidence:
+  - flood-impact-segmentation
+  - jlg-peer-pressure-failure
+  - field-operations-and-moratorium
+  conclusion: Collection collapsed because systemic crop damage broke the JLG mutual guarantee, triggering strategic defaults
+    that spread due to suspended center meetings.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Microfinance Recovery Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Restructure flood-hit loans, decouple group liability for healthy borrowers, and resume disciplined weekly center
+    meetings.
+edges:
+- from: objective.mfi-recovery
+  to: flood-impact-segmentation
+  relation: investigate
+- from: objective.mfi-recovery
+  to: jlg-peer-pressure-failure
+  relation: investigate
+- from: objective.mfi-recovery
+  to: field-operations-and-moratorium
+  relation: investigate
+- from: flood-impact-segmentation
+  to: diagnosis
+  relation: supports
+- from: jlg-peer-pressure-failure
+  to: diagnosis
+  relation: supports
+- from: field-operations-and-moratorium
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: field-first
+  sequence:
+  - flood-impact-segmentation
+  - jlg-peer-pressure-failure
+  - field-operations-and-moratorium
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from portfolio loss to group behavioral dynamics.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate why non-flooded borrowers stopped paying their loans.
+  - Clarify that the MFI operates on group liability (JLGs).
+  - Redirect toward the breakdown of peer guarantees and center meetings.

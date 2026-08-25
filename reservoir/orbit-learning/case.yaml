@@ -1,19 +1,75 @@
 schema_version: reservoir-v1
 case_id: orbit-learning-v1
 title: Orbit Learning
-status: draft
+status: approved
 rights_status: original
 category: digital_transformation
 industry: education
 difficulty: intermediate
 supported_durations: [30]
 skills_tested: [clarification, digital strategy, adoption, implementation, synthesis]
+
 candidate_opening:
   context: >-
     Orbit Learning runs vocational colleges across India. It invested in a
     digital learning platform, but student completion and faculty adoption remain low after the pilot.
-  objective: Recommend how Orbit should redesign and scale the programme.
+  objective: >-
+    Recommend how Orbit should redesign and scale the digital learning programme over twelve months to improve completion and employability outcomes.
+  opening_requirements:
+    - Name Orbit Learning and describe its vocational college network.
+    - Identify the core problem (38% pilot completion and uneven faculty adoption).
+    - Confirm the 12-month redesign and rollout timeline and completion/employability metrics.
+    - Ask clarifying questions on student user experience, faculty incentives, content pedagogy, and employer placement value.
+
 objective_function:
   primary_metric: course completion and employability outcomes
   decision_question: What should Orbit change before scaling its digital learning platform?
   time_horizon: twelve months
+  expected_candidate_output:
+    - Root cause diagnosis of student drop-off and faculty resistance.
+    - Pedagogical redesign plan (bite-sized mobile micro-drills linked to lab sessions).
+    - Faculty change management and incentive realignment.
+    - Phased wave rollout and 100-day pilot milestones.
+  design_principle: >-
+    Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+
+case_essence:
+  core_mechanism: >-
+    Pedagogy-workflow mismatch and perverse incentives. The digital platform simply mirrored long
+    passive lectures online, creating friction for mobile-first students and adding uncompensated prep
+    work for faculty whose KPIs were tied to classroom contact hours.
+  what_the_case_wanted_to_test: >-
+    Change management, incentive alignment in educational institutions, user friction in B2B2C digital
+    transformation, and modular pedagogical design.
+  pivotal_insight: >-
+    Digital content efficacy is sound when completed; redesigning into bite-sized 10-minute micro-drills
+    linked to lab sessions and aligning faculty incentive structures drives adoption.
+  common_traps:
+    - Blaming student motivation or hardware availability without auditing content format (60-minute passive videos on mobile screens).
+    - Mandating digital completion via administrative threats without addressing faculty workload and contact-hour accreditation incentives.
+    - Re-platforming technology stack or changing LMS software when user engagement friction is pedagogical and organizational.
+  takeaway_lesson: >-
+    Digital transformation in education and enterprise training fails when digital tools simply digitize
+    analog workflows; success requires redesigning content for the medium and aligning stakeholder compensation with adoption.
+  suggested_readings:
+    - knowledge_base/industries/08_saas_and_b2b_tech.md
+    - knowledge_base/case_types/unconventional_and_abstract.md
+    - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+    - clarification
+    - drill_down
+    - synthesis
+
+reservoir_files:
+  - facts.yaml
+  - issue-tree.yaml
+  - conversation-policy.yaml
+  - validation.md

@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: mfi.portfolio
+  domain: company
+  release_level: broad_context
+  content: "MFI has \u20B96,000 Cr AUM; affected state represents \u20B91,400 Cr across 500,000 JLG borrowers."
+- id: collection.drop
+  domain: financials
+  release_level: sharp_question
+  content: Weekly collection efficiency fell from 98.5% to 74% within 6 weeks post-monsoon flooding.
+- id: group.dynamics
+  domain: operations
+  release_level: hypothesis_backed
+  content: 45% of borrowers suffered crop loss, but 85% of center meetings ceased because healthy borrowers refused to cover
+    insolvent peers' weekly payments.
+  dependencies:
+  - collection.drop
+- id: contagion.spread
+  domain: risk
+  release_level: hypothesis_backed
+  content: Rumors of state government farm loan waivers led non-flooded districts to withhold repayments.
+  dependencies:
+  - group.dynamics
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Default contagion occurred because systemic flood damage broke the JLG mutual guarantee mechanism; healthy borrowers
+    strategically defaulted when weekly center meetings were abandoned amid loan waiver rumors.
+- id: recommendation.moratorium
+  domain: recommendation
+  release_level: synthesis_support
+  content: Provide immediate 90-day interest-free loan restructuring and emergency livelihood top-ups to verified flood-damaged
+    households.
+- id: recommendation.decouple
+  domain: recommendation
+  release_level: synthesis_support
+  content: Temporarily decouple joint liability so non-affected members can repay their individual share without penalization
+    for group defaults.
+- id: recommendation.meetings
+  domain: recommendation
+  release_level: synthesis_support
+  content: Re-establish weekly center meetings led by local branch officers to dispel loan waiver misinformation.

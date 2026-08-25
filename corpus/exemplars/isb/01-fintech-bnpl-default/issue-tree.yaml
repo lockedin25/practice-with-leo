@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.bnpl-fpd
+  label: Reduce BNPL first-payment default rate from 11.8% to under 4%.
+nodes:
+- id: default-concentration-by-sku
+  type: branch
+  label: SKU Category & Merchant Risk Clustering
+  status: valid_branch
+  evidence: []
+  conclusion: 82% of defaults occur in digital vouchers and electronics ordered via emulators.
+- id: underwriting-friction-vs-conversion
+  type: branch
+  label: Instant Checkout vs Bureau KYC Friction
+  status: valid_branch
+  evidence: []
+  conclusion: Zero friction enabled syndicate abuse; heavy manual KYC causes 60% checkout drop-off.
+- id: silent-telemetry-defense
+  type: branch
+  label: Device Fingerprinting & Velocity Gating
+  status: valid_branch
+  evidence: []
+  conclusion: Silent SIM/device binding blocks 88% of fraud with zero user friction.
+- id: diagnosis
+  type: diagnosis
+  label: Frictionless Checkout Vulnerability to Emulator Syndicates
+  status: hidden_target
+  evidence:
+  - default-concentration-by-sku
+  - underwriting-friction-vs-conversion
+  - silent-telemetry-defense
+  conclusion: Defaults exploded because frictionless checkout lacked basic device risk verification, allowing fraud rings
+    to liquidate digital vouchers; silent telemetry restores risk control.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Embedded Risk Architecture
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Implement silent device SDK risk scoring, enforce step-up auth on liquid SKUs, and use graduated credit limits.
+edges:
+- from: objective.bnpl-fpd
+  to: default-concentration-by-sku
+  relation: investigate
+- from: objective.bnpl-fpd
+  to: underwriting-friction-vs-conversion
+  relation: investigate
+- from: objective.bnpl-fpd
+  to: silent-telemetry-defense
+  relation: investigate
+- from: default-concentration-by-sku
+  to: diagnosis
+  relation: supports
+- from: underwriting-friction-vs-conversion
+  to: diagnosis
+  relation: supports
+- from: silent-telemetry-defense
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: risk-first
+  sequence:
+  - default-concentration-by-sku
+  - underwriting-friction-vs-conversion
+  - silent-telemetry-defense
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from fraud category concentration to silent technical verification solutions.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate which product categories have the highest default rates.
+  - Clarify that genuine fashion/grocery buyers have low default rates.
+  - Redirect toward silent device fingerprinting and graduated credit limits.

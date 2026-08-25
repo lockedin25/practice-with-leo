@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: fleet.spec
+  domain: company
+  release_level: broad_context
+  content: Client operates 12 mid-size jets (Hawker/Learjet) based out of Delhi and Mumbai.
+- id: hourly.pricing
+  domain: financials
+  release_level: sharp_question
+  content: "Charter rate is \u20B94.5 lakh/hour, but average billable hours per aircraft are only 24 hours/month (breakeven\
+    \ is 40 hours)."
+- id: deadhead.rate
+  domain: operations
+  release_level: hypothesis_backed
+  content: 38% of all airborne flight hours are unpaid empty-leg ferry flights required to reposition aircraft for one-way
+    charters.
+  dependencies:
+  - hourly.pricing
+- id: airport.fees
+  domain: financials
+  release_level: hypothesis_backed
+  content: Night parking and landing charges at Delhi/Mumbai airports are 3x higher than regional secondary airports.
+  dependencies:
+  - deadhead.rate
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Negative EBITDA is caused by low billable utilization (24 hrs/month vs 40 hrs breakeven) driven by 38% unpaid empty-leg
+    repositioning flights and high metro parking fees.
+- id: recommendation.empty_leg_app
+  domain: recommendation
+  release_level: synthesis_support
+  content: Launch digital empty-leg marketplace offering 50% discounted one-way seats to luxury leisure travelers.
+- id: recommendation.floating_base
+  domain: recommendation
+  release_level: synthesis_support
+  content: Shift from fixed Delhi/Mumbai bases to a floating fleet model with regional overnight parking at lower-cost airports.
+- id: recommendation.membership
+  domain: recommendation
+  release_level: synthesis_support
+  content: Introduce 25-hour and 50-hour corporate jet card memberships with round-trip commitment incentives.

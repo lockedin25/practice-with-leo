@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.ott-churn
+  label: Reduce OTT subscriber churn from 58% to under 25%.
+nodes:
+- id: content-consumption-lifecycle
+  type: branch
+  label: Tentpole Movie Releases vs Series Viewing
+  status: valid_branch
+  evidence: []
+  conclusion: 64% of users churn within 35 days after watching a single blockbuster movie.
+- id: payment-mandate-failures
+  type: branch
+  label: RBI Recurring Card Mandate Friction
+  status: valid_branch
+  evidence: []
+  conclusion: 42% of monthly renewals fail due to banking OTP and card e-mandate issues.
+- id: telco-bundling-reach
+  type: branch
+  label: Telco Prepaid Packaging & Wholesale Yield
+  status: valid_branch
+  evidence: []
+  conclusion: Telco prepaid bundles achieve 82% 12-month retention with zero payment failure.
+- id: diagnosis
+  type: diagnosis
+  label: Episodic Movie Churn & Payment Failure Barrier
+  status: hidden_target
+  evidence:
+  - content-consumption-lifecycle
+  - payment-mandate-failures
+  - telco-bundling-reach
+  conclusion: Churn is driven by episodic movie watchers cancelling after 1 month and high payment auto-renewal failures;
+    shifting to annual mobile plans and telco bundling solves retention.
+- id: actions
+  type: recommendation
+  label: 3-Pillar OTT Retention Architecture
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: "Introduce \u20B9299 annual mobile plan, partner with telco prepaid packs, and deploy UPI AutoPay."
+edges:
+- from: objective.ott-churn
+  to: content-consumption-lifecycle
+  relation: investigate
+- from: objective.ott-churn
+  to: payment-mandate-failures
+  relation: investigate
+- from: objective.ott-churn
+  to: telco-bundling-reach
+  relation: investigate
+- from: content-consumption-lifecycle
+  to: diagnosis
+  relation: supports
+- from: payment-mandate-failures
+  to: diagnosis
+  relation: supports
+- from: telco-bundling-reach
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: churn-first
+  sequence:
+  - content-consumption-lifecycle
+  - payment-mandate-failures
+  - telco-bundling-reach
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from user viewing habits to payment failure and telco partnerships.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate why users cancel after 30 days.
+  - Clarify that credit card auto-renewals in India have high failure rates.
+  - Redirect toward annual mobile plans and telco prepaid data bundles.

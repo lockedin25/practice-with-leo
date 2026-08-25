@@ -4,6 +4,8 @@ Version: 0.1.0
 Summary: A LangChain-powered case interview simulator.
 Requires-Python: >=3.11
 Requires-Dist: fastapi<1.0,>=0.115
+Requires-Dist: httpx<1.0,>=0.27
+Requires-Dist: jinja2<4.0,>=3.1
 Requires-Dist: langchain<2.0,>=1.0
 Requires-Dist: langchain-openrouter<1.0,>=0.1
 Requires-Dist: pydantic<3.0,>=2.8

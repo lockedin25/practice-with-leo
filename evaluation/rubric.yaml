@@ -1,0 +1,142 @@
+schema_version: rubric-v2
+
+# BCG-calibrated 1.0–5.0 scoring scale across 5 core consulting dimensions.
+# Weights feed the deterministic weighted overall score. When the quantitative
+# dimension is not applicable (no mathematical calculations in the attempt), its
+# weight redistributes proportionally across the assessed dimensions.
+
+scoring_scale:
+  min: 1.0
+  max: 5.0
+  bands:
+    Below Bar:
+      range: [1.0, 2.4]
+      summary: "Critical gaps in casing craft; generic framework recitation, unprompted data fishing, unverified arithmetic, or passive dependence on interviewer."
+    Meets Bar:
+      range: [2.5, 3.7]
+      summary: "Solid consulting competence; structured issue trees, hypothesis-led inquiry, accurate calculations, and clear 4-part synthesis."
+    Top 1% MBB:
+      range: [3.8, 5.0]
+      summary: "Elite partner-ready consulting craft; bespoke MECE-by-construction trees, ex-ante hypothesis precision, rapid sanity-checked numeracy, and boardroom presence."
+
+dimensions:
+  - name: structuring
+    weight: 0.25
+    focus: >-
+      Whether the candidate's structures are MECE at every level of decomposition,
+      tailored to the client's business model and industry economics, and avoid generic
+      framework dumping. Credit structures that are MECE by construction: formulas
+      (e.g., profit = revenue - cost, revenue = price x volume), operational process flows,
+      and exhaustive segmentations with explicit catch-alls.
+    violation_classes:
+      - overlap: an item belongs to two buckets at the same level (e.g., marketing listed under both fixed costs and discretionary spend).
+      - gap: the buckets together miss something critical (e.g., revenue and costs with no room for one-off non-operating items).
+      - mixed_hierarchy_levels: items from different levels of abstraction sit side by side (e.g., raw material costs beside total revenue).
+      - framework_dumping: reciting generic textbook frameworks (4Ps, 3Cs) without adaptation to the client's industry.
+    calibration:
+      - MECE is necessary but not sufficient. A generic template scores below a bespoke structure tailored to the client's specific value chain.
+      - Prioritising mutual exclusivity and case relevance matters more than theoretical completeness.
+    bands:
+      Below Bar: >-
+        Structures are lists rather than trees; overlaps, gaps, or mixed levels are common;
+        textbook framework dumping with zero business model tailoring.
+      Meets Bar: >-
+        Tree is MECE at Level 1 and mostly MECE at Level 2; adapts framework with industry
+        context; clear verbal signposting and top-down delivery.
+      Top 1% MBB: >-
+        Flawless MECE-by-construction 3+ levels deep; mathematical identities with explicit
+        catch-alls; bespoke unit economics and operational value chain tailoring; self-corrects unprompted.
+
+  - name: problem_solving
+    weight: 0.25
+    focus: >-
+      How quickly and directly the candidate reaches the core of the problem:
+      ex-ante hypothesis-led inquiry, 80/20 prioritization of high-leverage drivers,
+      and agility in responding to interviewer hints and pivots.
+    violation_classes:
+      - data_fishing: requesting data without stating a commercial hypothesis or reason.
+      - boil_the_ocean: exploring low-impact branches sequentially without economic prioritization.
+      - pivot_resistance: ignoring interviewer hints or defending disproven hypotheses.
+    calibration:
+      - Every data request should be framed as a hypothesis test.
+      - 80/20 prioritization requires identifying the largest levers upfront.
+    bands:
+      Below Bar: >-
+        Questions are exploratory data fishing without hypotheses; explores branches sequentially
+        regardless of materiality; oblivious or defensive to interviewer hints.
+      Meets Bar: >-
+        Hypotheses guide inquiries; prioritizes main branches based on economic scale; responds
+        promptly to direct interviewer guidance.
+      Top 1% MBB: >-
+        100% ex-ante hypothesis-led throughout; relentless 80/20 prioritization; effortlessly catches
+        subtle conversational nuances and pivots dynamically with zero friction.
+
+  - name: quantitative
+    weight: 0.15
+    focus: >-
+      Mental math speed and accuracy, algebraic formula articulation, dimensional unit tracking,
+      commercial sanity checking, and strategic 'so-what' interpretation.
+    violation_classes:
+      - naked_calculation: reporting a raw number without commercial interpretation.
+      - unit_slip: dropping units, confusing thousands/millions/billions, or mixing margin and markup.
+      - missing_formula: diving into arithmetic without stating the underlying formula.
+    calibration:
+      - Mark unassessed (low confidence) when the attempt contains no quantitative work.
+      - Arithmetic speed is secondary to formula discipline and commercial sanity checking.
+    bands:
+      Below Bar: >-
+        Calculates blindly without stating formulas; severe unit confusion or magnitude drops;
+        reports bare numbers with zero commercial interpretation.
+      Meets Bar: >-
+        States formulas and computes accurately with proper units; connects numbers to the case
+        question with minor guidance.
+      Top 1% MBB: >-
+        Crystal-clear formula and unit discipline; lightning-fast mental math; unprompted commercial
+        reality checks against industry benchmarks; immediate strategic 'so-what' insight.
+
+  - name: synthesis
+    weight: 0.20
+    focus: >-
+      Delivering an executive-ready, top-down (Pyramid Principle), 4-part closing recommendation:
+      Direct Answer first, 2-3 Quantified Supporting Pillars, Key Implementation Risks & Mitigations,
+      and a Concrete Next Steps / 100-Day Action Plan.
+    violation_classes:
+      - chronological_recap: narrating the journey rather than stating the answer first.
+      - menu_of_options: listing choices without committing to a clear strategic recommendation.
+      - missing_risks_or_actions: failing to include implementation risks or immediate next steps.
+    calibration:
+      - Answer must come in the first 10 seconds.
+      - All 4 parts are mandatory for Meets Bar and Top 1% MBB distinction.
+    bands:
+      Below Bar: >-
+        Chronological narrative of the case; vague or menu-of-options recommendation; omits
+        risks or actionable next steps; qualitative generalities with zero quantitative backing.
+      Meets Bar: >-
+        Answer-first recommendation backed by 2-3 quantified case findings; covers risks and
+        next steps with reasonable specificity.
+      Top 1% MBB: >-
+        Authoritative Pyramid Principle close in under 90 seconds: crisp quantified recommendation,
+        2-3 prioritized pillars with data, paired risk-mitigation vectors, and a 100-day tactical roadmap.
+
+  - name: communication
+    weight: 0.15
+    focus: >-
+      Information density per turn, top-down structure, signposting, concise delivery,
+      and boardroom-grade executive presence.
+    violation_classes:
+      - rambling: excessive turn length relative to substance (>300 words without structure).
+      - buried_point: delivering evidence first and takeaway at the end.
+      - filler: excessive verbal crutches and repetition.
+    calibration:
+      - Every turn should have high information density.
+      - Transitions between branches must be explicitly signposted.
+    bands:
+      Below Bar: >-
+        Rambling, long turns relative to content; buried conclusions; verbal crutches; low
+        executive presence; hard-to-follow delivery.
+      Meets Bar: >-
+        Professional and clear; answers questions directly with followable structure; minimal
+        filler and good pacing.
+      Top 1% MBB: >-
+        Boardroom-grade executive presence: high information density, crisp top-down delivery,
+        explicit roadmaps and signposts, effortless synthesis checkpoints.

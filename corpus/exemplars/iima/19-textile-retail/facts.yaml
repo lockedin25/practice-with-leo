@@ -1,0 +1,41 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: store.profile
+  domain: company
+  release_level: broad_context
+  content: "Client operates 18 flagship stores with average ticket size of \u20B985,000."
+- id: markdown.surge
+  domain: financials
+  release_level: sharp_question
+  content: "Gross margin dropped from 54% to 46% due to \u20B924 Cr in end-of-season clearance discounts."
+- id: category.split
+  domain: merchandising
+  release_level: hypothesis_backed
+  content: "Ready-to-wear sarees and kurtas had 82% full-price sell-through; heavy bridal lehengas (>\u20B91.5L) had only\
+    \ 38% sell-through."
+  dependencies:
+  - markdown.surge
+- id: buying.process
+  domain: operations
+  release_level: hypothesis_backed
+  content: Store managers ordered finished, fully stitched bridal sets 9 months in advance with zero customer pre-orders.
+  dependencies:
+  - category.split
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Margin loss is driven by finished pre-stitched bridal inventory (>\u20B91.5L) with low 38% sell-through, forcing\
+    \ heavy 60% clearance markdowns; bridal buying must shift to sample-based made-to-order."
+- id: recommendation.mto
+  domain: recommendation
+  release_level: synthesis_support
+  content: Shift bridal wear from finished inventory to made-to-order sample master pieces with 21-day customized tailoring.
+- id: recommendation.otb
+  domain: recommendation
+  release_level: synthesis_support
+  content: Implement centralized Open-To-Buy (OTB) planning with 50% budget reserved for in-season replenishment.
+- id: recommendation.clearance
+  domain: recommendation
+  release_level: synthesis_support
+  content: Liquidate aged bridal inventory through private VIP trunk shows and rental platform partnerships.

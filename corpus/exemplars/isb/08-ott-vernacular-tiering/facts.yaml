@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: subscriber.base
+  domain: company
+  release_level: broad_context
+  content: Platform has 5M subscribers across Tamil, Telugu, and Malayalam content libraries.
+- id: churn.profile
+  domain: customers
+  release_level: sharp_question
+  content: Annual churn is 58%; 64% of users cancel within 35 days of sign-up following major movie releases.
+- id: payment.friction
+  domain: operations
+  release_level: hypothesis_backed
+  content: RBI recurring mandate regulations caused 42% of automated credit/debit card recurring renewals to fail on monthly
+    plans.
+  dependencies:
+  - churn.profile
+- id: telco.bundle_economics
+  domain: economics
+  release_level: hypothesis_backed
+  content: "Telco bundled distribution (pre-integrated into monthly recharge) yields 82% 12-month retention at a wholesale\
+    \ wholesale payout of \u20B924/user/month with zero payment failure."
+  dependencies:
+  - payment.friction
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "58% churn is driven by episodic tentpole movie sign-ups and 42% recurring card renewal payment failures; solution\
+    \ requires shifting users to annual mobile-only plans (\u20B9299/yr) and telco prepaid bundling."
+- id: recommendation.annual_mobile
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Launch an affordable \u20B9299/year single-screen mobile-only plan to eliminate monthly renewal friction."
+- id: recommendation.telco_bundle
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Partner with Jio/Airtel to bundle OTT access into regional \u20B9399/month mobile data recharge packs."
+- id: recommendation.upi_autopay
+  domain: recommendation
+  release_level: synthesis_support
+  content: Integrate UPI AutoPay with instant recurring debit authorization to replace failing credit card mandates.

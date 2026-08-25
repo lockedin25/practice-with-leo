@@ -1,0 +1,46 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: bank.pilot
+  domain: company
+  release_level: broad_context
+  content: Pilot deployed to 250 private wealth advisors in Singapore and Mumbai generating 5,000 monthly investment suitability
+    memos.
+- id: audit.failure
+  domain: risk
+  release_level: sharp_question
+  content: Compliance audits flagged a 26% failure rate due to inaccurate risk tolerance citations and hallucinated product
+    disclosures.
+- id: advisor.workflow
+  domain: operations
+  release_level: hypothesis_backed
+  content: Advisors spend 45 minutes editing each AI draft (vs 30 minutes writing manually from scratch) because AI output
+    lacked source document citations.
+  dependencies:
+  - audit.failure
+- id: liability.policy
+  domain: governance
+  release_level: hypothesis_backed
+  content: Bank compliance policy mandates that human advisors face personal regulatory fines and disciplinary action for
+    any factual error in submitted notes.
+  dependencies:
+  - advisor.workflow
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: GenAI pilot failed because 100% personal liability was assigned to advisors while AI generated ungrounded notes
+    with no citation links, forcing advisors to spend more time fact-checking than writing from scratch.
+- id: recommendation.rag
+  domain: recommendation
+  release_level: synthesis_support
+  content: Re-engineer copilot with Retrieval-Augmented Generation (RAG) providing clickable sentence-by-sentence citations
+    to CRM transcripts and portfolio data.
+- id: recommendation.workflow_gate
+  domain: recommendation
+  release_level: synthesis_support
+  content: Introduce structured 3-click verification checklist where advisors validate key risk assumptions rather than editing
+    raw prose.
+- id: recommendation.governance
+  domain: recommendation
+  release_level: synthesis_support
+  content: Establish clear institutional safe-harbor rules and automated compliance pre-screening before formal submission.

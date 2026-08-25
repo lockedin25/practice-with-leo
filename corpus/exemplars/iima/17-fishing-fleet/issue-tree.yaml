@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.fishing-voyage-profit
+  label: Restore deep-sea trawler voyage profitability.
+nodes:
+- id: fuel-burn-analysis
+  type: branch
+  label: Diesel Fuel Burn & Search Days
+  status: valid_branch
+  evidence: []
+  conclusion: Fuel is 56% of cost; blind search consumes 9 days per voyage.
+- id: catch-value-yield
+  type: branch
+  label: Target Catch vs Discarded Bycatch
+  status: valid_branch
+  evidence: []
+  conclusion: 45% of netted catch is discarded at sea due to lack of cold-hold storage.
+- id: onboard-processing
+  type: branch
+  label: Onboard Chilling & Commercial Offtake
+  status: valid_branch
+  evidence: []
+  conclusion: Zero commercial contracts exist for secondary pelagic fish species.
+- id: diagnosis
+  type: diagnosis
+  label: Blind Search Fuel Burn & Bycatch Discard
+  status: hidden_target
+  evidence:
+  - fuel-burn-analysis
+  - catch-value-yield
+  - onboard-processing
+  conclusion: Voyages lose money due to 9 days of blind search fuel consumption and discarding 45% of catch that could be
+    monetized.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Marine Efficiency Plan
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy satellite PFZ scouting, monetize bycatch through surimi processors, and optimize cruising speed.
+edges:
+- from: objective.fishing-voyage-profit
+  to: fuel-burn-analysis
+  relation: investigate
+- from: objective.fishing-voyage-profit
+  to: catch-value-yield
+  relation: investigate
+- from: objective.fishing-voyage-profit
+  to: onboard-processing
+  relation: investigate
+- from: fuel-burn-analysis
+  to: diagnosis
+  relation: supports
+- from: catch-value-yield
+  to: diagnosis
+  relation: supports
+- from: onboard-processing
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: operations-first
+  sequence:
+  - fuel-burn-analysis
+  - catch-value-yield
+  - onboard-processing
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from fuel cost breakdown to catch composition and search efficiency.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what percentage of a voyage is spent searching vs netting fish.
+  - Clarify that fish market prices for premium tuna remain high.
+  - Redirect toward search time reduction and bycatch monetization.

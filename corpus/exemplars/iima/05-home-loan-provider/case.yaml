@@ -1,0 +1,69 @@
+schema_version: reservoir-v1
+case_id: 05-home-loan-provider-v1
+title: Housing Finance NBFC
+school: IIM-A
+status: approved
+rights_status: original
+category: profitability
+industry: banking_and_financial_services
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a mid-sized housing finance company (HFC) in South India. Net interest margin (NIM) has compressed
+    from 3.8% to 2.4% over 2 years, accompanied by rising 90+ DPD delinquencies in Tier-2 cities.
+  objective: Diagnose the compression in net interest margin and credit quality, and propose a corrective underwriting strategy.
+  opening_requirements:
+  - Name Housing Finance NBFC and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Net Interest Margin (NIM) and Gross NPA ratio) and time horizon (eighteen months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Net Interest Margin (NIM) and Gross NPA ratio
+  decision_question: Why did HFC net interest margin compress and how should lending channels and underwriting be restructured?
+  time_horizon: eighteen months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Channel escalation of Direct Selling Agent (DSA) broker commissions (from 0.8% to 2.2%) combined with adverse
+    borrower selection from aggressive builder subvention schemes where builders defaulted on construction milestones.
+  what_the_case_wanted_to_test: HFC loan originations, broker incentive misalignment, cost of funds vs lending yield, and
+    project construction escrow risk.
+  pivotal_insight: DSA broker originations rose to 75% of disbursements, inflating acquisition costs while brokers routed
+    high-risk, unverified self-employed borrowers to earn 2.2% upfront broker fees.
+  common_traps:
+  - Assuming bank wholesale borrowing cost of funds spiked without checking RBI repo benchmark spreads.
+  - Blaming macroeconomic real estate crash rather than broker channel adverse selection.
+  - Proposing exiting home loans entirely to focus on unsecured personal loans.
+  takeaway_lesson: In retail lending, third-party broker channels create adverse selection unless credit underwriting is entirely
+    decentralized from sales incentives and backed by direct field investigation.
+  suggested_readings:
+  - knowledge_base/industries/04_banking_and_financial_services.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

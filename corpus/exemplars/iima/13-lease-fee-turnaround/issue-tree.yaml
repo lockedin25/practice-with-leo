@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.reit-occupancy
+  label: Restore commercial office REIT occupancy and Net Operating Income.
+nodes:
+- id: lease-expiry-trend
+  type: branch
+  label: Tenant Lease Expiries & Downsizing
+  status: valid_branch
+  evidence: []
+  conclusion: 18 major IT tenants downsized space upon 3-year lease renewals.
+- id: hybrid-work-patterns
+  type: branch
+  label: Physical Office Utilization & Hybrid Policies
+  status: valid_branch
+  evidence: []
+  conclusion: Physical daily office attendance is 45%, driving demand for 35% smaller footprints.
+- id: flex-vs-traditional
+  type: branch
+  label: Managed Space Economics vs Bare-Shell Leases
+  status: valid_branch
+  evidence: []
+  conclusion: Managed flexible workspace maintains 90% occupancy at 25% higher rent.
+- id: diagnosis
+  type: diagnosis
+  label: Rigid Lease Structure Mismatch with Hybrid Work
+  status: hidden_target
+  evidence:
+  - lease-expiry-trend
+  - hybrid-work-patterns
+  - flex-vs-traditional
+  conclusion: Occupancy collapsed because traditional 9-year bare-shell leases cannot accommodate hybrid work, pushing clients
+    toward flexible managed office operators.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Managed Workplace Transformation
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Launch captive enterprise flex-space, structure 'Core & Flex' leases, and monetize centralized tech park amenities.
+edges:
+- from: objective.reit-occupancy
+  to: lease-expiry-trend
+  relation: investigate
+- from: objective.reit-occupancy
+  to: hybrid-work-patterns
+  relation: investigate
+- from: objective.reit-occupancy
+  to: flex-vs-traditional
+  relation: investigate
+- from: lease-expiry-trend
+  to: diagnosis
+  relation: supports
+- from: hybrid-work-patterns
+  to: diagnosis
+  relation: supports
+- from: flex-vs-traditional
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: tenant-first
+  sequence:
+  - lease-expiry-trend
+  - hybrid-work-patterns
+  - flex-vs-traditional
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from tenant non-renewals to hybrid work utilization.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what percentage of leased desks are physically occupied on any given weekday.
+  - Clarify that IT clients still value tech park location.
+  - Redirect inquiry toward flexible managed office models.

@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debrief · Leo MBB Prep</title>
+    <meta name="description" content="Your evidence-based case debrief: scores, cited moments, and what to practise next." />
+    <link rel="icon" type="image/svg+xml" href="/static/logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/tokens.css" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="stylesheet" href="/static/debrief.css" />
+  </head>
+  <body class="debrief-body">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Leo Home">
+        <svg class="brand-icon" viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="debLeoGrad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="var(--brand-primary)"/>
+              <stop offset="100%" stop-color="var(--brand-deep)"/>
+            </linearGradient>
+            <linearGradient id="debGoldGrad" x1="10" y1="8" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="var(--gold-soft)"/>
+              <stop offset="100%" stop-color="var(--gold-primary)"/>
+            </linearGradient>
+          </defs>
+          <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#debLeoGrad)" stroke="var(--line-base)" stroke-width="1"/>
+          <path d="M9 8.5C9 7.67 9.67 7 10.5 7H13V19H22.5C23.33 19 24 19.67 24 20.5V23C24 23.83 23.33 24.5 22.5 24.5H10.5C9.67 24.5 9 23.83 9 23V8.5Z" fill="#ffffff" fill-opacity="0.9"/>
+          <path d="M18.5 7.5L23.5 12.5L18.5 17.5L13.5 12.5Z" fill="url(#debGoldGrad)"/>
+        </svg>
+        <span class="brand-name">Leo</span>
+      </a>
+      <span class="rule" aria-hidden="true"></span>
+      <span class="profile-chip">Case debrief</span>
+      <div class="topbar-actions">
+        <a class="btn btn-ghost btn-sm" href="/cases">Case library</a>
+        <a class="btn btn-ghost btn-sm" href="/profile">Your progress</a>
+        <a class="btn btn-ghost btn-sm" id="transcript-link" href="/practice">View transcript</a>
+        <button class="icon-button" id="theme-toggle" type="button" aria-label="Switch colour theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="icon icon-sun"><circle cx="12" cy="12" r="4.2" /><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6l-1.4 1.4M7 17l-1.4 1.4" /></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true" class="icon icon-moon"><path d="M20 14.1A8.2 8.2 0 1 1 9.9 4a6.6 6.6 0 0 0 10.1 10.1Z" /></svg>
+        </button>
+
+        <div class="user-menu hidden" id="user-menu">
+          <button class="user-chip" id="user-chip" type="button" aria-haspopup="true" aria-expanded="false" title="Your Account">
+            <span class="user-avatar" id="user-avatar" aria-hidden="true"></span>
+            <span class="user-name-label" id="user-name-label">Profile</span>
+            <svg viewBox="0 0 24 24" class="icon user-caret" aria-hidden="true"><path d="M7 10l5 5 5-5" /></svg>
+          </button>
+          <div class="user-sheet hidden" id="user-sheet">
+            <p class="user-sheet-name" id="user-name"></p>
+            <p class="user-sheet-email" id="user-email"></p>
+            <a class="user-sheet-item" href="/profile"><strong>Your Progress &amp; History</strong></a>
+            <a class="user-sheet-item" href="/cases">Case Library (69 Cases)</a>
+            <a class="user-sheet-item" href="/practice">Practice Room</a>
+            <a class="user-sheet-item hidden" id="admin-link" href="/admin">Admin Console</a>
+            <button class="user-sheet-item sign-out-btn" id="sign-out" type="button">Sign Out</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="debrief">
+      <!-- Loading, error, and pending states replace the report content. -->
+      <section class="debrief-state hidden" id="debrief-state">
+        <span class="orbit" id="state-spinner"></span>
+        <h1 id="state-title">Leo is marking your case…</h1>
+        <p class="muted" id="state-note">The evaluator reads your transcript against the rubric. This usually takes under a minute.</p>
+        <div class="debrief-actions hidden" id="state-actions">
+          <button class="button button-solid" id="state-retry" type="button">Check again</button>
+          <a class="button button-ghost" href="/practice">Back to practice</a>
+        </div>
+      </section>
+
+      <!-- The report -->
+      <div class="debrief-report hidden" id="debrief-report">
+        <header class="debrief-head">
+          <div>
+            <p class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"></span> Evidence-based debrief</p>
+            <h1 id="case-title">Your case</h1>
+            <p class="muted" id="report-subtitle"></p>
+          </div>
+          <div class="overall-card" aria-label="Weighted overall score">
+            <p class="micro-label">Overall</p>
+            <p class="overall-value"><span id="overall-score">–</span><span class="overall-out-of">/5</span></p>
+            <p class="overall-note" id="overall-note"></p>
+          </div>
+        </header>
+
+        <section class="report-stage" aria-labelledby="scorecard-heading">
+          <header class="stage-head">
+            <div>
+              <p class="stage-kicker">01 · The headline</p>
+              <h2 id="scorecard-heading">Your scorecard</h2>
+              <p>Start with the result, then decide where to focus your next practice session.</p>
+            </div>
+          </header>
+
+          <!-- Executive Summary & MBB Rating Badge -->
+          <section class="card executive-summary-card hidden" id="executive-summary-card">
+            <p class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"></span> Executive summary</p>
+            <p class="executive-summary-text" id="executive-summary-text"></p>
+            <span class="mbb-badge" id="mbb-badge"></span>
+          </section>
+
+          <!-- Key Takeaways: Strengths, Priorities, Next Drill -->
+          <section class="debrief-takeaways">
+            <article class="card takeaway-card">
+              <p class="micro-label">Headline strengths</p>
+              <ul class="takeaway-list is-strengths" id="strength-list"></ul>
+            </article>
+            <article class="card takeaway-card">
+              <p class="micro-label">Priority improvements</p>
+              <ul class="takeaway-list is-priorities" id="priority-list"></ul>
+              <div class="next-drill">
+                <p class="micro-label">Next drill</p>
+                <p id="drill-text"></p>
+              </div>
+            </article>
+          </section>
+
+          <!-- Evaluation dimensions: standard rubric pillars -->
+          <section class="dimension-grid" id="dimension-grid" aria-label="Dimension breakdown"></section>
+        </section>
+
+        <section class="report-stage" aria-labelledby="behaviour-heading">
+          <header class="stage-head">
+            <div>
+              <p class="stage-kicker">02 · The evidence</p>
+              <h2 id="behaviour-heading">Behaviour review</h2>
+              <p>Review the missed markers first. Open any row for the exact coaching and transcript evidence.</p>
+            </div>
+          </header>
+
+          <!-- Checklist of behaviors -->
+          <article class="card checklist-card" aria-label="Observed behaviours">
+            <header class="card-head checklist-head">
+              <div>
+                <p class="eyebrow">Observed behaviours</p>
+                <p class="card-subtitle" id="checklist-summary" aria-live="polite">Loading behaviour markers…</p>
+              </div>
+              <div class="checklist-legend">
+                <label class="checklist-filter-label" for="checklist-status-filter">
+                  <span>Show</span>
+                  <select id="checklist-status-filter" class="checklist-filter">
+                    <option value="missed" selected>Missed</option>
+                    <option value="demonstrated">Demonstrated</option>
+                    <option value="not_applicable">Not applicable</option>
+                  </select>
+                </label>
+              </div>
+            </header>
+            <p class="checklist-empty hidden" id="checklist-empty" aria-live="polite"></p>
+            <ul class="checklist" id="checklist"></ul>
+          </article>
+
+          <!-- Areas for Development -->
+          <article class="card development-card hidden" id="development-card">
+            <p class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"></span> Areas for development</p>
+            <div id="development-list"></div>
+          </article>
+        </section>
+
+        <section class="report-stage" aria-labelledby="masterclass-heading">
+          <header class="stage-head">
+            <div>
+              <p class="stage-kicker">03 · The masterclass</p>
+              <h2 id="masterclass-heading">Understand the case</h2>
+              <p>Use these deeper references when you are ready to see the mechanism, benchmark, and stronger delivery.</p>
+            </div>
+          </header>
+
+          <!-- What This Case Really Wanted to Test -->
+          <section class="card masterclass-card hidden" id="case-wanted-card">
+            <p class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"></span> What this case really wanted to test</p>
+            <div class="masterclass-grid">
+              <div class="masterclass-item">
+                <p class="micro-label">Core mechanism</p>
+                <p id="case-core-mechanism"></p>
+              </div>
+              <div class="masterclass-item">
+                <p class="micro-label">Pivotal insight</p>
+                <p id="case-pivotal-insight"></p>
+              </div>
+              <div class="masterclass-item">
+                <p class="micro-label">Your performance</p>
+                <p id="case-candidate-performance"></p>
+              </div>
+              <div class="masterclass-item">
+                <p class="micro-label">Gap to top 1%</p>
+                <p id="case-optimal-gap"></p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Golden MBB Rewrites -->
+          <section class="card golden-rewrites-card hidden" id="golden-rewrites-card">
+            <p class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"></span> Golden MBB rewrites</p>
+            <p class="card-subtitle">How an MBB partner would deliver the same turn.</p>
+            <div id="golden-rewrites-list"></div>
+          </section>
+
+          <!-- Strengths -->
+          <article class="card strengths-card hidden" id="strengths-card">
+            <p class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"></span> Headline strengths</p>
+            <div id="strengths-list"></div>
+          </article>
+        </section>
+
+        <section class="report-stage" aria-labelledby="action-plan-heading">
+          <header class="stage-head">
+            <div>
+              <p class="stage-kicker">04 · Next practice</p>
+              <h2 id="action-plan-heading">Your action plan</h2>
+              <p>Open the drill first. Keep the supporting reading nearby when you want to go deeper.</p>
+            </div>
+          </header>
+
+          <!-- Action Plan: Drill & Readings -->
+          <section class="card action-plan-card hidden" id="action-plan-card">
+            <details class="action-disclosure" id="drill-block" open>
+              <summary>
+                <span>
+                  <span class="micro-label">Targeted drill</span>
+                  <strong id="drill-title"></strong>
+                </span>
+                <span class="disclosure-icon" aria-hidden="true"></span>
+              </summary>
+              <div class="action-disclosure-body">
+                <p class="drill-meta" id="drill-meta"></p>
+                <p class="drill-prompt" id="drill-prompt"></p>
+              </div>
+            </details>
+            <details class="action-disclosure" id="readings-block">
+              <summary>
+                <span>
+                  <span class="micro-label">Suggested readings</span>
+                  <strong>Build the underlying skill</strong>
+                </span>
+                <span class="disclosure-icon" aria-hidden="true"></span>
+              </summary>
+              <div class="action-disclosure-body">
+                <ul id="readings-list"></ul>
+              </div>
+            </details>
+          </section>
+        </section>
+
+        <footer class="debrief-foot">
+          <p class="muted" id="version-note"></p>
+        </footer>
+
+        <div class="debrief-bottom-actions" style="margin-top: 32px; display: flex; gap: 12px; justify-content: center;">
+          <a class="button button-solid" href="/cases">Practise another case</a>
+          <a class="button button-ghost" href="/profile">Your practice history</a>
+        </div>
+      </div>
+    </main>
+
+    <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+    <template id="evidence-template">
+      <figure class="evidence">
+        <blockquote class="evidence-quote"></blockquote>
+        <figcaption class="evidence-ref"></figcaption>
+      </figure>
+    </template>
+
+    <script src="/static/theme.js"></script>
+    <script src="/static/debrief.js"></script>
+  </body>
+</html>

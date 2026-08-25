@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.logistics-saas-growth
+  label: Accelerate logistics SaaS platform growth via embedded freight marketplace expansion.
+nodes:
+- id: saas-tam-and-growth-ceiling
+  type: branch
+  label: Enterprise TMS TAM & Software ARR Growth
+  status: valid_branch
+  evidence: []
+  conclusion: Pure SaaS ARR growth plateaued at 11% across 200 mature enterprise accounts.
+- id: spot-freight-unmet-demand
+  type: branch
+  label: Unfulfilled Contract Loads & Spot Market GMV
+  status: valid_branch
+  evidence: []
+  conclusion: Shippers dump $210M in unfulfilled spot freight into offline unorganized brokers.
+- id: embedded-marketplace-economics
+  type: branch
+  label: Embedded Take-Rate & Software Stickiness
+  status: valid_branch
+  evidence: []
+  conclusion: 5% take-rate on $210M spot GMV generates $10.5M incremental net revenue with zero CAC.
+- id: diagnosis
+  type: diagnosis
+  label: Embedded B2B Marketplace Monetization on SaaS Workflows
+  status: hidden_target
+  evidence:
+  - saas-tam-and-growth-ceiling
+  - spot-freight-unmet-demand
+  - embedded-marketplace-economics
+  conclusion: Growth slowed because pure software fees are capped; embedding an autonomous spot-freight marketplace captures
+    $10.5M in take-rate revenue on $210M managed freight spend.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Vertical SaaS Expansion Plan
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Embed 1-click spot freight auction in TMS, integrate carrier invoice fintech financing, and preserve recurring
+    SaaS baseline fees.
+edges:
+- from: objective.logistics-saas-growth
+  to: saas-tam-and-growth-ceiling
+  relation: investigate
+- from: objective.logistics-saas-growth
+  to: spot-freight-unmet-demand
+  relation: investigate
+- from: objective.logistics-saas-growth
+  to: embedded-marketplace-economics
+  relation: investigate
+- from: saas-tam-and-growth-ceiling
+  to: diagnosis
+  relation: supports
+- from: spot-freight-unmet-demand
+  to: diagnosis
+  relation: supports
+- from: embedded-marketplace-economics
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: growth-first
+  sequence:
+  - saas-tam-and-growth-ceiling
+  - spot-freight-unmet-demand
+  - embedded-marketplace-economics
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from SaaS growth ceilings to embedded marketplace monetization.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate how much freight spend is already managed on the client's software.
+  - Clarify that 18% of contracted loads fail and go to the spot market.
+  - Redirect toward embedded freight auction take-rates on managed workflow data.

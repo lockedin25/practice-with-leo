@@ -1,0 +1,44 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: subsidy.exposure
+  domain: company
+  release_level: broad_context
+  content: Client sells 1.8M MT subsidized bulk Urea/DAP; government subsidies represent 62% of total invoice value.
+- id: working_capital.drag
+  domain: financials
+  release_level: sharp_question
+  content: "Subsidy payment delays average 185 days, resulting in \u20B92,800 Cr in unpaid government receivables and \u20B9\
+    240 Cr in bank borrowing interest."
+- id: specialty.economics
+  domain: economics
+  release_level: hypothesis_backed
+  content: Water-Soluble Fertilizers (WSF) and bio-stimulants carry zero government subsidy, command 32% gross margins, and
+    sell on 30-day cash terms.
+  dependencies:
+  - working_capital.drag
+- id: horticulture.growth
+  domain: market
+  release_level: hypothesis_backed
+  content: "Micro-irrigation and precision horticulture farming in Maharashtra, Gujarat, and AP is growing at 16% CAGR, creating\
+    \ \u20B96,000 Cr demand for drip-applied specialty nutrition."
+  dependencies:
+  - specialty.economics
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Bulk commodity fertilizers trap \u20B92,800 Cr in 185-day delayed subsidies with 4% margins; client must transition\
+    \ 35% of capacity into non-subsidized, high-margin (32%) specialty water-soluble and bio-stimulant nutrition."
+- id: recommendation.specialty_expansion
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Invest \u20B9120 Cr to build a 200,000 MT dedicated water-soluble fertilizer and liquid bio-fertilizer manufacturing\
+    \ plant."
+- id: recommendation.agronomy_sales
+  domain: recommendation
+  release_level: synthesis_support
+  content: Deploy 300 field agronomists to conduct farm crop demonstration trials for high-value cash crop growers.
+- id: recommendation.drip_partnerships
+  domain: recommendation
+  release_level: synthesis_support
+  content: Form exclusive co-marketing alliances with drip irrigation equipment manufacturers (Jain Irrigation / Netafim).

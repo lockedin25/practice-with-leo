@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.oncology-pricing
+  label: Design localized market access and pricing strategy for oncology launch.
+nodes:
+- id: patient-affordability
+  type: branch
+  label: Patient Demographics & Out-of-Pocket WTP
+  status: valid_branch
+  evidence: []
+  conclusion: "70% of spend is out-of-pocket; 12,000 patients can afford \u20B915L vs 400 at US list price."
+- id: global-reference-pricing
+  type: branch
+  label: International Reference Pricing (IRP) Risks
+  status: valid_branch
+  evidence: []
+  conclusion: Direct official price cuts in India trigger mandatory price reductions across Europe/Middle East.
+- id: commercial-access-models
+  type: branch
+  label: Patient Assistance Programs & Outcome Sharing
+  status: valid_branch
+  evidence: []
+  conclusion: PAP free-cycle structures and outcome-based guarantees expand volume while protecting nominal MRP.
+- id: diagnosis
+  type: diagnosis
+  label: Global IRP Conflict vs Domestic Affordability
+  status: hidden_target
+  evidence:
+  - patient-affordability
+  - global-reference-pricing
+  - commercial-access-models
+  conclusion: A direct price cut triggers global reference price collapse in Europe; company must deploy a tiered Patient
+    Assistance Program (PAP) with outcome guarantees.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Market Access Framework
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy 'Buy 2 Get 4 Free' PAP, offer 60-day progression refund guarantee, and enforce serialized anti-diversion
+    tracking.
+edges:
+- from: objective.oncology-pricing
+  to: patient-affordability
+  relation: investigate
+- from: objective.oncology-pricing
+  to: global-reference-pricing
+  relation: investigate
+- from: objective.oncology-pricing
+  to: commercial-access-models
+  relation: investigate
+- from: patient-affordability
+  to: diagnosis
+  relation: supports
+- from: global-reference-pricing
+  to: diagnosis
+  relation: supports
+- from: commercial-access-models
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: pricing-first
+  sequence:
+  - patient-affordability
+  - global-reference-pricing
+  - commercial-access-models
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from Indian WTP to international reference price implications.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what happens if European health authorities see an 80% price cut in India.
+  - Clarify that Indian insurance covers very few cancer patients.
+  - Redirect toward Patient Assistance Programs and outcome-based risk sharing.

@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.port-turnaround
+  label: Reduce vessel turnaround time from 34 hours to under 18 hours.
+nodes:
+- id: quayside-operations
+  type: branch
+  label: Quay Gantry Crane Productivity
+  status: valid_branch
+  evidence: []
+  conclusion: Quay cranes idle waiting for landside trucks due to yard congestion.
+- id: yard-stack-dynamics
+  type: branch
+  label: Container Yard Density & Re-Handling
+  status: valid_branch
+  evidence: []
+  conclusion: Yard utilization is 92%, causing 4.2 unproductive re-handling moves per lift.
+- id: gate-and-customs
+  type: branch
+  label: Customs Clearance & Truck Evacuation
+  status: valid_branch
+  evidence: []
+  conclusion: Customs paper batching increased import dwell time from 3.2 to 7.8 days.
+- id: diagnosis
+  type: diagnosis
+  label: Yard Congestion from Customs Dwell Delays
+  status: hidden_target
+  evidence:
+  - quayside-operations
+  - yard-stack-dynamics
+  - gate-and-customs
+  conclusion: Vessel turnaround delays are caused by 92% yard stack congestion driven by customs dwell time rising to 7.8
+    days, creating massive re-handling delays.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Landside Debottlenecking Plan
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Mandate Direct Port Delivery, implement progressive dwell tariffs, and introduce 24/7 digital gate appointment
+    scheduling.
+edges:
+- from: objective.port-turnaround
+  to: quayside-operations
+  relation: investigate
+- from: objective.port-turnaround
+  to: yard-stack-dynamics
+  relation: investigate
+- from: objective.port-turnaround
+  to: gate-and-customs
+  relation: investigate
+- from: quayside-operations
+  to: diagnosis
+  relation: supports
+- from: yard-stack-dynamics
+  to: diagnosis
+  relation: supports
+- from: gate-and-customs
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: operations-first
+  sequence:
+  - quayside-operations
+  - yard-stack-dynamics
+  - gate-and-customs
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from crane idle time to yard dwell dynamics.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate why quay cranes are operating below rated capacity.
+  - Clarify that gantry cranes have no mechanical defects.
+  - Redirect inquiry toward yard stack density, dwell days, and customs evacuation.

@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 01-beer-manufacturer-v1
+title: Beer Manufacturer
+school: IIM-A
+status: approved
+rights_status: original
+category: profitability
+industry: food_and_beverage_restaurants
+difficulty: foundation
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a leading domestic beer manufacturer in India. Processing costs have risen significantly above international
+    benchmarks, depressing plant EBITDA margins.
+  objective: Determine why processing costs are higher than competitors and recommend a twelve-month operational turnaround
+    plan.
+  opening_requirements:
+  - Name Beer Manufacturer and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (processing cost per hectoliter) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: processing cost per hectoliter
+  decision_question: Why are processing costs uncompetitive, and what should management do to restore plant margins?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Sub-scale plant machine capacity due to import restrictions. Client operates 30,000 bottle/plant machines
+    at 100% utilization while international competitors utilize 80,000 bottle/plant automated Chinese equipment that is currently
+    blocked under Indian import curbs.
+  what_the_case_wanted_to_test: Capacity utilization vs potential scale bottlenecks, value-chain cost decomposition, and navigating
+    regulatory import constraints.
+  pivotal_insight: Actual capacity utilization is 100%, but potential plant capacity is capped at 30k bottles due to regulatory
+    import blocks on Chinese machinery; competitors use 80k bottle automated units.
+  common_traps:
+  - Assuming low worker labor productivity without checking machine capacity limits.
+  - Proposing unviable short-term domestic R&D to rebuild specialized equipment.
+  - Blaming raw material inflation when problem is strictly machine scale.
+  takeaway_lesson: When a plant operates at 100% capacity utilization yet has uncompetitive unit processing costs, the root
+    cause is structural machine scale limits, not operational slack.
+  suggested_readings:
+  - knowledge_base/industries/13_food_and_beverage_restaurants.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/02_issue_tree_structuring.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

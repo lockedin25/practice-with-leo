@@ -106,13 +106,13 @@ One new module, `app/evaluator.py`, plus one content directory,
 
 ```
 app/
-  evaluator.py          # orchestrator: loads context, runs passes, validates output
+  evaluator.py          # LangChain evaluator agent: tools, planning loop, report schema
 evaluation/
   rubric.yaml           # dimension definitions, band anchors, weights
   checklist.yaml        # the indexed tips-and-tricks catalogue
-  prompts/              # prompt templates for each analysis pass (versioned files)
+  prompts/              # versioned prompt templates (planner, graders, checklist)
 tests/
-  test_evaluator.py     # schema validation, leakage tests, evidence-link tests
+  test_evaluator.py     # tool behaviour, schema validation, leakage tests, evidence-link tests
 ```
 
 Independence rules:
@@ -171,96 +171,78 @@ class EvaluationReport(BaseModel):
 
 ---
 
-## Analysis pipeline
+## Agentic evaluation design
 
-The evaluator runs five sequential passes. Each pass produces structured output
-validated against a pydantic schema; invalid output retries once, then the pass
-reports `low` confidence rather than fabricating.
+The evaluator is a **LangChain agent, not a rule engine**. There is no fixed
+six-pass pipeline and no code that scores anything. Instead, an LLM planner
+decides what evidence it needs, pulls it through tools, reasons over it, and
+emits the final report as one validated structured output. The analysis
+objectives of the earlier pipeline sketch (segmentation, MECE audit,
+path-to-crux, communication density, quantitative audit, checklist
+verification) become *evaluation guidance in the agent's system prompt*, not
+code steps. The agent chooses how thoroughly to pursue each based on what it
+finds in this specific attempt.
 
-### Pass 1: Segmentation
+### Model stack
 
-Reconstruct the interview's arc before judging anything. Segment the
-transcript into episodes: clarification, structure presentation, branch
-investigations, synthesis. Attach the phase, disclosed facts, and turn numbers.
-This gives later passes their unit of analysis and lets the report say things
-like "the candidate reached the margin-driver hypothesis in turn 6".
+Identical provider setup to `app/interviewer.py`: `ChatOpenRouter` via
+`langchain-openrouter`, default `anthropic/claude-sonnet-4.6` with the
+configured fallback chain. Two bindings:
 
-### Pass 2: Structure extraction and MECE audit
+| Role | Binding | Temperature | Notes |
+|---|---|---|---|
+| Planner / analyst | `bind_tools(...)` with the tool schemas | 0 | Decides which evidence to gather and in what order |
+| Report writer | `with_structured_output(EvaluationReport)` | 0 | Produces the final typed report once analysis is complete |
 
-For every episode where the candidate presents or extends a structure:
+Temperature 0 on both roles keeps grading stable across re-evaluations.
 
-1. Extract the implied tree: root question, branches, sub-branches, as
-   structured JSON with message citations.
-2. Audit each split against the four violation classes (overlap, gap, mixed
-   hierarchy, irrelevance), using the private issue tree as the reference for
-   exhaustiveness on this specific case.
-3. Record whether the cut was MECE-by-construction (formula, components,
-   process, single-dimension segmentation) or an ad hoc bucket list.
-4. Track *progression*: does MECE quality hold, improve, or collapse as the
-   case gets harder and deeper?
+### Agent tools
 
-Output feeds both the structuring dimension and the checklist items about
-stating a structure before diving in.
+Tools are the only way the agent touches attempt data. Each returns plain,
+typed data; none of them score or judge:
 
-### Pass 3: Path-to-crux analysis
+| Tool | Returns | Boundary note |
+|---|---|---|
+| `read_messages(from_index, to_index)` | Transcript slice with role, phase, turn numbers | Bounded window size prevents context blow-ups on long attempts |
+| `get_released_facts()` | Released facts with the turn each was disclosed at | Candidate-visible data only |
+| `get_case_context()` | Case metadata: category, difficulty, skills tested, objective | No hidden content |
+| `compare_to_answer_key(claim)` | For one candidate claim: whether the private answer key agrees, partially agrees, or contradicts, plus which issue-tree branch it maps to | The tool's *verdict* may enter the report; the answer-key text itself never does |
+| `get_checklist()` | Checklist items with titles and detection guidance | Detection markers are hints for the agent, not match patterns |
+| `verify_citation(message_index, quote)` | Whether the quote appears verbatim in that message | Self-check the agent should run before finalising |
 
-Measures problem-solving velocity:
+### The loop
 
-- Identify the case's crux (from the private answer key) and locate the first
-  turn where the candidate engages it substantively.
-- Compute efficiency signals: turns spent on preamble versus investigation;
-  dead-end branches explored and abandoned; whether hypotheses were stated
-  before requesting data; whether the candidate updated direction when evidence
-  contradicted them.
-- Normalise against case length and difficulty so a hard case does not
-  mechanically produce a low score.
+1. **Plan.** The planner receives the case metadata, rubric summary, checklist
+   summary, and transcript length, then states its evaluation plan (which
+   episodes to inspect, what to compare against the answer key).
+2. **Investigate.** The agent calls tools in whatever order its findings
+   justify: reading message windows around structures presented, checking
+   candidate claims against the answer key, pulling disclosure timelines.
+   Typical runs make five to fifteen tool calls; hard limits cap the loop.
+3. **Grade.** Working from gathered evidence and rubric band anchors, the
+   agent forms per-dimension judgements with citations, resolves checklist
+   items, and drafts strengths, improvements, and a next drill.
+4. **Self-audit.** Before emitting, the agent verifies every citation with
+   `verify_citation`, re-checks its own MECE verdicts against the four
+   violation classes, and confirms no unreleased-fact wording leaked into any
+   field.
+5. **Emit.** One `with_structured_output` call produces `EvaluationReport`.
+   Schema failure retries once; persistent failure degrades affected fields to
+   low-confidence placeholders rather than fabrications.
 
-This pass also detects the negative pattern explicitly requested: if reaching
-the core took disproportionately many messages relative to the case's
-expected path, problem-solving bands drop and the observation says so plainly.
+### What stays deterministic (and why)
 
-### Pass 4: Communication density audit
+Validation is code; judgement is not. Three cheap deterministic checks run
+*after* the agent finishes, mirroring the house rule that the LLM proposes and
+the runtime validates:
 
-Per candidate message, estimate information density using structured LLM
-judgement over features such as:
+1. Citation check: every `(message_index, quote)` must resolve verbatim.
+2. Leakage scan: no unreleased fact content or issue-tree label string may
+   appear anywhere in the report.
+3. Version stamping: model, prompt, rubric, and checklist versions recorded.
 
-- New-information ratio versus restatement of known facts.
-- Answer-first framing (top-down: conclusion then support) versus rambling.
-- Repetition across consecutive turns; circling back to closed topics.
-- Precision of language: named drivers, numbers, and segments versus vague
-  qualifiers ("a lot", "probably significant").
-
-Aggregate into a communication score with representative good and bad excerpts
-cited verbatim.
-
-### Pass 5: Quantitative audit (forward-compatible)
-
-Activated fully when cases carry math facts and exhibits. Until then the pass
-still runs and reports honestly:
-
-- Detect any arithmetic, estimation, or sanity-check the candidate performed;
-  grade accuracy and speed (turns taken to reach a figure once the inputs were
-  available).
-- Grade unit discipline and order-of-magnitude sense where present.
-- If the attempt contained no quantitative work, emit score 0 with
-  `confidence: low` and `not_applicable`-style messaging rather than inventing
-  a judgement.
-
-### Pass 6: Checklist verification
-
-Load `evaluation/checklist.yaml`. Each entry carries detection guidance:
-observable markers, the episode types where it would appear, and
-counter-indicators. For each item the agent decides `demonstrated`,
-`missed`, or `not_applicable`, citing messages for demonstrations and writing a
-specific corrective action for misses. Missed items that were genuinely
-relevant to this case surface in `priority_improvements`.
-
-### Final assembly
-
-A deterministic (non-LLM) assembly step combines pass outputs into the report:
-applies rubric weights, ranks strengths and improvements, picks one next drill
-matched to the weakest dimension, stamps all versions. Determinism here keeps
-scores reproducible from identical pass outputs.
+These checks can reject a report and trigger one bounded retry. They never
+alter scores or write feedback text.
 
 ---
 
@@ -337,10 +319,12 @@ row keyed by version rather than overwriting history.
 
 | Risk | Mitigation |
 |---|---|
-| Model hallucinates quotes | Assembly step verifies every citation string appears in the referenced message; mismatch rejects the report |
+| Model hallucinates quotes | The agent self-verifies with `verify_citation`, and a deterministic post-check re-verifies every citation before the report is accepted; mismatch triggers one bounded retry |
+| Agent skips a dimension or checklist section | Report schema requires all four dimensions and all checklist IDs, so omission fails validation rather than passing silently |
 | Answer-key leakage into the report | Post-generation leakage scan: report text is compared against unreleased fact contents and issue-tree labels; hits block publication |
-| Non-MECE evaluation itself (inconsistent grades) | Band anchors are behavioural; temperature 0 for grading passes; two-pass self-check where the grader re-audits its own MECE verdicts against the four violation classes |
-| Long transcripts exceeding context | Pass 1 segments first; passes 2-6 consume only relevant episodes, not the whole transcript |
+| Runaway agent loop | Hard caps on tool calls and total tokens; on cap the agent must emit its best-effort report with low confidence on unexamined areas |
+| Non-MECE evaluation itself (inconsistent grades) | Band anchors are behavioural; temperature 0 for both roles; the self-audit step re-checks MECE verdicts against the four violation classes |
+| Long transcripts exceeding context | `read_messages` returns bounded windows; the planner chooses which windows matter instead of ingesting everything |
 | Quant dimension graded on nothing | Explicit `not_applicable` path with confidence downgrade; excluded from weighted total with disclosure |
 | Prompt or rubric drift making scores incomparable | Every report stamps evaluator, rubric, prompt, and model versions; admin view groups by version |
 
@@ -348,8 +332,11 @@ row keyed by version rather than overwriting history.
 
 ## Test plan
 
-- Schema tests: every pass output validates; malformed output retries then
-  degrades to low confidence instead of crashing.
+- Tool tests: each tool returns correct typed data, enforces its bounds, and
+  exposes no private content beyond the answer-key comparison verdict.
+- Schema tests: the final output validates against `EvaluationReport`;
+  malformed output retries then degrades to low-confidence placeholders
+  instead of crashing.
 - Leakage tests: fixture attempts where the candidate never reached the true
   diagnosis must produce reports containing zero unreleased-fact strings.
 - Evidence tests: every citation resolves to a real message index and verbatim
@@ -357,8 +344,11 @@ row keyed by version rather than overwriting history.
 - Calibration fixtures: replay the authored QA transcripts (strong path,
   plausible wrong path, stuck path, premature synthesis from the roadmap QA
   pack) and assert band directions, not exact scores.
+- Loop-boundedness: adversarial fixtures cannot push the agent past tool-call
+  or token caps.
 - Idempotence: evaluating the same finished attempt twice with the same
-  versions yields the same assembled report given identical pass outputs.
+  versions yields equivalent scores (temperature 0), with any variance
+  confined to phrasing.
 
 ---
 
@@ -367,9 +357,10 @@ row keyed by version rather than overwriting history.
 | Phase | Outcome | Gate |
 |---|---|---|
 | 1. Contracts | Pydantic models, rubric/checklist YAML schemas, storage table | Schemas reviewed and frozen for v1 |
-| 2. Pipeline | Passes 1, 2, 6 live; structuring + checklist report behind the existing `/end` call | Leakage and evidence tests green on Meridian fixtures |
-| 3. Full report | Passes 3, 4, 5 live; weighted overall score; admin re-evaluation | QA-transcript calibration matches expected band directions |
-| 4. Math activation | Cases gain quantitative facts/exhibits; pass 5 becomes fully weighted | At least one quant case passes end-to-end calibration |
+| 2. Tools + agent core | Tool set, planner loop, structured-output writer live behind `/end`; structuring + checklist in scope via system-prompt guidance | Leakage, evidence, and loop-bound tests green on Meridian fixtures |
+| 3. Full report | All four dimensions graded, weighted overall score, admin re-evaluation endpoint | QA-transcript calibration matches expected band directions |
+| 4. Math activation | Cases gain quantitative facts/exhibits; quantitative dimension becomes fully weighted | At least one quant case passes end-to-end calibration |
 
-Phase 2 alone already retires the heuristic `scorecard()`: the checklist plus
-MECE audit deliver most of the learning value while later passes mature.
+Phase 2 alone already retires the heuristic `scorecard()`: agentic grading of
+structuring plus checklist verification delivers most of the learning value
+while full-dimension calibration matures.

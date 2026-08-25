@@ -1,0 +1,90 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+
+root:
+  id: objective.digital-learning-redesign
+  label: Diagnose low digital pilot adoption (38% completion) and recommend a 12-month redesign and scaling strategy.
+
+nodes:
+  - id: content-efficacy-vs-format
+    type: branch
+    label: Academic content quality vs digital delivery format
+    status: valid_branch
+    evidence:
+      - pilot.result
+      - learning_outcome
+      - product_design
+    conclusion: Efficacy is proven when completed; the failure is passive long-form lecture design that fails mobile students.
+
+  - id: student-experience-and-access
+    type: mechanism
+    label: Student device constraints and daily time availability
+    status: pivotal_test
+    evidence:
+      - student_access
+    conclusion: Students are mobile-first with intermittent data; they require bite-sized 10-minute offline modules.
+
+  - id: faculty-workload-and-incentives
+    type: mechanism
+    label: Faculty workload friction and KPI misalignment
+    status: pivotal_test
+    evidence:
+      - faculty
+    conclusion: Faculty face uncompensated prep work; performance reviews reward physical classroom hours, disincentivizing digital support.
+
+  - id: scaling-governance-and-risk
+    type: branch
+    label: Campus rollout capacity and stakeholder alignment
+    status: valid_branch
+    evidence:
+      - economics
+      - rollout_risk
+      - employer
+    conclusion: Sunk software cost is paid; immediate nationwide rollout risks entrenched resistance; wave-gated rollout is required.
+
+  - id: diagnosis
+    type: diagnosis
+    label: Synthesize pedagogical and change management bottlenecks
+    status: hidden_target
+    evidence:
+      - content-efficacy-vs-format
+      - student-experience-and-access
+      - faculty-workload-and-incentives
+    conclusion: >-
+      Low adoption stems from a double barrier: passive desktop-style lectures incompatible with mobile students' daily rhythms,
+      and uncompensated faculty prep work with misaligned contact-hour metrics; redesign must modularize content and align faculty incentives.
+
+  - id: actions
+    type: recommendation
+    label: 3-Pillar 12-Month Redesign and Scaling Plan
+    status: synthesis
+    evidence:
+      - recommendation.workflow
+      - recommendation.faculty
+      - recommendation_scale
+    conclusion: Chunk modules into mobile micro-drills linked to labs, protect faculty prep time and realign KPIs, and scale in outcome-gated waves.
+
+edges:
+  - { from: objective.digital-learning-redesign, to: content-efficacy-vs-format, relation: investigate }
+  - { from: objective.digital-learning-redesign, to: faculty-workload-and-incentives, relation: investigate }
+  - { from: content-efficacy-vs-format, to: student-experience-and-access, relation: motivates }
+  - { from: student-experience-and-access, to: diagnosis, relation: supports }
+  - { from: faculty-workload-and-incentives, to: diagnosis, relation: supports }
+  - { from: scaling-governance-and-risk, to: actions, relation: constrains }
+  - { from: diagnosis, to: actions, relation: determines }
+
+acceptable_routes:
+  - id: user-experience-first
+    sequence: [content-efficacy-vs-format, student-experience-and-access, faculty-workload-and-incentives, diagnosis, actions]
+    interviewer_behaviour: Guide candidate to explore student mobile usage habits before examining faculty workload hurdles.
+
+  - id: faculty-adoption-first
+    sequence: [faculty-workload-and-incentives, content-efficacy-vs-format, student-experience-and-access, diagnosis, actions]
+    interviewer_behaviour: Allow candidate to explore organizational resistance before probing student content format mismatch.
+
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+    - Ask candidate to state hypothesis on why students drop off and why faculty resist.
+    - Clarify that learning outcomes are strong when students finish, ruling out flawed underlying curriculum.
+    - Redirect candidate toward examining lecture duration on mobile screens and faculty KPI contact-hour structures.

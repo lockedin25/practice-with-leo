@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 04-urban-company-v1
+title: On-Demand Home Services Platform
+school: IIM-A
+status: approved
+rights_status: original
+category: profitability
+industry: ecommerce_and_marketplaces
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a leading on-demand home services platform operating in 15 Indian cities. Unit economics on home
+    cleaning and appliance repair have deteriorated, with partner churn exceeding 45% annually.
+  objective: Identify the root cause of service partner churn and platform margin erosion, and propose a retention strategy.
+  opening_requirements:
+  - Name On-Demand Home Services Platform and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Partner retention rate and contribution margin per job) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Partner retention rate and contribution margin per job
+  decision_question: Why are service partners churning and how can marketplace take-rates and partner retention be optimized?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "Off-platform disintermediation and high tool/consumable onboarding debt. Platform charges a 22% commission\
+    \ plus mandatory upfront purchase of expensive branded equipment kits (\u20B915k); after completing 1-2 platform jobs,\
+    \ customers and technicians exchange phone numbers to transact offline for a 15% discount."
+  what_the_case_wanted_to_test: Marketplace leakages, two-sided platform disintermediation, partner unit economics, and service
+    trust guarantees.
+  pivotal_insight: High commission + upfront tool capex creates financial strain on technicians, while repeat customers easily
+    bypass platform fees by booking the technician directly offline via UPI.
+  common_traps:
+  - Assuming customer demand is drying up or that marketing ad spend is too high.
+  - Recommending penal legal lawsuits against technicians for off-platform bookings.
+  - Raising commission fees to make up for lost revenue, accelerating partner defection.
+  takeaway_lesson: In local service marketplaces where repeat jobs involve in-person physical interaction, the platform must
+    provide ongoing value (insurance, instant payout, warranty, financing) to prevent direct buyer-seller disintermediation.
+  suggested_readings:
+  - knowledge_base/industries/02_ecommerce_and_marketplaces.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

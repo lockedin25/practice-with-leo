@@ -1,0 +1,73 @@
+schema_version: reservoir-v1
+case_id: 08-pharma-api-sourcing-v1
+title: Pharma API Dual-Vendor Sourcing
+school: IIM-C
+status: approved
+rights_status: original
+category: operations
+industry: pharma_and_healthcare
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is a leading Indian generic finished dosage formulation (FDF) manufacturer exporting cardiovascular\
+    \ drugs to the US and EU. Severe active pharmaceutical ingredient (API) supply shortages and price spikes wiped out \u20B9\
+    180 Cr in gross profit."
+  objective: Design a multi-vendor API procurement and regulatory qualification strategy to de-risk critical drug manufacturing.
+  opening_requirements:
+  - Name Pharma API Dual-Vendor Sourcing and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (API Supply Uptime (%) and Landed Cost per Kilogram) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: API Supply Uptime (%) and Landed Cost per Kilogram
+  decision_question: How should the pharma company structure API vendor allocation and regulatory filings to eliminate supply
+    shock risks?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Regulatory regulatory filing lock-in (Drug Master File / DMF single-source approval with US FDA). Formulator
+    was locked into a single Chinese API supplier; qualifying a secondary domestic API vendor requires 9 months of stability
+    testing and a US FDA prior approval supplement (PAS).
+  what_the_case_wanted_to_test: Pharmaceutical regulatory supply chain, US FDA DMF filing requirements, API dual-sourcing
+    economics, and buffer inventory carrying cost.
+  pivotal_insight: Procurement saved 8% by single-sourcing from China, but US FDA rules make switching suppliers take 9 months;
+    maintaining dual-approved DMF sources (70% primary / 30% secondary domestic) eliminates stockout risks at minimal cost
+    premium.
+  common_traps:
+  - Assuming the company can simply buy API from alternative vendors on the open spot market without US FDA regulatory approvals.
+  - Holding 2 years of raw API inventory, which creates massive working capital lockup and degradation.
+  - Exiting regulated US markets entirely.
+  takeaway_lesson: In regulated life sciences, supply chain resilience is constrained by regulatory filing lead times; dual-sourcing
+    must be built into original regulatory dossiers rather than attempted during crisis.
+  suggested_readings:
+  - knowledge_base/industries/03_pharma_and_healthcare.md
+  - knowledge_base/case_types/unconventional_and_abstract.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

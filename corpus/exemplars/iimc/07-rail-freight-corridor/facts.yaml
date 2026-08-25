@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: terminal.spec
+  domain: company
+  release_level: broad_context
+  content: MMLP handles 4 daily double-stack DFC container trains connecting NCR to Mundra/JNPT ports.
+- id: dwell.metrics
+  domain: operations
+  release_level: sharp_question
+  content: Average container dwell time is 48 hours vs 12-hour customer commitment, causing 25% shipper churn.
+- id: train.clearance
+  domain: operations
+  release_level: hypothesis_backed
+  content: Customs ICD regulations mandate full train-manifest clearance before gantry crane offloading can begin on the main
+    rail siding.
+  dependencies:
+  - dwell.metrics
+- id: decoupling.solution
+  domain: operations
+  release_level: hypothesis_backed
+  content: Offloading all containers immediately to an interim bonded buffer yard frees the rail siding in 3 hours, allowing
+    hold containers to be inspected separately.
+  dependencies:
+  - train.clearance
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: 48-hour dwell time is caused by customs regulations blocking train unloading whenever single containers have discrepancies;
+    solution requires immediate train offloading to a bonded buffer yard within 3 hours.
+- id: recommendation.buffer_yard
+  domain: recommendation
+  release_level: synthesis_support
+  content: Create a designated Bonded Buffer Siding to offload entire trains immediately in 3 hours, isolating exception containers.
+- id: recommendation.pre_clearance
+  domain: recommendation
+  release_level: synthesis_support
+  content: Enforce electronic pre-clearance filing 12 hours before train arrival via ICEGATE customs integration.
+- id: recommendation.truck_appointment
+  domain: recommendation
+  release_level: synthesis_support
+  content: Launch automated truck appointment scheduling to ensure road trailers are at the gate when containers are grounded.

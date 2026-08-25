@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.api-sourcing-derisk
+  label: De-risk pharmaceutical API procurement and eliminate stockout disruptions.
+nodes:
+- id: single-source-vulnerability
+  type: branch
+  label: Single-Source Reliance & Plant Downtime
+  status: valid_branch
+  evidence: []
+  conclusion: "Single Chinese vendor shutdown caused 4-month formulation halt and \u20B9180 Cr loss."
+- id: regulatory-approval-hurdles
+  type: branch
+  label: US FDA DMF Filing & Stability Lead Times
+  status: valid_branch
+  evidence: []
+  conclusion: Adding a new API source requires 9 months of stability data and US FDA PAS approval.
+- id: dual-sourcing-cost-benefit
+  type: branch
+  label: 70:30 Split Sourcing Unit Economics
+  status: valid_branch
+  evidence: []
+  conclusion: 70:30 dual-sourcing adds only 3.5% cost while providing 100% supply redundancy.
+- id: diagnosis
+  type: diagnosis
+  label: Regulatory Single-Source Lock-in
+  status: hidden_target
+  evidence:
+  - single-source-vulnerability
+  - regulatory-approval-hurdles
+  - dual-sourcing-cost-benefit
+  conclusion: Supply collapsed because client single-sourced API in FDA dossiers, creating a 9-month regulatory switching
+    barrier when the primary vendor halted production.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Pharma Supply Resilience Framework
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Pre-qualify dual DMF sources with US FDA, execute 70:30 split procurement contracts, and maintain 90-day strategic
+    KSM buffer stock.
+edges:
+- from: objective.api-sourcing-derisk
+  to: single-source-vulnerability
+  relation: investigate
+- from: objective.api-sourcing-derisk
+  to: regulatory-approval-hurdles
+  relation: investigate
+- from: objective.api-sourcing-derisk
+  to: dual-sourcing-cost-benefit
+  relation: investigate
+- from: single-source-vulnerability
+  to: diagnosis
+  relation: supports
+- from: regulatory-approval-hurdles
+  to: diagnosis
+  relation: supports
+- from: dual-sourcing-cost-benefit
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: regulatory-first
+  sequence:
+  - single-source-vulnerability
+  - regulatory-approval-hurdles
+  - dual-sourcing-cost-benefit
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from single-source supply shock to FDA regulatory approval lead times.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate whether a pharma company can instantly switch API vendors without drug regulatory approvals.
+  - Clarify that US FDA requires stability test filings.
+  - Redirect toward proactive dual-DMF vendor qualification.

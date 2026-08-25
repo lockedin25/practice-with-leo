@@ -1,14 +1,109 @@
 schema_version: reservoir-facts-v1
 facts:
-  - {id: company.model, domain: company, release_level: broad_context, content: "ClearCart connects customers with third-party sellers of home, furniture, and lifestyle products and earns commission plus fulfilment fees."}
-  - {id: cohort.problem, domain: customers, release_level: sharp_question, content: "New-customer orders grew 30 percent, but the 90-day repeat rate fell from 26 to 17 percent over the last four acquisition cohorts."}
-  - {id: economics, domain: economics, release_level: hypothesis_backed, content: "Paid acquisition remains contribution-positive on the first order for some categories, but low repeat purchase makes lifetime value fall below customer-acquisition cost overall."}
-  - {id: category, domain: customers, release_level: sharp_question, content: "The repeat-rate decline is concentrated in furniture and décor customers; consumable home-care customers continue to repurchase at prior levels."}
-  - {id: service, domain: operations, release_level: hypothesis_backed, content: "Furniture customers experience the highest delivery-delay and damage-contact rates, especially when orders move through sellers using their own logistics."}
-  - {id: seller_mix, domain: operations, release_level: broad_context, content: "ClearCart expanded lower-cost marketplace fulfilment to support acquisition growth, increasing the share of orders fulfilled directly by sellers."}
-  - {id: research, domain: customers, release_level: hypothesis_backed, content: "Customer surveys show that product inspiration and discounting attract the first purchase, but reliable delivery and issue resolution determine whether customers return."}
-  - {id: alternatives, domain: market, release_level: sharp_question, content: "Competitors offer similar promotions, but their high-value furniture sellers have stricter delivery-service standards and clearer installation support."}
-  - {id: tradeoff, domain: risk, release_level: hypothesis_backed, content: "Subsidising every repeat purchase would raise orders but would not solve the service failure that drives high-value customers away."}
-  - {id: recommendation.service, domain: recommendation, release_level: synthesis_support, content: "Prioritise service-quality standards, tracked delivery, and proactive issue resolution for high-value furniture cohorts."}
-  - {id: recommendation.seller, domain: recommendation, release_level: synthesis_support, content: "Reward compliant sellers with demand placement and restrict fulfilment privileges when damage or delay metrics fail."}
-  - {id: recommendation.measure, domain: recommendation, release_level: synthesis_support, content: "Measure repeat rate and contribution by category, fulfilment path, and incident experience rather than applying one retention programme to every customer."}
+  - id: company.model
+    domain: company
+    release_level: broad_context
+    content: "ClearCart connects home-and-lifestyle brands with online shoppers, earning commission on marketplace sales and offering optional fulfillment services."
+    candidate_purpose: "Establish marketplace business model and commission structure."
+    question_examples:
+      - "What is ClearCart's business model and revenue stream?"
+      - "Does ClearCart hold inventory or operate purely as a 3P marketplace?"
+
+  - id: repeat.profile
+    domain: customers
+    release_level: sharp_question
+    content: "Ninety-day repeat rates fell from 26 to 17 percent over four quarters, while customer acquisition cost rose 35 percent."
+    candidate_purpose: "Disclose cohort retention collapse and CAC deterioration metrics."
+    question_examples:
+      - "How has repeat purchase rate trended over time?"
+      - "What are the specific cohort retention and CAC figures?"
+
+  - id: category.mix
+    domain: product
+    release_level: sharp_question
+    content: "Small home accessories have healthy repeat rates; bulky furniture and lighting accounts for the entire decline in cohort retention."
+    dependencies: [repeat.profile]
+    candidate_purpose: "Isolate the retention problem to bulky furniture and lighting."
+    question_examples:
+      - "Is the repeat drop uniform across categories or concentrated in specific segments?"
+      - "How do repeat rates vary between small accessories and large furniture?"
+
+  - id: fulfillment.split
+    domain: operations
+    release_level: hypothesis_backed
+    content: "Bulky items are shipped directly by third-party sellers, with delivery times averaging nine days and damage rates near 8 percent."
+    dependencies: [category.mix]
+    candidate_purpose: "Identify the operational root cause: unmanaged 3P drop-shipping with high damage."
+    question_examples:
+      - "How are bulky items fulfilled and delivered?"
+      - "What are the delivery lead times and transit damage rates for furniture?"
+
+  - id: customer.satisfaction
+    domain: customers
+    release_level: sharp_question
+    content: "Negative reviews for bulky orders cite delivery delays, damaged packaging, and lack of assembly assistance as primary reasons for defecting."
+    candidate_purpose: "Confirm post-purchase friction as driver of customer defection."
+    question_examples:
+      - "What do customer feedback and NPS data indicate for bulky purchases?"
+      - "Why are first-time furniture buyers choosing not to return?"
+
+  - id: marketing.spend
+    domain: marketing
+    release_level: broad_context
+    content: "ClearCart increased remarketing ad spend and discount coupons for lapsed users, but these cohorts had low second-order conversion."
+    candidate_purpose: "Show that discounting and retargeting ads fail to solve underlying dissatisfaction."
+    question_examples:
+      - "What marketing interventions has ClearCart tested to boost retention?"
+      - "Did remarketing discounts improve repeat purchase rates?"
+
+  - id: seller.economics
+    domain: economics
+    release_level: hypothesis_backed
+    content: "Third-party sellers resist higher commission fees but are willing to use certified delivery partners if it reduces customer returns and disputes."
+    candidate_purpose: "Highlight merchant alignment with managed logistics."
+    question_examples:
+      - "How do 3P sellers feel about logistics requirements?"
+      - "Would sellers adopt a certified delivery network if it cut returns?"
+
+  - id: economics.ltv
+    domain: financials
+    release_level: hypothesis_backed
+    content: "Improving ninety-day repeat on bulky orders by 5 percentage points generates more cumulative contribution margin than reducing customer acquisition cost by 20 percent."
+    candidate_purpose: "Demonstrate high financial sensitivity of bulky category retention."
+    question_examples:
+      - "What is the financial leverage of improving bulky category repeat rates?"
+      - "How does retention improvement compare to CAC reduction?"
+
+  - id: risk.seller_churn
+    domain: risk
+    release_level: sharp_question
+    content: "Mandating exclusive fulfillment without pilot testing could cause small artisan sellers to leave the platform."
+    candidate_purpose: "Identify risk of seller churn if operational standards are applied without support."
+    question_examples:
+      - "What are the risks of mandating new fulfillment standards for sellers?"
+      - "Could strict delivery SLAs cause supplier attrition?"
+
+  - id: diagnosis.hidden
+    domain: diagnosis
+    release_level: interviewer_only
+    provenance: source_derived
+    content: "Repeat purchase collapse is entirely driven by unmanaged 3P fulfillment in bulky furniture/lighting (9-day lead times, 8% damage, no assembly); discounting cannot fix post-delivery dissatisfaction; ClearCart must mandate certified white-glove logistics SLAs for bulky sellers and provide assembly support."
+    candidate_purpose: "Never disclose directly. Benchmark for evaluator answer-key comparison and interviewer recovery."
+
+  - id: recommendation.logistics
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Partner with specialized bulky-goods logistics providers to offer scheduled delivery, white-glove handling, and basic assembly."
+    candidate_purpose: "Pillar 1: Specialized white-glove bulky fulfillment partnership."
+
+  - id: recommendation.sla
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Introduce delivery SLAs and quality badges for bulky sellers, routing marketplace search traffic to compliant partners."
+    candidate_purpose: "Pillar 2: Search algorithm prioritization and seller quality badges."
+
+  - id: recommendation.post_purchase
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Reallocate marketing budget from generic retargeting discounts to proactive post-delivery follow-ups and resolution support."
+    candidate_purpose: "Pillar 3: Post-purchase customer care reallocation."

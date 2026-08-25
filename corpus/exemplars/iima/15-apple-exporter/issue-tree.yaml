@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.apple-spoilage
+  label: Reduce export apple rejection rate from 19% to below 3%.
+nodes:
+- id: orchard-postharvest
+  type: branch
+  label: Farm Harvesting & Pre-Cooling
+  status: valid_branch
+  evidence: []
+  conclusion: Farm CA storage and initial grading meet global standards.
+- id: transport-legs-audit
+  type: branch
+  label: Multi-Modal Transit Temperature Handoffs
+  status: valid_branch
+  evidence: []
+  conclusion: Road transit and sea vessel temperatures are compliant; breach occurs at port yard.
+- id: port-yard-handling
+  type: branch
+  label: Mumbai Port Reefer Staging & Power
+  status: valid_branch
+  evidence: []
+  conclusion: 40% plug point deficit caused containers to sit unplugged in port yard.
+- id: diagnosis
+  type: diagnosis
+  label: Port Reefer Power Disconnection
+  status: hidden_target
+  evidence:
+  - orchard-postharvest
+  - transport-legs-audit
+  - port-yard-handling
+  conclusion: Apple spoilage is caused by 48-hour power disconnects during port yard staging due to terminal plug shortages.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Cold Chain Integrity Protocol
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy IoT satellite temperature loggers, contract reserved port plug capacity, and synchronize JIT farm-to-vessel
+    loading.
+edges:
+- from: objective.apple-spoilage
+  to: orchard-postharvest
+  relation: investigate
+- from: objective.apple-spoilage
+  to: transport-legs-audit
+  relation: investigate
+- from: objective.apple-spoilage
+  to: port-yard-handling
+  relation: investigate
+- from: orchard-postharvest
+  to: diagnosis
+  relation: supports
+- from: transport-legs-audit
+  to: diagnosis
+  relation: supports
+- from: port-yard-handling
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: transit-first
+  sequence:
+  - orchard-postharvest
+  - transport-legs-audit
+  - port-yard-handling
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate through step-by-step temperature monitoring across transit legs.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to identify where custody changes during the export journey.
+  - Clarify that farm storage and ocean vessel temperatures are normal.
+  - Redirect inquiry toward port container yard staging and power supply.

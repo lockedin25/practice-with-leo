@@ -116,13 +116,17 @@ def test_an_administrator_reads_the_transcript_with_its_owner(admin_client, stub
     attempt_id = _start(candidate)
     assert candidate.post(
         f"/api/attempts/{attempt_id}/turn",
+        json={"content": "I'm ready to begin.", "turn_id": "ready"},
+    ).status_code == 200
+    assert candidate.post(
+        f"/api/attempts/{attempt_id}/turn",
         json={"content": "Has the customer mix changed?", "turn_id": "turn-1"},
     ).status_code == 200
 
     payload = admin.get(f"/api/admin/attempts/{attempt_id}").json()
     assert payload["attempt"]["user"]["email"] == owner.email
     roles = [message["role"] for message in payload["messages"]]
-    assert roles == ["interviewer", "candidate", "interviewer"]
+    assert roles == ["interviewer", "candidate", "interviewer", "candidate", "interviewer"]
     assert payload["facts"], "a released fact should be listed with its content"
     assert all(fact["content"] for fact in payload["facts"])
     assert payload["scorecard"]["dimensions"]

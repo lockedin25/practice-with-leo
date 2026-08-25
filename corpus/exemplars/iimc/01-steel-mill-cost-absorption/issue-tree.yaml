@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.steel-cost-absorption
+  label: Optimize production strategy and product mix during global steel slump.
+nodes:
+- id: fixed-cost-leverage
+  type: branch
+  label: Fixed Cost Absorption vs Volume Curtailment
+  status: valid_branch
+  evidence: []
+  conclusion: "Throttling volume increases unit fixed cost from \u20B914k to \u20B918.6k/ton."
+- id: blast-furnace-physics
+  type: branch
+  label: Refractory Thermal Damage & Restart Capex
+  status: valid_branch
+  evidence: []
+  conclusion: Shutting furnaces risks $35M in refractory relining damage and takes 4 months.
+- id: product-mix-realization
+  type: branch
+  label: Commodity HRC vs Value-Add CRCA Spreads
+  status: valid_branch
+  evidence: []
+  conclusion: "Automotive CRCA sells at \u20B952,000/ton, generating \u20B914,000/ton positive cash contribution."
+- id: diagnosis
+  type: diagnosis
+  label: Continuous Utilization & Value-Add Mix Shift
+  status: hidden_target
+  evidence:
+  - fixed-cost-leverage
+  - blast-furnace-physics
+  - product-mix-realization
+  conclusion: Curtailing production worsens cash losses due to lost fixed cost absorption; mill must maintain 100% output
+    and shift hot metal to high-margin automotive CRCA.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Industrial Turnaround Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Run blast furnaces at 100%, expand downstream CRCA line share, and maximize PCI coal substitution.
+edges:
+- from: objective.steel-cost-absorption
+  to: fixed-cost-leverage
+  relation: investigate
+- from: objective.steel-cost-absorption
+  to: blast-furnace-physics
+  relation: investigate
+- from: objective.steel-cost-absorption
+  to: product-mix-realization
+  relation: investigate
+- from: fixed-cost-leverage
+  to: diagnosis
+  relation: supports
+- from: blast-furnace-physics
+  to: diagnosis
+  relation: supports
+- from: product-mix-realization
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: cost-absorption-first
+  sequence:
+  - fixed-cost-leverage
+  - blast-furnace-physics
+  - product-mix-realization
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from unit fixed cost math to product mix margin realization.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what happens to fixed cost per ton if production volume drops 30%.
+  - Clarify that selling price still covers variable cash costs.
+  - Redirect toward value-added steel mix (CRCA) and PCI injection.

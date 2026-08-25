@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: export.volume
+  domain: company
+  release_level: broad_context
+  content: Client exports 1,200 reefer containers of premium Royal Delicious apples annually to Europe.
+- id: spoilage.symptoms
+  domain: operations
+  release_level: sharp_question
+  content: "Rejected apples arrive soft with internal browning, indicating exposure to temperatures above 6\xB0C for >36 continuous\
+    \ hours."
+- id: supplychain.legs
+  domain: operations
+  release_level: hypothesis_backed
+  content: 'Journey has 4 legs: Farm CA storage -> Road reefer truck -> Mumbai port container yard staging -> Ocean freight.'
+  dependencies:
+  - spoilage.symptoms
+- id: port.power_break
+  domain: operations
+  release_level: hypothesis_backed
+  content: Port yard reefer plug points had a 40% shortage, causing containers to sit on diesel genset battery trucks that
+    were switched off to save fuel.
+  dependencies:
+  - supplychain.legs
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Rejection rate surged to 19% because reefer containers were unplugged during 48-hour port yard holding in Mumbai\
+    \ due to plug point shortages, causing temperature spike to 12\xB0C."
+- id: recommendation.iot
+  domain: recommendation
+  release_level: synthesis_support
+  content: Equip all containers with real-time cellular/satellite IoT temperature and humidity loggers with instant breach
+    alerts.
+- id: recommendation.port_sla
+  domain: recommendation
+  release_level: synthesis_support
+  content: Contract dedicated reserved reefer plug points with the port terminal backed by contractual penalty clauses.
+- id: recommendation.smart_staging
+  domain: recommendation
+  release_level: synthesis_support
+  content: Schedule farm dispatches using just-in-time vessel arrival tracking to minimize port yard dwell time to <12 hours.

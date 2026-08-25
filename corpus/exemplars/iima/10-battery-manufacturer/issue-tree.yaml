@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.battery-margin
+  label: Restore lead-acid battery manufacturing gross margins.
+nodes:
+- id: bill-of-materials
+  type: branch
+  label: BOM Cost Breakdown (Lead vs Other Inputs)
+  status: valid_branch
+  evidence: []
+  conclusion: Lead constitutes 68% of cost; other inputs are stable.
+- id: lead-sourcing-mix
+  type: branch
+  label: Virgin Imported vs Recycled Secondary Lead
+  status: valid_branch
+  evidence: []
+  conclusion: Virgin lead share surged from 20% to 55% as recycled scrap became unavailable.
+- id: scrap-supply-chain
+  type: branch
+  label: Scrap Cartels & Dealer Buyback Mechanics
+  status: valid_branch
+  evidence: []
+  conclusion: "Dealers hoarded scrap because client's \u20B9500 retail trade-in discount was uncompetitive."
+- id: diagnosis
+  type: diagnosis
+  label: Scrap Hoarding & Virgin Lead Sourcing Surge
+  status: hidden_target
+  evidence:
+  - bill-of-materials
+  - lead-sourcing-mix
+  - scrap-supply-chain
+  conclusion: Margin collapse was driven by switching to expensive virgin lead due to scrap cartel hoarding, caused by an
+    uncompetitive consumer battery exchange scheme.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Circular Sourcing Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Raise retail exchange discounts, build captive secondary smelting capacity, and secure B2B fleet closed-loop
+    contracts.
+edges:
+- from: objective.battery-margin
+  to: bill-of-materials
+  relation: investigate
+- from: objective.battery-margin
+  to: lead-sourcing-mix
+  relation: investigate
+- from: objective.battery-margin
+  to: scrap-supply-chain
+  relation: investigate
+- from: bill-of-materials
+  to: diagnosis
+  relation: supports
+- from: lead-sourcing-mix
+  to: diagnosis
+  relation: supports
+- from: scrap-supply-chain
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: sourcing-first
+  sequence:
+  - bill-of-materials
+  - lead-sourcing-mix
+  - scrap-supply-chain
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from BOM cost analysis to virgin vs recycled sourcing mix.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what percentage of battery manufacturing cost is raw lead.
+  - Clarify that battery selling prices and sales volume are steady.
+  - Redirect inquiry toward virgin vs secondary recycled lead procurement.

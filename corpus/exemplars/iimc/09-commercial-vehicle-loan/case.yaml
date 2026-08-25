@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 09-commercial-vehicle-loan-v1
+title: Commercial Vehicle Loan Telematics
+school: IIM-C
+status: approved
+rights_status: original
+category: operations
+industry: banking_and_financial_services
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a leading non-banking financial company (NBFC) financing heavy commercial vehicles (trucks and tippers).
+    Gross NPAs in the small fleet operator segment (<5 trucks) rose from 3.2% to 8.9% during high diesel price inflation.
+  objective: Diagnose default drivers among small fleet truck owners and design an IoT telematics-based underwriting and early
+    warning system.
+  opening_requirements:
+  - Name Commercial Vehicle Loan Telematics and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Gross NPA Ratio (%) and Early Default Intervention Rate) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Gross NPA Ratio (%) and Early Default Intervention Rate
+  decision_question: Why did commercial vehicle loan defaults surge during diesel inflation and how can IoT telematics be
+    used to mitigate credit risk?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Cash flow squeeze on small fleet operators who lack freight pricing power to pass on fuel price hikes, compounded
+    by unmonitored vehicle idle time and unauthorized trip diversion that eroded monthly EMI debt service capacity.
+  what_the_case_wanted_to_test: Commercial vehicle asset financing, operating cash flow debt service coverage (DSCR), diesel
+    fuel inflation elasticity, and telematics IoT data integration.
+  pivotal_insight: Small fleet operators run 18% fewer kilometers per month due to freight broker freight rate delays; using
+    IoT telematics to track real-time engine running hours and FASTag toll spend predicts default 45 days before EMI bounce.
+  common_traps:
+  - Assuming truck drivers are deliberately siphoning loans without working.
+  - Immediately repossessing trucks, which crashes resale recovery value in a depressed commercial vehicle market.
+  - Blaming vehicle mechanical breakdown.
+  takeaway_lesson: In asset-backed commercial lending, real-time telematics utilization telemetry provides predictive leading
+    indicators of borrower cash-flow distress long before bank check bounces occur.
+  suggested_readings:
+  - knowledge_base/industries/04_banking_and_financial_services.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

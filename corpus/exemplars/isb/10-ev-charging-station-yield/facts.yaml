@@ -1,0 +1,46 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: station.footprint
+  domain: company
+  release_level: broad_context
+  content: Client operates 400 DC fast-charging stations with 800 charging guns across Delhi, Mumbai, and Bengaluru.
+- id: cost.structure
+  domain: financials
+  release_level: sharp_question
+  content: "Fixed grid sanctioned load demand charges are \u20B945,000/month per station; average revenue is only \u20B938,000/month\
+    \ due to 12% utilization."
+- id: fleet.demand
+  domain: customers
+  release_level: hypothesis_backed
+  content: "Commercial EV taxi fleets (Uber/BluSmart) need 25,000 daily fast-charging sessions but require \u20B914-\u20B9\
+    16/kWh pricing to maintain driver unit economics."
+  dependencies:
+  - cost.structure
+- id: tod.impact
+  domain: economics
+  release_level: hypothesis_backed
+  content: "Piloting off-peak Time-of-Day pricing (\u20B914/kWh from 11 PM to 7 AM and 1 PM to 4 PM) boosted station utilization\
+    \ from 12% to 29%, generating \u20B978,000/month revenue per station."
+  dependencies:
+  - fleet.demand
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Network lost money because 12% utilization failed to cover \u20B945,000 fixed grid demand charges; implementing\
+    \ off-peak Time-of-Day tariffs for commercial taxi fleets fills idle valley hours and pushes utilization to 29%, achieving\
+    \ EBITDA profitability."
+- id: recommendation.tod_tariffs
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Implement dynamic Time-of-Day (ToD) charging rates: \u20B924/kWh peak (6-10 PM) and \u20B914/kWh off-peak."
+- id: recommendation.fleet_contracts
+  domain: recommendation
+  release_level: synthesis_support
+  content: Sign exclusive off-peak charging contracts with commercial EV ride-hailing and delivery fleets with minimum volume
+    commitments.
+- id: recommendation.amenity_monetization
+  domain: recommendation
+  release_level: synthesis_support
+  content: Partner with QSR coffee chains and retail convenience stores at charging hubs to earn retail revenue share while
+    drivers charge.

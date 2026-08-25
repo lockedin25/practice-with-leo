@@ -1,0 +1,48 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: company.operations
+  domain: company
+  release_level: broad_context
+  content: Client operates 3 brewing and bottling plants in India with 3 machines each, totaling 30,000 bottles per plant.
+- id: cost.breakdown
+  domain: financials
+  release_level: sharp_question
+  content: Cost benchmarking shows raw materials, packaging, and distribution are competitive; processing cost per bottle
+    is 45% higher than peers.
+- id: capacity.utilization
+  domain: operations
+  release_level: sharp_question
+  content: Current machine capacity utilization is running at 100% across all shifts.
+- id: benchmark.machines
+  domain: operations
+  release_level: hypothesis_backed
+  content: Global competitors operate automated 50,000 to 80,000 bottle per plant machinery imported from China, producing
+    twice the output per shift.
+  dependencies:
+  - capacity.utilization
+- id: regulatory.ban
+  domain: regulation
+  release_level: hypothesis_backed
+  content: The Indian government placed import restrictions on specific Chinese equipment, preventing the client from purchasing
+    identical replacement lines.
+  dependencies:
+  - benchmark.machines
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: High processing cost is caused by sub-scale 30k bottle machines running at 100% utilization under Chinese machinery
+    import bans; solution requires sourcing from alternative German/Japanese vendors or contract manufacturing.
+- id: recommendation.sourcing
+  domain: recommendation
+  release_level: synthesis_support
+  content: Source high-throughput machinery from alternative non-restricted countries with higher capex justified by scale
+    efficiency.
+- id: recommendation.contracting
+  domain: recommendation
+  release_level: synthesis_support
+  content: Explore third-party contract bottling agreements with existing high-capacity breweries.
+- id: recommendation.lobbying
+  domain: recommendation
+  release_level: synthesis_support
+  content: Engage industry associations to lobby for specialized capital goods import exemptions.

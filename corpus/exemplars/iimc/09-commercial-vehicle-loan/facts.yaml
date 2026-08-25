@@ -1,0 +1,45 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: portfolio.scale
+  domain: company
+  release_level: broad_context
+  content: "NBFC has \u20B914,000 Cr CV loan book; small fleet operators (<5 trucks) represent \u20B96,200 Cr."
+- id: fuel.impact
+  domain: financials
+  release_level: sharp_question
+  content: "Diesel represents 58% of truck operating costs; fuel price hikes squeezed operator monthly net cash flow from\
+    \ \u20B942,000 to \u20B914,000 per truck against \u20B928,000 EMI."
+- id: telematics.signal
+  domain: operations
+  release_level: hypothesis_backed
+  content: Piloting IoT GPS telematics on 5,000 trucks showed that drops in daily running kilometers (<180 km/day) predict
+    EMI default 45 days in advance with 88% accuracy.
+  dependencies:
+  - fuel.impact
+- id: restructuring.feasibility
+  domain: risk
+  release_level: hypothesis_backed
+  content: Offering seasonal flexible EMIs linked to telematics mileage reduced 90+ DPD defaults by 55% compared to static
+    payment schedules.
+  dependencies:
+  - telematics.signal
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "NPAs surged because diesel inflation wiped out small truckers' cash flow (net income fell to \u20B914k vs \u20B9\
+    28k EMI); integrating IoT telematics enables 45-day advance default prediction and dynamic mileage-linked EMI restructuring."
+- id: recommendation.telematics_underwriting
+  domain: recommendation
+  release_level: synthesis_support
+  content: Mandate connected IoT telematics transponders on all financed vehicles with live kilometer and fuel consumption
+    tracking.
+- id: recommendation.flexible_emi
+  domain: recommendation
+  release_level: synthesis_support
+  content: Structure 'Pay-As-You-Drive' flexible EMI plans where monthly repayments adjust based on verified freight running
+    mileage.
+- id: recommendation.freight_tieup
+  domain: recommendation
+  release_level: synthesis_support
+  content: Partner with digital freight brokerage platforms to provide guaranteed trip loads directly to financed truck owners.

@@ -1,4 +1,6 @@
 fastapi<1.0,>=0.115
+httpx<1.0,>=0.27
+jinja2<4.0,>=3.1
 langchain<2.0,>=1.0
 langchain-openrouter<1.0,>=0.1
 pydantic<3.0,>=2.8

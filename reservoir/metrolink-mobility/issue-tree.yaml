@@ -1,0 +1,90 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+
+root:
+  id: objective.transit-restoration
+  label: Diagnose 12% ridership decline and recommend service changes to restore reliability within a fixed fleet budget over 18 months.
+
+nodes:
+  - id: corridor-vs-network
+    type: branch
+    label: Ridership patterns by corridor and route type
+    status: valid_branch
+    evidence:
+      - ridership.pattern
+    conclusion: Ridership losses are concentrated on 2 main commuter corridors; neighborhood routes maintain stable ridership.
+
+  - id: reliability-and-variance
+    type: mechanism
+    label: Schedule adherence and travel-time variability
+    status: pivotal_test
+    evidence:
+      - reliability
+      - cause.congestion
+      - customer.behaviour
+    conclusion: Construction degraded on-time arrival from 81% to 58%; commuters defected to 2-wheelers due to wait-time variance, not fares.
+
+  - id: capacity-and-fleet-allocation
+    type: mechanism
+    label: Peak crowding vs off-peak fleet utilization
+    status: pivotal_test
+    evidence:
+      - capacity
+      - fleet
+      - risk
+    conclusion: Peak buses are overcrowded while off-peak buses run at <30% load; budget is fixed, requiring asset reallocation.
+
+  - id: municipal-policy-alignment
+    type: branch
+    label: Municipal constraints and transit priority measures
+    status: valid_branch
+    evidence:
+      - stakeholder
+    conclusion: City supports dedicated bus-priority lanes on key corridors but mandates minimum coverage in low-income wards.
+
+  - id: diagnosis
+    type: diagnosis
+    label: Synthesize operational bottleneck and commuter defection
+    status: hidden_target
+    evidence:
+      - corridor-vs-network
+      - reliability-and-variance
+      - capacity-and-fleet-allocation
+    conclusion: >-
+      Ridership collapsed due to severe arrival unpredictability on 2 key corridors where static schedules failed amidst construction;
+      with fleet capex capped, MetroLink must dynamically reallocate off-peak fleet to peak frequencies and implement terminal headway control.
+
+  - id: actions
+    type: recommendation
+    label: 3-Pillar 18-Month Operational Transformation
+    status: synthesis
+    evidence:
+      - recommendation.dispatch
+      - recommendation.capacity
+      - recommendation.priority
+    conclusion: Dynamic dispatch with headway regulation, peak bus reallocation with minimum-service safeguards, and bus-priority lane enforcement.
+
+edges:
+  - { from: objective.transit-restoration, to: corridor-vs-network, relation: investigate }
+  - { from: corridor-vs-network, to: reliability-and-variance, relation: motivates }
+  - { from: corridor-vs-network, to: capacity-and-fleet-allocation, relation: motivates }
+  - { from: reliability-and-variance, to: diagnosis, relation: supports }
+  - { from: capacity-and-fleet-allocation, to: diagnosis, relation: supports }
+  - { from: municipal-policy-alignment, to: actions, relation: constrains }
+  - { from: diagnosis, to: actions, relation: determines }
+
+acceptable_routes:
+  - id: reliability-first
+    sequence: [corridor-vs-network, reliability-and-variance, capacity-and-fleet-allocation, diagnosis, actions]
+    interviewer_behaviour: Guide candidate to isolate commuter corridors and investigate arrival variance before fleet reallocation.
+
+  - id: capacity-first
+    sequence: [corridor-vs-network, capacity-and-fleet-allocation, reliability-and-variance, diagnosis, actions]
+    interviewer_behaviour: Probe candidate on why buses run empty off-peak and how fleet can be redeployed within the fixed budget.
+
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+    - Ask candidate to state hypothesis on why riders are defecting and where demand is lost.
+    - Clarify that bus fares are lower than alternatives, yet passengers are switching to 2-wheelers.
+    - Redirect candidate toward investigating schedule reliability, wait-time variance, and off-peak fleet utilization.

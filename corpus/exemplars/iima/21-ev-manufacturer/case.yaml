@@ -1,0 +1,73 @@
+schema_version: reservoir-v1
+case_id: 21-ev-manufacturer-v1
+title: Electric Two-Wheeler Market Entry
+school: IIM-A
+status: approved
+rights_status: original
+category: market_entry
+industry: automotive_and_ev
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is a leading Indian conventional two-wheeler OEM evaluating a \u20B91,500 Cr entry into the electric\
+    \ scooter (E2W) market. Management is debating between battery swapping vs fast charging."
+  objective: Evaluate battery swapping vs onboard fast-charging and recommend the winning architecture and commercial entry
+    strategy.
+  opening_requirements:
+  - Name Electric Two-Wheeler Market Entry and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (5-year Total Cost of Ownership (TCO) and Network Payback) and time horizon (three years).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: 5-year Total Cost of Ownership (TCO) and Network Payback
+  decision_question: Should the OEM adopt battery swapping or onboard fast-charging, and what is the optimal market entry
+    roadmap?
+  time_horizon: three years
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Commercial B2B delivery fleets vs retail B2C consumer dichotomy. B2B delivery riders prioritize zero downtime
+    and adopt battery swapping, while retail B2C consumers prefer home overnight charging and reject recurring battery subscription
+    fees.
+  what_the_case_wanted_to_test: EV architecture trade-offs, battery swapping network density capex, B2B gig-economy fleet
+    economics vs B2C consumer charging habits.
+  pivotal_insight: "Battery swapping requires 1.8 batteries per vehicle plus dense automated swap stations (\u20B9400 Cr capex);\
+    \ commercial B2B fleets provide the 85% daily utilization needed to make swapping profitable, whereas B2C retail adoption\
+    \ fails subscription economics."
+  common_traps:
+  - Assuming a single charging architecture works for both commercial delivery fleets and daily office commuters.
+  - Underestimating battery swapping network density capital requirements.
+  - Treating EV entry as a pure hardware launch without considering battery lifecycle residual value.
+  takeaway_lesson: 'In EV infrastructure strategy, charging architecture is determined by fleet duty cycle: high-mileage commercial
+    fleets require battery swapping, whereas low-mileage retail consumers are best served by home charging.'
+  suggested_readings:
+  - knowledge_base/industries/10_automotive_and_ev.md
+  - knowledge_base/case_types/market_entry.md
+  - knowledge_base/methodology/02_issue_tree_structuring.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

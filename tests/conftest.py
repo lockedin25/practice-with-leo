@@ -14,7 +14,7 @@ from pathlib import Path
 import pytest
 
 from app.accounts import SESSION_COOKIE, AccountStore, User
-from app.store import SessionStore
+from app.store import EvaluationStore, SessionStore
 
 _TEMPORARY_ROOT: Path | None = None
 
@@ -29,9 +29,11 @@ def pytest_configure(config: pytest.Config) -> None:
     main.DATABASE_PATH = database
     main.ACCOUNTS = AccountStore(database)
     main.STORE = SessionStore(database)
+    main.EVALUATIONS = EvaluationStore(database)
     main.app.state.accounts = main.ACCOUNTS
     main.app.state.store = main.STORE
     main.app.state.database_path = database
+    main.app.state.evaluations = main.EVALUATIONS
 
 
 def pytest_unconfigure(config: pytest.Config) -> None:
@@ -49,7 +51,7 @@ def sign_in(client, email: str, name: str = "Test Candidate") -> User:
 
 
 @pytest.fixture(autouse=True)
-def _authentication_stays_real():
+def _authentication_stays_real(monkeypatch):
     """Guard against a module-level dependency override leaking across tests.
 
     Overriding require_user at import time disables authentication for every
@@ -59,19 +61,29 @@ def _authentication_stays_real():
     import app.main as main
     from app.accounts import require_user
 
+    class ReadyOnboarding:
+        """Keep API tests offline while exercising the readiness-gated runtime."""
+
+        def respond(self, _candidate_turn):
+            from app.voice_onboarding import VoiceOnboardingTurn
+
+            return VoiceOnboardingTurn(ready_to_begin=True, reply="Okay, let's begin.")
+
     main.app.dependency_overrides.pop(require_user, None)
+    monkeypatch.setattr(main, "VOICE_ONBOARDING", ReadyOnboarding())
     yield
     main.app.dependency_overrides.pop(require_user, None)
 
 
 @pytest.fixture
 def candidate_client():
+    from uuid import uuid4
     from fastapi.testclient import TestClient
 
     import app.main as main
 
     client = TestClient(main.app)
-    user = sign_in(client, "candidate@casecall.test")
+    user = sign_in(client, f"candidate-{uuid4()}@casecall.test")
     return client, user
 
 
@@ -93,7 +105,7 @@ def stub_interviewer(monkeypatch):
     from app.interviewer import InterviewTurn
 
     class StubInterviewer:
-        def respond(self, session, candidate_turn):
+        def respond(self, session, candidate_turn, *, spoken=False):
             session.record_candidate_turn(candidate_turn)
             facts = session.case.validate_fact_selection(
                 ["customers.segment-mix"], session.stage, session.disclosed_ids

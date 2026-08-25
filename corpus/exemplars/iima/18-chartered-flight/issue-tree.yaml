@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.charter-profit
+  label: Restore private jet fleet EBITDA and billable utilization.
+nodes:
+- id: utilization-vs-breakeven
+  type: branch
+  label: Billable Flight Hours vs Breakeven
+  status: valid_branch
+  evidence: []
+  conclusion: Aircraft fly 24 billable hours/month against 40 hours required for breakeven.
+- id: deadhead-ferry-legs
+  type: branch
+  label: Empty Repositioning Flight Analysis
+  status: valid_branch
+  evidence: []
+  conclusion: 38% of total flight time is unbilled deadhead ferry flying.
+- id: base-operating-costs
+  type: branch
+  label: Hangar & Metro Airport Parking Fees
+  status: valid_branch
+  evidence: []
+  conclusion: "Metro airport parking and landing fees add \u20B912 Cr annual fixed overhead."
+- id: diagnosis
+  type: diagnosis
+  label: High Deadhead Ratio & Fixed Base Overhead
+  status: hidden_target
+  evidence:
+  - utilization-vs-breakeven
+  - deadhead-ferry-legs
+  - base-operating-costs
+  conclusion: EBITDA is negative because 38% of flight hours are unpaid empty repositioning legs and fixed base parking costs
+    at metro airports are excessive.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Charter Fleet Optimization
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Monetize empty legs on digital consumer channels, adopt floating fleet dispatch, and sell prepaid corporate
+    jet card programs.
+edges:
+- from: objective.charter-profit
+  to: utilization-vs-breakeven
+  relation: investigate
+- from: objective.charter-profit
+  to: deadhead-ferry-legs
+  relation: investigate
+- from: objective.charter-profit
+  to: base-operating-costs
+  relation: investigate
+- from: utilization-vs-breakeven
+  to: diagnosis
+  relation: supports
+- from: deadhead-ferry-legs
+  to: diagnosis
+  relation: supports
+- from: base-operating-costs
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: utilization-first
+  sequence:
+  - utilization-vs-breakeven
+  - deadhead-ferry-legs
+  - base-operating-costs
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from hourly charter rates to billable utilization and empty legs.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to calculate total airborne hours vs revenue-generating hours.
+  - Clarify that charter hourly pricing is among the highest in the market.
+  - Redirect inquiry toward empty-leg ferry flights and base parking costs.

@@ -1,0 +1,45 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: company.legacy
+  domain: company
+  release_level: broad_context
+  content: Client served 4,000 corporate clients with paper meal vouchers accepted at 50,000 grocery and restaurant outlets.
+- id: revenue.drivers
+  domain: financials
+  release_level: sharp_question
+  content: 'Legacy revenue came from 3 streams: corporate issuance fee (1%), merchant acceptance fee (2.5%), and unredeemed
+    paper breakage (8% of GMV).'
+- id: digital.impact
+  domain: regulation
+  release_level: hypothesis_backed
+  content: RBI digital PPI rules mandated non-expiring digital balances (eliminating breakage) and merchants negotiated MDR
+    down to 1.0%.
+  dependencies:
+  - revenue.drivers
+- id: fintech.threat
+  domain: market
+  release_level: sharp_question
+  content: Modern SaaS HR fintechs offer multi-benefit cards covering fuel, phone, books, and medical under a single tax-saving
+    app.
+  dependencies:
+  - digital.impact
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Revenue collapsed because RBI digital mandates eliminated lucrative 8% paper breakage and eroded merchant MDR from
+    2.5% to 1.0%; client must pivot into an enterprise multi-benefit employee SaaS platform.
+- id: recommendation.saas
+  domain: recommendation
+  release_level: synthesis_support
+  content: Transform into an integrated HR employee benefits SaaS suite charging recurring per-employee-per-month (PEPM) platform
+    fees.
+- id: recommendation.multi_wallet
+  domain: recommendation
+  release_level: synthesis_support
+  content: Expand from meal vouchers to multi-pocket tax allowances (fuel, health, WFH equipment, wellness).
+- id: recommendation.merchant_network
+  domain: recommendation
+  release_level: synthesis_support
+  content: Build direct merchant partnerships offering corporate employee-exclusive discounts in exchange for 3-5% affiliate
+    marketing fees.

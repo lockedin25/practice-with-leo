@@ -1,0 +1,98 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+
+root:
+  id: objective.restore-restaurant-margin
+  label: Diagnose EBITDA margin decline from 14% to 7% and recommend a 12-month recovery plan.
+
+nodes:
+  - id: revenue-and-demand
+    type: branch
+    label: Top-line sales volume and same-store growth
+    status: valid_branch
+    evidence:
+      - financials.scope
+    conclusion: Same-store sales grew 5%, proving customer demand is robust and top-line volume is not the driver.
+
+  - id: channel-mix-shift
+    type: branch
+    label: Channel sales volume decomposition
+    status: valid_branch
+    evidence:
+      - channels.mix
+    conclusion: Delivery skyrocketed from 20% to 46% of total revenue, while dine-in remained flat.
+
+  - id: channel-unit-economics
+    type: mechanism
+    label: Compare channel unit contribution economics
+    status: pivotal_test
+    evidence:
+      - channels.economics
+      - commercial.promotions
+    conclusion: Aggregator delivery yields only ₹35 contribution per ₹500 order vs ₹110 for dine-in due to commissions and discounts.
+
+  - id: kitchen-labor-efficiency
+    type: mechanism
+    label: Kitchen labor scheduling and off-peak utilization
+    status: pivotal_test
+    evidence:
+      - operations.kitchen
+      - operations.utilisation
+    conclusion: Kitchen staffing remained fixed to dine-in peaks, resulting in <45% afternoon labor utilization.
+
+  - id: industry-benchmarking
+    type: branch
+    label: Peer chain channel pricing benchmarks
+    status: valid_branch
+    evidence:
+      - benchmark
+      - pricing.flexibility
+    conclusion: Peers maintain healthy EBITDA by marking up delivery menus; Harvest Table has contractual pricing freedom.
+
+  - id: diagnosis
+    type: diagnosis
+    label: Synthesize root cause of margin erosion
+    status: hidden_target
+    evidence:
+      - channel-mix-shift
+      - channel-unit-economics
+      - kitchen-labor-efficiency
+    conclusion: >-
+      Margin collapsed because growth shifted into high-commission, heavily discounted delivery channels
+      which generate 68% lower contribution, while store labor schedules failed to adapt to delivery demand spikes.
+
+  - id: actions
+    type: recommendation
+    label: 3-Pillar 12-Month Turnaround Roadmap
+    status: synthesis
+    evidence:
+      - recommendation.channel-price
+      - recommendation.loyalty
+      - recommendation.labour
+    conclusion: Introduce delivery-specific combo pricing, migrate loyal diners to direct-app ordering, and flex off-peak kitchen staffing.
+
+edges:
+  - { from: objective.restore-restaurant-margin, to: revenue-and-demand, relation: investigate }
+  - { from: objective.restore-restaurant-margin, to: channel-mix-shift, relation: investigate }
+  - { from: channel-mix-shift, to: channel-unit-economics, relation: motivates }
+  - { from: channel-mix-shift, to: kitchen-labor-efficiency, relation: motivates }
+  - { from: channel-unit-economics, to: industry-benchmarking, relation: informs }
+  - { from: channel-unit-economics, to: diagnosis, relation: supports }
+  - { from: kitchen-labor-efficiency, to: diagnosis, relation: supports }
+  - { from: diagnosis, to: actions, relation: determines }
+
+acceptable_routes:
+  - id: channel-economics-first
+    sequence: [revenue-and-demand, channel-mix-shift, channel-unit-economics, kitchen-labor-efficiency, diagnosis, actions]
+    interviewer_behaviour: Guide candidate to calculate per-order unit contribution by channel after isolating the delivery surge.
+
+  - id: operations-first
+    sequence: [channel-mix-shift, kitchen-labor-efficiency, channel-unit-economics, diagnosis, actions]
+    interviewer_behaviour: Allow candidate to explore kitchen capacity before linking to aggregator fee structures.
+
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+    - Ask candidate to state hypothesis on channel mix and order-level profit contribution.
+    - Clarify that food raw material costs per dish did not increase in dine-in channels.
+    - Redirect candidate toward comparing unit contribution of a ₹500 dine-in meal vs a ₹500 delivery order.

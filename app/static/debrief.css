@@ -1,0 +1,1129 @@
+/* ==========================================================================
+   Leo — case debrief
+
+   The payoff screen. Reading order is outcome, then evidence, then detail:
+   one outcome panel (score, rating, summary), five cited dimensions, then the
+   deeper cards and the behaviour checklist.
+
+   Breakpoints, literal everywhere: 1200px, 900px, 640px. Nothing else.
+   ========================================================================== */
+
+.debrief-body {
+  margin: 0;
+  min-height: 100dvh;
+  background:
+    radial-gradient(120% 60% at 50% 0%, var(--brand-tint) 0%, transparent 55%),
+    var(--paper);
+}
+
+.debrief {
+  width: min(1060px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 44px) 0 72px;
+}
+
+.muted {
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+}
+
+/* A debrief is a temporary review surface, not a dead end. This link stays
+   above loading and report states, and always returns to the live workspace
+   without relying on browser history. */
+.debrief-return {
+  display: flex;
+  margin: 0 0 14px;
+}
+
+.debrief-return-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.debrief-return-link:hover {
+  border-color: color-mix(in srgb, var(--brand) 38%, var(--line));
+  color: var(--brand-deep);
+}
+
+.debrief-return-link:focus-visible {
+  outline: 3px solid var(--brand-tint-2);
+  outline-offset: 3px;
+}
+
+/* --- States -------------------------------------------------------------- */
+
+.debrief-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: clamp(48px, 12vh, 120px) 16px;
+}
+
+.debrief-state h1 {
+  margin: 6px 0 0;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(26px, 3.4vw, 34px);
+}
+
+.debrief-state .muted {
+  max-width: 46ch;
+  font-size: 0.9375rem;
+}
+
+.debrief-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* The report follows a wait, so it rises in once instead of snapping into
+   place. riseIn comes from tokens.css. */
+.debrief-report {
+  animation: riseIn 0.4s var(--ease) both;
+}
+
+/* --- 1. Outcome panel ---------------------------------------------------- */
+/* The score used to sit in its own card floating beside the title. It is the
+   same fact as the title, so title, score and rating are now one object. */
+
+.debrief-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px 28px;
+  margin-bottom: 16px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.debrief-head-text {
+  min-width: 0;
+}
+
+.debrief-head h1 {
+  margin: 8px 0 6px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(26px, 3.6vw, 38px);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+}
+
+.debrief-head .muted {
+  margin: 0;
+}
+
+.overall-card {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  padding-left: 26px;
+  border-left: 1px solid var(--line);
+  text-align: right;
+}
+
+.overall-card .micro-label {
+  margin: 0;
+}
+
+.overall-value {
+  margin: 2px 0 4px;
+  font-family: var(--serif);
+  font-size: clamp(38px, 4.4vw, 50px);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--brand-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+.overall-out-of {
+  margin-left: 2px;
+  font-size: 0.42em;
+  color: var(--ink-3);
+}
+
+/* The weighting explanation is a footnote, not a paragraph competing with the
+   title, so it spans the panel and sits under a rule. */
+.overall-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line-dashed);
+  color: var(--ink-3);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.overall-note:empty {
+  display: none;
+}
+
+.mbb-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--r-pill);
+  background: var(--sunken);
+  color: var(--ink-2);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.badge-distinction,
+.badge-top-1-mbb { background: var(--brand-tint-2); color: var(--brand-deep); }
+.badge-strong-pass { background: var(--brand-tint); color: var(--brand); }
+.badge-meets-bar { background: var(--paper-deep); color: var(--ink-2); }
+.badge-developing { background: var(--leo-gold-soft); color: var(--leo-gold-deep); }
+.badge-needs-practice,
+.badge-needs-substantial-practice,
+.badge-below-bar { background: var(--clay-tint); color: var(--clay); }
+
+/* --- 2. Executive summary ------------------------------------------------ */
+
+.executive-summary-card {
+  margin-bottom: 14px;
+}
+
+.executive-summary-text {
+  margin: 10px 0 0;
+  max-width: 78ch;
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+/* --- Report flow --------------------------------------------------------- */
+
+.report-stage {
+  margin-top: 38px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.stage-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.stage-kicker {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.stage-head h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(1.65rem, 2.5vw, 2.125rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.stage-head p:last-child {
+  max-width: 66ch;
+  margin: 8px 0 0;
+  color: var(--ink-3);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* --- 3. Takeaways -------------------------------------------------------- */
+
+.debrief-takeaways {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.takeaway-card > .micro-label {
+  margin: 0 0 12px;
+}
+
+.takeaway-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.takeaway-list li {
+  position: relative;
+  padding-left: 26px;
+  font-size: 0.9062rem;
+  line-height: 1.5;
+}
+
+.takeaway-list.is-strengths li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--brand-tint-2);
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+
+.takeaway-list.is-priorities { counter-reset: priority; }
+
+.takeaway-list.is-priorities li {
+  counter-increment: priority;
+  padding-left: 30px;
+}
+
+.takeaway-list.is-priorities li::before {
+  content: counter(priority);
+  position: absolute;
+  left: 0;
+  top: 2px;
+  display: grid;
+  place-items: center;
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  background: var(--leo-gold-soft);
+  color: var(--leo-gold-deep);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.next-drill {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line-dashed);
+}
+
+.next-drill .micro-label {
+  margin: 0 0 4px;
+}
+
+.next-drill p:last-child {
+  margin: 0;
+  font-size: 0.9062rem;
+  line-height: 1.5;
+}
+
+.empty-note {
+  padding-left: 0 !important;
+  color: var(--ink-3);
+  font-style: italic;
+}
+
+.empty-note::before {
+  content: none !important;
+}
+
+/* --- Section headings ---------------------------------------------------- */
+/* Two rules divide the report into outcome, evidence and detail. Without them
+   fourteen sibling cards read as one undifferentiated stack. */
+
+.debrief-section-title {
+  margin: 30px 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--serif);
+  font-size: 1.375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* --- 4. Dimensions ------------------------------------------------------- */
+
+.dimension-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.dimension-card {
+  width: 100%;
+}
+
+.dimension-card header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.dimension-name {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.dimension-score-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.dimension-score {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--brand-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+.dimension-out-of {
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+
+.score-track {
+  height: 7px;
+  margin: 10px 0 4px;
+  overflow: hidden;
+  border-radius: var(--r-pill);
+  background: var(--paper-deep);
+}
+
+.score-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand-lift), var(--brand-deep));
+  transition: width 0.7s var(--ease);
+}
+
+.dimension-bands {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 2px;
+}
+
+.band {
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  background: var(--sunken);
+  color: var(--ink-2);
+  font-size: 0.6563rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.band-top-1-mbb { background: var(--brand-tint-2); color: var(--brand-deep); }
+.band-meets-bar { background: var(--brand-tint); color: var(--brand); }
+.band-below-bar { background: var(--clay-tint); color: var(--clay); }
+
+.confidence-chip {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.confidence-chip.is-low { color: var(--amber); }
+
+.dimension-section {
+  margin-top: 12px;
+}
+
+.dimension-label {
+  margin: 0 0 5px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.dimension-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dimension-list li {
+  position: relative;
+  padding-left: 16px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.dimension-list li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink-4);
+}
+
+.dimension-list.is-improvements li::before { background: var(--leo-gold); }
+
+/* --- Evidence ------------------------------------------------------------ */
+
+.evidence {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--brand-tint-2);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  background: var(--sunken);
+}
+
+.evidence-quote {
+  margin: 0;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.9062rem;
+  line-height: 1.45;
+}
+
+.evidence-ref {
+  margin-top: 5px;
+  font-family: var(--mono);
+  font-size: 0.7188rem;
+  color: var(--ink-3);
+}
+
+/* --- 5. Detail cards ----------------------------------------------------- */
+
+.masterclass-card,
+.golden-rewrites-card,
+.strengths-card,
+.development-card,
+.action-plan-card {
+  margin-bottom: 14px;
+}
+
+.masterclass-card > .eyebrow,
+.golden-rewrites-card > .eyebrow,
+.strengths-card > .eyebrow,
+.development-card > .eyebrow,
+.action-plan-card > .eyebrow {
+  margin-bottom: 12px;
+}
+
+.masterclass-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.masterclass-item p:first-child {
+  margin: 0 0 4px;
+}
+
+.masterclass-item p:last-child {
+  margin: 0;
+  font-size: 0.9062rem;
+  line-height: 1.5;
+}
+
+/* Golden rewrites */
+
+.rewrite-block {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line-dashed);
+}
+
+.rewrite-block:first-child {
+  margin-top: 8px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.rewrite-phase {
+  margin: 0 0 10px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.rewrite-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.rewrite-col {
+  padding: 14px;
+  border-radius: var(--r-md);
+}
+
+.rewrite-candidate {
+  border: 1px solid var(--line);
+  background: var(--sunken);
+}
+
+.rewrite-partner {
+  border: 1px solid var(--brand-tint-2);
+  background: var(--brand-tint);
+}
+
+.rewrite-text {
+  margin: 6px 0 0;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.rewrite-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rewrite-notes li {
+  position: relative;
+  padding-left: 16px;
+  font-size: 0.8438rem;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.rewrite-notes li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+/* Strengths in detail */
+
+.strength-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.strength-item:last-child {
+  border-bottom: none;
+}
+
+.strength-claim {
+  margin: 0 0 4px;
+  font-weight: 600;
+  font-size: 0.9062rem;
+  line-height: 1.4;
+}
+
+.strength-impact {
+  margin: 6px 0 0;
+  font-size: 0.8125rem;
+  color: var(--ink-3);
+}
+
+/* Development areas in detail */
+
+.dev-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.dev-item:last-child {
+  border-bottom: none;
+}
+
+.dev-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.dev-gap {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.9062rem;
+  line-height: 1.4;
+}
+
+.priority-badge {
+  flex: none;
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  font-size: 0.6563rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.priority-badge.is-high { background: var(--clay-tint); color: var(--clay); }
+.priority-badge.is-medium { background: var(--leo-gold-soft); color: var(--leo-gold-deep); }
+.priority-badge.is-low { background: var(--paper-deep); color: var(--ink-3); }
+
+.dev-guidance {
+  margin: 6px 0 0;
+  font-size: 0.8438rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* Action plan */
+
+.action-plan-card {
+  display: grid;
+  gap: 10px;
+}
+
+.action-disclosure {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--sunken);
+}
+
+.action-disclosure summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 62px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.action-disclosure summary::-webkit-details-marker { display: none; }
+
+.action-disclosure .micro-label,
+.action-disclosure strong {
+  display: block;
+}
+
+.action-disclosure .micro-label {
+  margin: 0 0 3px;
+}
+
+.action-disclosure strong {
+  font-size: 0.9375rem;
+  line-height: 1.35;
+}
+
+.disclosure-icon {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 180ms var(--ease);
+  color: var(--ink-3);
+}
+
+.action-disclosure[open] .disclosure-icon {
+  transform: rotate(225deg) translateY(-2px);
+}
+
+.action-disclosure-body {
+  padding: 0 16px 16px;
+}
+
+.drill-meta {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.drill-prompt {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--sunken);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.readings-block ul {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.readings-block li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 0.8438rem;
+  line-height: 1.4;
+}
+
+.readings-block li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+/* --- Checklist ----------------------------------------------------------- */
+
+.checklist-card .card-head {
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.checklist-head {
+  gap: 18px;
+}
+
+.checklist-filter-label {
+  display: grid;
+  grid-template-columns: auto minmax(142px, auto);
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.checklist-filter {
+  min-height: 40px;
+  padding: 0 34px 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  background-color: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.checklist-filter:focus-visible,
+.action-disclosure summary:focus-visible,
+.checklist-summary:focus-visible {
+  outline: 3px solid var(--brand-tint-2);
+  outline-offset: 2px;
+}
+
+.checklist-empty {
+  margin: 0;
+  padding: 18px;
+  border: 1px dashed var(--line-dashed);
+  border-radius: var(--r-md);
+  color: var(--ink-3);
+  font-size: 0.875rem;
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checklist-item {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--sunken);
+  overflow: hidden;
+}
+
+.checklist-details {
+  width: 100%;
+}
+
+.checklist-summary {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto 9px;
+  align-items: center;
+  gap: 12px;
+  min-height: 62px;
+  padding: 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.checklist-summary::-webkit-details-marker { display: none; }
+
+.checklist-details[open] .checklist-summary {
+  border-bottom: 1px dashed var(--line-dashed);
+  background: var(--surface);
+}
+
+.checklist-mark {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  margin-top: 1px;
+  border-radius: 50%;
+}
+
+.checklist-item.is-demonstrated .checklist-mark {
+  background: var(--brand-tint-2);
+  color: var(--brand-deep);
+}
+
+.checklist-item.is-missed .checklist-mark {
+  background: var(--clay-tint);
+  color: var(--clay);
+}
+
+.checklist-item.is-not-applicable .checklist-mark {
+  background: var(--paper-deep);
+  color: var(--ink-4);
+}
+
+.checklist-body {
+  min-width: 0;
+}
+
+.checklist-title {
+  display: block;
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.35;
+}
+
+.checklist-item.is-not-applicable .checklist-title {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.checklist-status {
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  font-size: 0.6563rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.is-demonstrated .checklist-status { background: var(--brand-tint-2); color: var(--brand-deep); }
+.is-missed .checklist-status { background: var(--clay-tint); color: var(--clay); }
+.is-not-applicable .checklist-status { background: var(--paper-deep); color: var(--ink-3); }
+
+.checklist-disclosure {
+  width: 9px;
+  height: 9px;
+  border-right: 1.5px solid var(--ink-3);
+  border-bottom: 1.5px solid var(--ink-3);
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 180ms var(--ease);
+}
+
+.checklist-details[open] .checklist-disclosure {
+  transform: rotate(225deg) translateY(-2px);
+}
+
+.checklist-detail-body {
+  padding: 14px 16px 16px 50px;
+}
+
+.checklist-note {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--clay);
+}
+
+.checklist-item.is-not-applicable .checklist-note {
+  color: var(--ink-3);
+}
+
+.checklist-item .evidence { margin-top: 10px; }
+
+.checklist-severity {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.6563rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+/* --- Foot and next step -------------------------------------------------- */
+
+.debrief-bottom-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.debrief-actions .btn,
+.debrief-bottom-actions .btn {
+  min-height: 44px;
+}
+
+.debrief-foot {
+  margin-top: 22px;
+  text-align: center;
+}
+
+.debrief-foot .muted {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.7188rem;
+}
+
+/* --- Responsive ---------------------------------------------------------- */
+
+@media (max-width: 1200px) {
+  .debrief {
+    width: min(1060px, calc(100% - 40px));
+  }
+}
+
+@media (max-width: 900px) {
+  .debrief-head {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  /* Stacked, the score keeps its own row and reads as a footer to the title
+     rather than as a floating block. */
+  .overall-card {
+    grid-template-columns: auto auto;
+    justify-items: start;
+    align-items: center;
+    gap: 6px 12px;
+    padding: 14px 0 0;
+    border-left: 0;
+    border-top: 1px dashed var(--line-dashed);
+    text-align: left;
+  }
+
+  .overall-card .micro-label {
+    grid-column: 1 / -1;
+  }
+
+  .overall-value {
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  .rewrite-comparison {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .debrief {
+    width: calc(100% - 32px);
+  }
+
+  .debrief-head {
+    padding: 18px 18px 16px;
+    border-radius: var(--r-lg);
+  }
+
+  .debrief-return-link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .checklist-legend {
+    justify-content: flex-start;
+  }
+
+  .stage-head {
+    margin-bottom: 14px;
+  }
+
+  .report-stage {
+    margin-top: 30px;
+    padding-top: 24px;
+  }
+
+  .checklist-head {
+    flex-direction: column;
+  }
+
+  .checklist-filter-label {
+    width: 100%;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .checklist-filter {
+    min-height: 44px;
+  }
+
+  .checklist-summary {
+    grid-template-columns: 24px minmax(0, 1fr) 9px;
+    gap: 10px;
+  }
+
+  .checklist-status {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .checklist-disclosure {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+  }
+
+  .checklist-detail-body {
+    padding: 14px 14px 16px;
+  }
+
+  .debrief-bottom-actions {
+    flex-direction: column;
+  }
+
+  .debrief-bottom-actions .btn {
+    width: 100%;
+  }
+}

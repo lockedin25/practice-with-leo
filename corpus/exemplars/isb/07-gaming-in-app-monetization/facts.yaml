@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: gaming.scale
+  domain: company
+  release_level: broad_context
+  content: "Platform has 4M monthly active players generating \u20B9400 Cr in monthly contest entry amounts."
+- id: tax.shock
+  domain: regulation
+  release_level: sharp_question
+  content: "New 28% GST applies on total face-value deposits rather than platform rake, increasing tax liability from \u20B9\
+    8 Cr to \u20B9112 Cr monthly."
+- id: liquidity.drain
+  domain: operations
+  release_level: hypothesis_backed
+  content: Passing tax directly to players reduced casual player gameplay sessions from 14 to 4 per month, destroying table
+    matchmaking liquidity.
+  dependencies:
+  - tax.shock
+- id: bonus.economics
+  domain: economics
+  release_level: hypothesis_backed
+  content: Offering 100% GST cashback as non-withdrawable discount gameplay credits retains 88% of depositors and lifts table
+    rake turnover by 34%.
+  dependencies:
+  - liquidity.drain
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Direct tax pass-through destroyed player liquidity and game velocity; platform must absorb GST via non-withdrawable
+    gameplay discount credits, offset by dynamic rake optimization on high-stakes tables.
+- id: recommendation.gst_cashback
+  domain: recommendation
+  release_level: synthesis_support
+  content: Credit 100% of GST paid as non-withdrawable gameplay discount chips usable exclusively to pay contest entry fees.
+- id: recommendation.rake_optimization
+  domain: recommendation
+  release_level: synthesis_support
+  content: Adjust platform rake from 8% to 11% on high-stakes VIP tables while maintaining low 5% rake on casual micro-tables.
+- id: recommendation.tds_simplification
+  domain: recommendation
+  release_level: synthesis_support
+  content: Automate net-winnings TDS tax calculations at annual fiscal year-end/withdrawal to maximize active player bankroll.

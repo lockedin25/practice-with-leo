@@ -1,0 +1,41 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: loan.portfolio
+  domain: financials
+  release_level: broad_context
+  content: "HFC manages an \u20B98,500 Cr loan book with 60% salaried and 40% self-employed borrowers."
+- id: margin.compression
+  domain: financials
+  release_level: sharp_question
+  content: NIM fell from 3.8% to 2.4% due to 140 bps increase in customer acquisition cost and 80 bps rise in credit cost.
+- id: channel.origin
+  domain: operations
+  release_level: hypothesis_backed
+  content: DSA broker originations rose from 35% to 75% of volume; DSA commission jumped from 0.8% to 2.2% of loan value.
+  dependencies:
+  - margin.compression
+- id: delinquency.profile
+  domain: risk
+  release_level: hypothesis_backed
+  content: 90+ DPD defaults are concentrated in builder-tied subvention projects and unverified cash-income self-employed
+    borrowers sourced via DSAs.
+  dependencies:
+  - channel.origin
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: NIM drop and NPA rise are driven by over-reliance on DSAs (75% of loans) who inflated broker costs to 2.2% and
+    passed high-default self-employed and builder subvention risks.
+- id: recommendation.direct
+  domain: recommendation
+  release_level: synthesis_support
+  content: Scale direct in-house branch sourcing to 60% of volume, cutting broker commission spend.
+- id: recommendation.underwriting
+  domain: recommendation
+  release_level: synthesis_support
+  content: Mandate internal risk verification officers for cash-flow assessment and ban non-escrow builder subvention schemes.
+- id: recommendation.clawback
+  domain: recommendation
+  release_level: synthesis_support
+  content: Implement 18-month broker commission clawbacks on any loan that defaults within the first 24 EMIs.

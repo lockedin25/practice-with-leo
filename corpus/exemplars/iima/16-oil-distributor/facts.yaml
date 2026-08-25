@@ -1,0 +1,45 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: distributor.scale
+  domain: company
+  release_level: broad_context
+  content: Distributor supplies 3,500 retail outlets, spare part shops, and independent garages across Punjab and Haryana.
+- id: dso.trend
+  domain: financials
+  release_level: sharp_question
+  content: "DSO expanded from 32 days to 88 days, resulting in \u20B918 Cr in unpaid dealer receivables and high bank overdraft\
+    \ interest."
+- id: sku.analysis
+  domain: operations
+  release_level: hypothesis_backed
+  content: Distributor carries 420 SKUs; bottom 250 SKUs turn over less than twice a year but occupy 40% of warehouse space.
+  dependencies:
+  - dso.trend
+- id: channel.credit
+  domain: financials
+  release_level: hypothesis_backed
+  content: 92% of bad debts and credit delays originate from unorganized small repair garages, while authorized service stations
+    pay in 15 days.
+  dependencies:
+  - sku.analysis
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Margin fell to 1.2% because working capital is trapped in 250 slow-moving SKUs and unorganized garage credit (DSO
+    88 days) where bad debts surged.
+- id: recommendation.credit_policy
+  domain: recommendation
+  release_level: synthesis_support
+  content: Transition unorganized garages to cash-and-carry with 2% instant cash discounts, capping credit terms at 15 days
+    for vetted dealers only.
+- id: recommendation.sku_rationalization
+  domain: recommendation
+  release_level: synthesis_support
+  content: Delist bottom 150 slow-moving niche SKUs and focus inventory on fast-moving 4T motorcycle and commercial diesel
+    oils.
+- id: recommendation.fintech_financing
+  domain: recommendation
+  release_level: synthesis_support
+  content: Partner with supply-chain fintechs to offer retailer invoice financing, transferring balance-sheet credit risk
+    to third parties.

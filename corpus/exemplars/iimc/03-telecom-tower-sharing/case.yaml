@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 03-telecom-tower-sharing-v1
+title: Telecom Tower Tenancy Yield
+school: IIM-C
+status: approved
+rights_status: original
+category: profitability
+industry: telecom_and_media
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is an Indian passive telecom infrastructure tower company managing 120,000 towers. Tenancy ratio has
+    dropped from 2.2x to 1.6x following telco industry consolidation, eroding ROIC.
+  objective: Diagnose tenancy loss and recommend a business model expansion into smart city small-cells, green energy management,
+    and fiber sharing.
+  opening_requirements:
+  - Name Telecom Tower Tenancy Yield and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Average Tenancy Ratio per Tower and Power & Fuel Margin) and time horizon (eighteen months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Average Tenancy Ratio per Tower and Power & Fuel Margin
+  decision_question: How can the telecom tower company boost tenancy yield and expand into non-traditional infrastructure
+    revenue?
+  time_horizon: eighteen months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Telco market consolidation (exit of sub-scale operators) leaving redundant duplicate tenancies, combined
+    with high diesel generator energy costs where the towerco leaked power margins under fixed energy billing.
+  what_the_case_wanted_to_test: Passive telecom infrastructure economics, anchor tenancy vs sharing tenancy multipliers, energy
+    pass-through contracts vs green energy-as-a-service, and 5G street furniture small-cells.
+  pivotal_insight: Adding a 2nd tenant to an existing tower requires negligible capex and generates 80% incremental EBITDA
+    flow-through; transforming diesel-powered sites into solar-battery green energy hubs captures profitable energy margins.
+  common_traps:
+  - Assuming the tower company can build thousands of new macro-towers when telcos are cutting macro-capex.
+  - Blaming steel structural maintenance costs.
+  - Failing to recognize that 5G requires dense micro-cells and fiberized street furniture.
+  takeaway_lesson: In passive infrastructure, operating leverage is driven by co-location tenancy ratios; as macro-tenancies
+    consolidate, revenue growth shifts to energy-as-a-service and dense micro-small-cell deployment.
+  suggested_readings:
+  - knowledge_base/industries/07_telecom_and_media.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

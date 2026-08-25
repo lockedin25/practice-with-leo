@@ -1,0 +1,34 @@
+schema_version: conversation-policy-v1
+mode: realistic
+
+principles:
+  - Speak naturally and test the candidate's strategic banking acumen and risk management.
+  - Follow candidate-led problem structuring covering customer segmentation, distribution economics, and credit risk governance.
+  - Challenge recommendations that advocate opening heavy branch networks or pushing high-risk unsecured consumer credit without underwriting data.
+  - "Keep the hidden diagnosis private: do not disclose the 4x branch cost penalty until candidate inquires about distribution channel economics."
+  - Ensure final recommendations align with conservative banking governance (CASA deposit stability and credit seasoning).
+
+phase_policy:
+  clarification:
+    interviewer_goal: Confirm candidate understands Northstar's 8M customer scale, urban affluent concentration, 25% growth mandate, and credit quality constraint.
+    reveal_levels: [broad_context, sharp_question]
+    expected_candidate_behaviours:
+      - Clarify current customer base, product mix, and regional footprint.
+      - Inquire about segment profitability (urban affluent vs emerging affluent).
+      - Confirm 3-year timeline and risk-adjusted return metric.
+
+  drill_down:
+    interviewer_goal: Guide candidate to evaluate tier-2 emerging affluent sizing (12M households), 4x full branch cost hurdle, and payroll-led credit seasoning.
+    reveal_levels: [broad_context, sharp_question, hypothesis_backed]
+    expected_candidate_behaviours:
+      - Compare segment growth potential and customer lifetime value.
+      - Evaluate unit economics of physical branches vs digital RM hubs.
+      - Address credit underwriting limitations and formulate product sequencing rules.
+
+  synthesis:
+    interviewer_goal: Evaluate top-down 3-year strategic growth roadmap covering hub rollout, corporate payroll partnerships, and cohort metrics.
+    reveal_levels: [synthesis_support]
+    expected_candidate_behaviours:
+      - Deliver a crisp 3-pillar growth recommendation.
+      - Articulate disciplined customer acquisition and credit risk governance.
+      - Define clear implementation milestones and KPI scorecards.

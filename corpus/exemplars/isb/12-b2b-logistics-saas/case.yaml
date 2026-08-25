@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 12-b2b-logistics-saas-v1
+title: B2B Logistics SaaS Platform Expansion
+school: ISB
+status: approved
+rights_status: original
+category: growth_strategy
+industry: saas_and_b2b_tech
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is an Indian B2B logistics SaaS platform providing enterprise Transport Management Systems (TMS) and
+    GPS visibility tracking to 200 large enterprise shippers. Enterprise software ARR is $15M, but growth has plateaued.
+  objective: Evaluate expanding into an integrated freight brokerage marketplace with autonomous freight contract bidding.
+  opening_requirements:
+  - Name B2B Logistics SaaS Platform Expansion and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Total ARR & Marketplace Take-Rate Revenue and Gross Margin Profile) and time horizon (eighteen
+    months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Total ARR & Marketplace Take-Rate Revenue and Gross Margin Profile
+  decision_question: Should the logistics SaaS company expand from pure software subscription into an embedded freight marketplace?
+  time_horizon: eighteen months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Software vs transaction marketplace margin trade-off. Pure SaaS carries high 80% gross margins but low contract
+    ticket sizes ($60k/yr); embedding freight matching monetization captures 4-6% take-rates on billions in managed freight
+    spend, but requires working capital and carrier fulfillment liability.
+  what_the_case_wanted_to_test: B2B SaaS to marketplace transition, take-rate vs software subscription economics, carrier
+    payment float working capital, and software stickiness.
+  pivotal_insight: Client already tracks $1.2B in enterprise freight spend on its TMS software; introducing an autonomous
+    spot-freight bidding engine captures a 5% broker take-rate on unfulfilled spot loads with zero carrier acquisition CAC.
+  common_traps:
+  - Purchasing physical truck fleets onto the balance sheet.
+  - Abandoning high-margin pure SaaS software subscriptions entirely.
+  - Assuming enterprise shippers will give 100% of dedicated contract freight to an unproven broker.
+  takeaway_lesson: In enterprise B2B vertical SaaS, embedding transactional marketplaces on top of workflow software unlocks
+    massive GMV monetization by monetizing platform workflow data with zero customer acquisition cost.
+  suggested_readings:
+  - knowledge_base/industries/08_saas_and_b2b_tech.md
+  - knowledge_base/case_types/growth_strategy.md
+  - knowledge_base/methodology/01_preliminary_questions.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

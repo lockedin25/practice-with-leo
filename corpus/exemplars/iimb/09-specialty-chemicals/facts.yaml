@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: client.exposure
+  domain: company
+  release_level: broad_context
+  content: Client imports 72% of active ingredient KSM intermediates from single-source Chinese suppliers.
+- id: target.profile
+  domain: company
+  release_level: sharp_question
+  content: Target is a Gujarat-based chemical synthesis company producing 3 critical KSM intermediates with 45% spare capacity.
+- id: etp.compliance
+  domain: regulation
+  release_level: hypothesis_backed
+  content: "State Pollution Control Board issued a conditional notice requiring \u20B965 Cr investment in Zero Liquid Discharge\
+    \ (ZLD) effluent treatment within 12 months."
+  dependencies:
+  - target.profile
+- id: synergy.valuation
+  domain: financials
+  release_level: hypothesis_backed
+  content: "Backward integration saves $22M/year in import duties and freight, but target asking price of $80M does not account\
+    \ for the \u20B965 Cr ($8M) ZLD capex."
+  dependencies:
+  - etp.compliance
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Acquisition creates $22M annual synergy by securing captive KSM supply, but buyer must negotiate an $8M purchase
+    price deduction to fund mandatory Zero Liquid Discharge environmental compliance capex.
+- id: recommendation.price_adjustment
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Proceed with acquisition, adjusting bid price from $80M to $72M to fund the mandatory \u20B965 Cr ZLD effluent\
+    \ treatment plant."
+- id: recommendation.continuous_flow
+  domain: recommendation
+  release_level: synthesis_support
+  content: Upgrade batch synthesis lines to automated continuous-flow chemistry to increase yield by 18%.
+- id: recommendation.rnd_retention
+  domain: recommendation
+  release_level: synthesis_support
+  content: Structure 3-year retention bonuses and patent royalties for target chemical process scientists.

@@ -1,6 +1,6 @@
 """Administrator views: every attempt, every transcript, and the metrics over them.
 
-Reads the runtime's attempt table read-only and joins it to the account tables.
+Reads the runtime's attempt table and joins it to the account and evaluation tables.
 Nothing here writes to interview state, and the transcript view shows only what
 the runtime actually released to the candidate, so the answer key stays private
 even from an administrator.
@@ -46,55 +46,107 @@ def _minutes_between(start: datetime | None, end: datetime | None) -> float | No
 
 
 def _attempt_rows(database_path: Path) -> list[dict[str, Any]]:
-    """Every attempt with its owner, tolerant of runtime schema drift."""
+    """Every attempt with its owner and evaluation, tolerant of runtime schema drift."""
     query = """
-        SELECT a.id, a.case_id, a.session_json, a.updated_at,
-               o.user_id, o.created_at, u.email, u.name, u.picture
+        SELECT a.id, a.case_id, a.session_json,
+               a.created_at AS a_created_at,
+               a.updated_at AS a_updated_at,
+               COALESCE(a.user_id, o.user_id) AS effective_user_id,
+               COALESCE(o.created_at, a.created_at, a.updated_at) AS effective_created_at,
+               u.email, u.name, u.picture,
+               e.evaluator_version, e.report_json, e.created_at AS evaluation_created_at
         FROM attempts a
         LEFT JOIN attempt_owners o ON o.attempt_id = a.id
-        LEFT JOIN users u ON u.id = o.user_id
-        ORDER BY COALESCE(o.created_at, a.updated_at) DESC
+        LEFT JOIN users u ON u.id = COALESCE(a.user_id, o.user_id)
+        LEFT JOIN evaluations e ON e.rowid = (
+            SELECT latest.rowid
+            FROM evaluations latest
+            WHERE latest.attempt_id = a.id
+            ORDER BY latest.created_at DESC, latest.rowid DESC
+            LIMIT 1
+        )
+        ORDER BY COALESCE(o.created_at, a.created_at, a.updated_at) DESC
         LIMIT ?
     """
     try:
         with sqlite3.connect(database_path, timeout=5) as connection:
             raw = connection.execute(query, (ROW_LIMIT,)).fetchall()
     except sqlite3.OperationalError:
-        return []
+        # Fallback if evaluations or user columns are structured differently
+        fallback_query = """
+            SELECT a.id, a.case_id, a.session_json, a.updated_at,
+                   o.user_id, o.created_at, u.email, u.name, u.picture
+            FROM attempts a
+            LEFT JOIN attempt_owners o ON o.attempt_id = a.id
+            LEFT JOIN users u ON u.id = o.user_id
+            ORDER BY COALESCE(o.created_at, a.updated_at) DESC
+            LIMIT ?
+        """
+        try:
+            with sqlite3.connect(database_path, timeout=5) as connection:
+                legacy_raw = connection.execute(fallback_query, (ROW_LIMIT,)).fetchall()
+                raw = [
+                    (r[0], r[1], r[2], r[5], r[3], r[4], r[5], r[6], r[7], r[8], None, None, None)
+                    for r in legacy_raw
+                ]
+        except sqlite3.OperationalError:
+            return []
 
     rows: list[dict[str, Any]] = []
     for (
         attempt_id,
         case_id,
         session_json,
-        updated_at,
+        a_created_at,
+        a_updated_at,
         user_id,
         created_at,
         email,
         name,
         picture,
+        eval_version,
+        report_json,
+        eval_created_at,
     ) in raw:
         try:
             session = json.loads(session_json)
         except (ValueError, TypeError):
             session = {}
 
+        try:
+            report = json.loads(report_json) if report_json else None
+        except (ValueError, TypeError):
+            report = None
+
         messages = session.get("messages") or []
-        started = _parse_timestamp(created_at)
-        updated = _parse_timestamp(updated_at)
+        started = _parse_timestamp(created_at or a_created_at)
+        updated = _parse_timestamp(a_updated_at)
+
+        feedback_score = None
+        if report and isinstance(report.get("dimensions"), list):
+            dim_scores = [
+                float(d["score"])
+                for d in report["dimensions"]
+                if isinstance(d, dict) and isinstance(d.get("score"), (int, float))
+            ]
+            if dim_scores:
+                feedback_score = round(sum(dim_scores) / len(dim_scores), 1)
+
         rows.append(
             {
                 "id": attempt_id,
                 "case_id": case_id,
-                "mode": session.get("mode", "unknown"),
+                "mode": session.get("mode", "realistic"),
                 "stage": session.get("stage", "unknown"),
                 "ended": bool(session.get("ended")),
                 "candidate_turns": int(session.get("candidate_turns") or 0),
                 "messages": len(messages),
                 "facts_released": len(session.get("disclosed_ids") or []),
-                "started_at": created_at,
-                "updated_at": updated_at,
+                "started_at": created_at or a_created_at or a_updated_at,
+                "updated_at": a_updated_at,
                 "duration_minutes": _minutes_between(started, updated),
+                "feedback_score": feedback_score,
+                "evaluator_version": eval_version,
                 "user": (
                     {"id": user_id, "email": email, "name": name, "picture": picture}
                     if user_id and email
@@ -102,6 +154,7 @@ def _attempt_rows(database_path: Path) -> list[dict[str, Any]]:
                 ),
                 "_messages": messages,
                 "_disclosed": list(session.get("disclosed_ids") or []),
+                "_report": report,
             }
         )
     return rows
@@ -247,11 +300,51 @@ def read_transcript(request: Request, attempt_id: str) -> dict[str, Any]:
         except Exception:  # a mid-flight runtime change must not break the transcript
             scorecard = None
 
+    evaluation = None
+    if row.get("_report"):
+        evaluation = {
+            "evaluator_version": row.get("evaluator_version"),
+            "report": row.get("_report"),
+        }
+
     return {
         "attempt": _public(row),
         "messages": row["_messages"],
         "facts": facts,
         "scorecard": scorecard,
+        "evaluation": evaluation,
+    }
+
+
+@router.post("/attempts/{attempt_id}/evaluate")
+def evaluate_attempt(request: Request, attempt_id: str) -> dict[str, Any]:
+    """Re-run the evaluator under the current rubric, prompt, and model versions.
+
+    Reports are keyed by evaluator version rather than overwritten, so this
+    builds history instead of rewriting it.
+    """
+    catalogue = request.app.state.catalogue
+    session = request.app.state.store.get(attempt_id, catalogue)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Attempt not found")
+    if not session.ended:
+        raise HTTPException(status_code=409, detail="The attempt has not ended yet")
+    evaluator = request.app.state.evaluator
+    if evaluator is None:
+        raise HTTPException(status_code=503, detail="The evaluator is not configured")
+
+    from app.evaluator import EvaluatorUnavailable
+
+    try:
+        report = evaluator.evaluate(session)
+    except EvaluatorUnavailable as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    payload = report.model_dump()
+    payload["overall"] = evaluator.overall(report)
+    request.app.state.evaluations.save(report.model_dump_json(), attempt_id, report.evaluator_version)
+    return {
+        "evaluation": payload,
+        "versions": request.app.state.evaluations.history(attempt_id),
     }
 
 

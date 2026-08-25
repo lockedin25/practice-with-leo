@@ -1,7 +1,7 @@
 /* Leo admin console: cohort metrics, per-candidate rollups, and the full
  * transcript of any attempt rendered the way the candidate saw it. */
 
-const state = { overview: null, users: [], attempts: [], filter: "" };
+const state = { overview: null, users: [], attempts: [], filter: "", caseTitles: new Map() };
 
 const el = {
   freshness: document.querySelector("#freshness"),
@@ -80,7 +80,7 @@ const RELATIVE_STEPS = [
 
 function relativeTime(value) {
   const moment = parseUtc(value);
-  if (!moment) return "—";
+  if (!moment) return "Not recorded";
   const seconds = Math.max(0, (Date.now() - moment.getTime()) / 1000);
   if (seconds < 45) return "just now";
   for (const [limit, unit] of RELATIVE_STEPS) {
@@ -94,11 +94,48 @@ function relativeTime(value) {
   return moment.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
 }
 
-const titleCase = (value) =>
-  String(value || "").replace(/(^|[\s·/-])([a-z])/g, (_, edge, char) => edge + char.toUpperCase());
+/* --- Labels --------------------------------------------------------------
+ * One formatter for every enum the API hands over. The attempt rows speak
+ * snake_case ("drill_down") and kebab-case (case ids), and neither reads as
+ * English without this. Identical copies live in profile.js and debrief.js;
+ * the three scripts are never loaded together.
+ */
 
-const humanise = (value) => titleCase(String(value || "").replace(/[-_]/g, " ")).trim();
-const caseName = (caseId) => humanise(String(caseId || "").replace(/-v\d+$/, "")) || "Unknown case";
+const LABEL_ACRONYMS = new Map(Object.entries({
+  saas: "SaaS", b2b: "B2B", b2c: "B2C", bnpl: "BNPL", fmcg: "FMCG",
+  cpg: "CPG", msme: "MSME", qsr: "QSR", ev: "EV", ai: "AI", it: "IT",
+  kpi: "KPI", ebitda: "EBITDA", mbb: "MBB", iim: "IIM", isb: "ISB",
+  bcg: "BCG", "m&a": "M&A", roi: "ROI", "r&d": "R&D",
+}));
+
+const LABEL_MINOR = new Set([
+  "and", "or", "of", "the", "a", "an", "to", "for", "in", "on", "at",
+  "vs", "per", "with", "from",
+]);
+
+function titleCase(value) {
+  const words = String(value ?? "").replace(/[_-]+/g, " ").trim().split(/\s+/);
+  if (!words[0]) return "";
+  return words
+    .map((word, index) => {
+      const key = word.toLowerCase();
+      if (LABEL_ACRONYMS.has(key)) return LABEL_ACRONYMS.get(key);
+      if (index > 0 && LABEL_MINOR.has(key)) return key;
+      return key.charAt(0).toUpperCase() + key.slice(1);
+    })
+    .join(" ");
+}
+
+/* The admin API returns case_id only, so the console used to show the slug
+ * ("02 Airline Fleet Optimization") in place of the real case title
+ * ("Low-Cost Airline Turnaround Time"). The catalogue is the only place the
+ * title exists, so it is loaded once at boot and looked up here. The
+ * de-slugged id stays as the fallback for a case that has left the library. */
+const caseName = (caseId) => {
+  const id = String(caseId || "");
+  return state.caseTitles.get(id) || titleCase(id.replace(/-v\d+$/, "")) || "Unknown case";
+};
+
 const percent = (ratio) => `${Math.round((ratio || 0) * 100)}%`;
 
 function personCell(person) {
@@ -134,12 +171,12 @@ function renderViewer(user) {
 
 function renderTiles(totals) {
   const tiles = [
-    ["Candidates", totals.users, `${totals.users_active_7d} signed in this week`],
-    ["Attempts", totals.attempts, `${totals.attempts_7d} started in the last 7 days`],
-    ["Completed", totals.attempts_completed, `${percent(totals.completion_rate)} of attempts reach a summary`],
-    ["Turns per attempt", totals.avg_turns_per_attempt, `${totals.candidate_turns} candidate turns in total`],
-    ["Evidence per attempt", totals.avg_facts_per_attempt, `${totals.facts_released} facts released in total`],
-    ["Minutes per attempt", totals.avg_minutes_per_attempt, `${totals.attempts_in_progress} attempts still open`],
+    ["Candidates", totals.users, `${totals.users_active_7d} active this week`],
+    ["Attempts", totals.attempts, `${totals.attempts_7d} in the last 7 days`],
+    ["Completed", totals.attempts_completed, `${percent(totals.completion_rate)} completion rate`],
+    ["Turns per attempt", totals.avg_turns_per_attempt, `${totals.candidate_turns} turns in total`],
+    ["Facts per attempt", totals.avg_facts_per_attempt, `${totals.facts_released} facts released`],
+    ["Minutes per attempt", totals.avg_minutes_per_attempt, `${totals.attempts_in_progress} attempts open`],
   ];
   el.tiles.replaceChildren(
     ...tiles.map(([label, value, note]) => {
@@ -159,8 +196,12 @@ function renderChart(daily) {
   el.chartTotal.textContent = String(daily.reduce((sum, day) => sum + day.count, 0));
   el.bars.replaceChildren(
     ...daily.map((day) => {
-      const bar = node("div", `bar${day.count === peak && day.count > 0 ? " is-peak" : ""}`);
-      bar.style.height = `${Math.max(3, Math.round((day.count / peak) * 100))}%`;
+      /* A quiet day still draws a trace on the baseline. Two bars in a row of
+       * fourteen empty slots looked like a broken chart rather than a quiet
+       * fortnight. */
+      const modifier = day.count === 0 ? " is-zero" : day.count === peak ? " is-peak" : "";
+      const bar = node("div", `bar${modifier}`);
+      bar.style.height = day.count === 0 ? "2px" : `${Math.max(8, Math.round((day.count / peak) * 100))}%`;
       bar.title = `${day.date}: ${day.count} attempt${day.count === 1 ? "" : "s"}`;
       return bar;
     }),
@@ -171,7 +212,7 @@ function renderChart(daily) {
   el.axisEnd.textContent = daily.length ? shortDate(daily[daily.length - 1].date) : "";
 }
 
-function renderBreakdown(target, rows, formatter = humanise) {
+function renderBreakdown(target, rows, formatter = titleCase) {
   if (!rows.length) {
     target.replaceChildren(node("p", "tile-note", "Nothing recorded yet."));
     return;
@@ -264,10 +305,10 @@ function renderAttempts(attempts) {
       row.append(
         person,
         cell(caseName(attempt.case_id)),
-        cell(humanise(attempt.stage)),
+        cell(titleCase(attempt.stage)),
         cell(String(attempt.candidate_turns), "numeric"),
         cell(String(attempt.facts_released), "numeric"),
-        cell(attempt.duration_minutes === null ? "—" : String(attempt.duration_minutes), "numeric"),
+        cell(attempt.duration_minutes === null ? "–" : String(attempt.duration_minutes), "numeric"),
         cell(relativeTime(attempt.started_at || attempt.updated_at)),
         status,
       );
@@ -315,11 +356,11 @@ async function openTranscript(attemptId) {
   }
 }
 
-function renderDrawer({ attempt, messages, facts, scorecard }) {
+function renderDrawer({ attempt, messages, facts, scorecard, evaluation }) {
   el.drawerTitle.textContent = caseName(attempt.case_id);
   el.drawerMeta.replaceChildren(
     node("span", "tag tag-accent", attempt.user ? attempt.user.name || attempt.user.email : "Unattributed"),
-    node("span", "tag", `${humanise(attempt.stage)} reached`),
+    node("span", "tag", `${titleCase(attempt.stage)} reached`),
     node("span", "tag", `${attempt.candidate_turns} turns`),
     node("span", "tag", `${attempt.facts_released} facts`),
     node("span", "tag", attempt.duration_minutes === null ? "Duration unknown" : `${attempt.duration_minutes} min`),
@@ -328,7 +369,41 @@ function renderDrawer({ attempt, messages, facts, scorecard }) {
 
   const sections = [];
 
-  if (scorecard) {
+  const report = evaluation?.report;
+  if (report) {
+    const section = node("section", "drawer-section");
+    section.append(node("p", "eyebrow", `Evaluator Debrief · ${evaluation.evaluator_version || "v1"}`));
+    const grid = node("div", "scorecard-grid");
+    if (Array.isArray(report.dimensions)) {
+      grid.append(
+        ...report.dimensions.map((dimension) => {
+          const line = node("div", "scorecard-line");
+          line.append(
+            node("strong", null, titleCase(dimension.name)),
+            node("span", "band band-strong", `${dimension.score}/10`),
+          );
+          return line;
+        }),
+      );
+    }
+    section.append(grid);
+    if (report.headline_strengths?.length) {
+      const drill = node("div", "next-drill");
+      drill.append(node("p", "micro-label", "Key strengths"), node("p", null, report.headline_strengths.join(" · ")));
+      section.append(drill);
+    }
+    if (report.priority_improvements?.length) {
+      const drill = node("div", "next-drill");
+      drill.append(node("p", "micro-label", "Priority improvements"), node("p", null, report.priority_improvements.join(" · ")));
+      section.append(drill);
+    }
+    if (report.next_drill) {
+      const drill = node("div", "next-drill");
+      drill.append(node("p", "micro-label", "Next drill"), node("p", null, report.next_drill));
+      section.append(drill);
+    }
+    sections.push(section);
+  } else if (scorecard) {
     const section = node("section", "drawer-section");
     section.append(node("p", "eyebrow", "Scorecard"));
     const grid = node("div", "scorecard-grid");
@@ -366,7 +441,7 @@ function renderDrawer({ attempt, messages, facts, scorecard }) {
       ...facts.map((fact, index) => {
         const card = node("article", "fact");
         card.append(
-          node("span", "fact-index", `${String(index + 1).padStart(2, "0")} · ${humanise(fact.id.replace(/\./g, " · "))}`),
+          node("span", "fact-index", `${String(index + 1).padStart(2, "0")} · ${titleCase(fact.id.replace(/\./g, " "))}`),
           node("p", "fact-content", fact.content),
         );
         return card;
@@ -425,9 +500,23 @@ el.signOut.addEventListener("click", async () => {
   }
 });
 
+/* The case catalogue, keyed by id, so every attempt row can show the title a
+ * candidate saw rather than the id it was stored under. */
+async function loadCaseTitles() {
+  if (state.caseTitles.size) return;
+  try {
+    const { cases } = await api("/api/cases");
+    state.caseTitles = new Map((cases || []).map((item) => [item.id, item.title]));
+  } catch {
+    /* A missing catalogue is not worth failing the console over: caseName
+     * falls back to the de-slugged id. */
+  }
+}
+
 async function refresh() {
   el.refresh.disabled = true;
   try {
+    await loadCaseTitles();
     const [overview, users, attempts] = await Promise.all([
       api("/api/admin/overview"),
       api("/api/admin/users"),

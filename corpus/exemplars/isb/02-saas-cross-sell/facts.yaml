@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: saas.metrics
+  domain: company
+  release_level: broad_context
+  content: Client has 850 enterprise clients with $60M ARR; Gross Revenue Retention is 94%, but NRR dropped to 102%.
+- id: module.adoption
+  domain: product
+  release_level: sharp_question
+  content: Only 14% of clients adopt more than 1 module; Module 2 (Analytics) and Module 3 (Automation) are sold as separate
+    standalone contracts.
+- id: sales.comp
+  domain: operations
+  release_level: hypothesis_backed
+  content: Account Executives receive 12% commission on new logos and 0% on renewals/upsells; Customer Success managers manage
+    support tickets with zero commercial quotas.
+  dependencies:
+  - module.adoption
+- id: platform.integration
+  domain: product
+  release_level: hypothesis_backed
+  content: Modules require separate user logins and do not share unified data schemas, creating IT integration friction for
+    enterprise buyers.
+  dependencies:
+  - sales.comp
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: NRR dropped to 102% because secondary modules are sold as fragmented standalone tools with separate logins, and
+    sales compensation ignores account expansion in favor of new logos.
+- id: recommendation.unified_platform
+  domain: recommendation
+  release_level: synthesis_support
+  content: Unify all 3 modules into a single modular platform with unified Single Sign-On (SSO) and shared data analytics.
+- id: recommendation.account_expansion
+  domain: recommendation
+  release_level: synthesis_support
+  content: Create a dedicated Account Management expansion team compensated on Net Expansion ARR with 130% target tiers.
+- id: recommendation.product_led_growth
+  domain: recommendation
+  release_level: synthesis_support
+  content: Introduce in-app free trials of secondary modules with 1-click credit-card or invoice add-ons.

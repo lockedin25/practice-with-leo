@@ -1,0 +1,46 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: order.volume
+  domain: company
+  release_level: broad_context
+  content: Platform fulfills 800,000 daily orders across 650 dark stores with average delivery time of 11.4 minutes.
+- id: unit.economics
+  domain: economics
+  release_level: sharp_question
+  content: "On an average \u20B9220 order: product margin is \u20B940 (18%), dark store pick/pack is \u20B916, rider delivery\
+    \ payout is \u20B944, payment/tech is \u20B92, resulting in -\u20B922 contribution."
+- id: basket.distribution
+  domain: customers
+  release_level: hypothesis_backed
+  content: "Orders below \u20B9199 represent 42% of volume and lose \u20B934 per order; orders above \u20B9399 generate +\u20B9\
+    18 positive contribution."
+  dependencies:
+  - unit.economics
+- id: handling.fee
+  domain: pricing
+  release_level: hypothesis_backed
+  content: "Testing a \u20B94 handling fee and \u20B925 delivery fee on orders below \u20B9249 reduced small order volume\
+    \ by only 8% while raising AOV by 24%."
+  dependencies:
+  - basket.distribution
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Loss of \u20B922/order is driven by 42% of orders being small baskets (<\u20B9199) with free delivery where fixed\
+    \ \u20B960 fulfillment cost exceeds \u20B932 margin; solution requires \u20B9299 free-delivery threshold, \u20B94 handling\
+    \ fee, and VIP subscription."
+- id: recommendation.threshold
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Set free delivery threshold at \u20B9299; charge tiered \u20B925 delivery fee for orders below \u20B9199 and \u20B9\
+    15 for \u20B9199-\u20B9299."
+- id: recommendation.handling_fee
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Implement a universal \u20B94-\u20B96 rain/peak handling fee on all orders during surge hours."
+- id: recommendation.vip_club
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Launch paid 'QuickPass' subscription (\u20B999/quarter) offering free delivery above \u20B9199 to lock in high-frequency\
+    \ power shoppers."

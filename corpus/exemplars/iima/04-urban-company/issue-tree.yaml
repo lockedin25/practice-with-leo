@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.home-services-retention
+  label: Fix service partner churn and platform contribution margin.
+nodes:
+- id: partner-lifecycle
+  type: branch
+  label: Partner Acquisition & Churn Dynamics
+  status: valid_branch
+  evidence: []
+  conclusion: Churn is 48%, driven by technicians leaving after 4 months.
+- id: disintermediation-leakage
+  type: branch
+  label: Off-Platform Transaction Leakage
+  status: valid_branch
+  evidence: []
+  conclusion: 35% of repeat bookings happen offline directly between customers and technicians.
+- id: partner-net-earnings
+  type: branch
+  label: Take-Rate, Kit Capex & Payout Timing
+  status: valid_branch
+  evidence: []
+  conclusion: "22% commission and \u20B915k kit cost make offline transactions compelling for partners."
+- id: diagnosis
+  type: diagnosis
+  label: Platform Disintermediation & High Partner Friction
+  status: hidden_target
+  evidence:
+  - partner-lifecycle
+  - disintermediation-leakage
+  - partner-net-earnings
+  conclusion: Technicians and clients defect offline to avoid 22% fees after initial matching, exacerbated by high upfront
+    equipment debt and slow payout cycles.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Marketplace Anti-Leakage Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Lower repeat booking commissions, offer technician benefits (insurance, daily payouts), and provide customer
+    warranty protection.
+edges:
+- from: objective.home-services-retention
+  to: partner-lifecycle
+  relation: investigate
+- from: objective.home-services-retention
+  to: disintermediation-leakage
+  relation: investigate
+- from: objective.home-services-retention
+  to: partner-net-earnings
+  relation: investigate
+- from: partner-lifecycle
+  to: diagnosis
+  relation: supports
+- from: disintermediation-leakage
+  to: diagnosis
+  relation: supports
+- from: partner-net-earnings
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: churn-first
+  sequence:
+  - partner-lifecycle
+  - disintermediation-leakage
+  - partner-net-earnings
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from partner churn to offline booking leakage.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what prevents customers and technicians from cutting out the platform after the first meeting.
+  - Clarify that customer demand exists but bypasses the app.
+  - Redirect toward partner take-rates and repeat-booking incentives.

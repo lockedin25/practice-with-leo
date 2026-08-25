@@ -1,0 +1,90 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+
+root:
+  id: objective.solar-conversion
+  label: Diagnose 9% lead conversion bottleneck and recommend offer and pricing redesign to achieve 18% target over 12 months.
+
+nodes:
+  - id: funnel-stage-dropoff
+    type: branch
+    label: Sales funnel drop-off and qualification analysis
+    status: valid_branch
+    evidence:
+      - funnel
+    conclusion: Inbound lead volume and technical site qualification are sound; conversion collapses post cash quote.
+
+  - id: customer-hurdle-rates
+    type: mechanism
+    label: Customer cash flow constraints and upfront capex perception
+    status: pivotal_test
+    evidence:
+      - customer.cashflow
+      - price.position
+    conclusion: SME owners reject large lump-sum capex quotes to preserve working capital, despite acknowledging long-term energy savings.
+
+  - id: financing-unit-economics
+    type: mechanism
+    label: 5-Year financed monthly payment vs grid power savings
+    status: pivotal_test
+    evidence:
+      - economics.loan
+      - competition
+    conclusion: 5-year loan installment is lower than monthly grid electricity savings from month one, yielding day-one positive cash flow.
+
+  - id: segment-repayment-capacity
+    type: branch
+    label: High-usage factories/warehouses vs low-usage retail economics
+    status: valid_branch
+    evidence:
+      - economics.segment
+      - risk.credit
+      - operations.install
+    conclusion: High-load industrial clients have rapid payback; third-party lender integration avoids balance-sheet credit risk.
+
+  - id: diagnosis
+    type: diagnosis
+    label: Synthesize commercial bottleneck and pricing redesign
+    status: hidden_target
+    evidence:
+      - funnel-stage-dropoff
+      - customer-hurdle-rates
+      - financing-unit-economics
+    conclusion: >-
+      Conversion fails because lump-sum quotes demand upfront capital from cash-constrained SMEs;
+      SunPeak must transition to an OPEX-equivalent financed monthly payment structure partnered with financial lenders.
+
+  - id: actions
+    type: recommendation
+    label: 3-Pillar 12-Month Commercial Transformation
+    status: synthesis
+    evidence:
+      - recommendation.offer
+      - recommendation.focus
+      - recommendation.process
+    conclusion: Roll out side-by-side financed monthly offer, focus sales on high-load industrial sectors, and integrate lender pre-approval into surveys.
+
+edges:
+  - { from: objective.solar-conversion, to: funnel-stage-dropoff, relation: investigate }
+  - { from: funnel-stage-dropoff, to: customer-hurdle-rates, relation: motivates }
+  - { from: customer-hurdle-rates, to: financing-unit-economics, relation: motivates }
+  - { from: financing-unit-economics, to: segment-repayment-capacity, relation: requires_segmentation }
+  - { from: financing-unit-economics, to: diagnosis, relation: supports }
+  - { from: segment-repayment-capacity, to: diagnosis, relation: supports }
+  - { from: diagnosis, to: actions, relation: determines }
+
+acceptable_routes:
+  - id: funnel-first
+    sequence: [funnel-stage-dropoff, customer-hurdle-rates, financing-unit-economics, segment-repayment-capacity, diagnosis, actions]
+    interviewer_behaviour: Guide candidate to isolate drop-off at the final quote, then test customer cash-flow hurdles.
+
+  - id: competitive-benchmark-first
+    sequence: [customer-hurdle-rates, financing-unit-economics, segment-repayment-capacity, diagnosis, actions]
+    interviewer_behaviour: Probe candidate on why competitors win with monthly energy plans before designing the financing structure.
+
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+    - Ask candidate to state hypothesis on why qualified leads reject quotes despite strong lifetime savings.
+    - Clarify that upfront equipment pricing is competitive with peers.
+    - Redirect candidate toward examining customer working-capital constraints and comparing monthly financing vs monthly power savings.

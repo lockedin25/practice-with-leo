@@ -1,14 +1,110 @@
 schema_version: reservoir-facts-v1
 facts:
-  - {id: company.model, domain: company, release_level: broad_context, content: "TerraBuild produces cement, aggregates, and ready-mix concrete for infrastructure and commercial construction customers."}
-  - {id: emissions_profile, domain: operations, release_level: sharp_question, content: "Cement clinker production creates most of TerraBuild's emissions; purchased electricity and logistics are smaller but material sources."}
-  - {id: customer_demand, domain: customers, release_level: sharp_question, content: "Large infrastructure and commercial customers increasingly request verified lower-carbon materials, but most will not accept a large price premium without performance assurance."}
-  - {id: carbon_cost, domain: financials, release_level: hypothesis_backed, content: "Expected carbon costs would materially reduce EBITDA at the most clinker-intensive plants if TerraBuild makes no changes over five years."}
-  - {id: levers, domain: strategy, release_level: hypothesis_backed, content: "Blended cement using supplementary materials can reduce emissions at attractive cost where reliable slag or fly-ash supply exists; deep kiln upgrades take longer and require more capital."}
-  - {id: plant_variation, domain: operations, release_level: sharp_question, content: "Plants differ in fuel efficiency, access to supplementary materials, customer mix, and remaining equipment life, so one investment sequence would be inefficient."}
-  - {id: economics, domain: economics, release_level: hypothesis_backed, content: "Energy-efficiency projects and selected blended products clear TerraBuild's return threshold before carbon-price upside; carbon capture does not yet clear the same threshold at current scale."}
-  - {id: quality, domain: risk, release_level: sharp_question, content: "Engineers and customers require product certification and reliable strength performance before changing specifications on major projects."}
-  - {id: capital, domain: financials, release_level: broad_context, content: "TerraBuild has a constrained capital envelope and cannot fund every plant upgrade, alternative-fuel project, and capture pilot simultaneously."}
-  - {id: recommendation.sequence, domain: recommendation, release_level: synthesis_support, content: "Prioritise energy efficiency and blended products at plants with strong material access, customer demand, and near-term economic return."}
-  - {id: recommendation_commercial, domain: recommendation, release_level: synthesis_support, content: "Co-develop certified lower-carbon specifications with anchor customers, linking any premium to verified performance and emissions reduction."}
-  - {id: recommendation_options, domain: recommendation, release_level: synthesis_support, content: "Preserve options for deeper kiln upgrades and carbon capture through pilots and site readiness, but do not make them the first portfolio-wide spend."}
+  - id: company.model
+    domain: company
+    release_level: broad_context
+    content: "TerraBuild produces cement, aggregates, and ready-mix concrete for infrastructure and commercial construction customers."
+    candidate_purpose: "Establish building materials operating model and product lines."
+    question_examples:
+      - "What products does TerraBuild produce and sell?"
+      - "What customer segments does TerraBuild serve?"
+
+  - id: emissions_profile
+    domain: operations
+    release_level: sharp_question
+    content: "Cement clinker production creates most of TerraBuild's emissions; purchased electricity and logistics are smaller but material sources."
+    candidate_purpose: "Isolate emissions baseline: clinker limestone calcination dominates Scope 1 emissions."
+    question_examples:
+      - "What is TerraBuild's emissions profile across Scopes 1, 2, and 3?"
+      - "Which operational process generates the highest carbon emissions?"
+
+  - id: customer_demand
+    domain: customers
+    release_level: sharp_question
+    content: "Large infrastructure and commercial customers increasingly request verified lower-carbon materials, but most will not accept a large price premium without performance assurance."
+    candidate_purpose: "Clarify buyer preferences: demand for verified green specs with strict strength certification and low premium."
+    question_examples:
+      - "What green procurement targets have customers announced?"
+      - "Are buyers willing to pay a premium for green cement?"
+
+  - id: carbon_cost
+    domain: financials
+    release_level: hypothesis_backed
+    content: "Expected carbon costs would materially reduce EBITDA at the most clinker-intensive plants if TerraBuild makes no changes over five years."
+    dependencies: [emissions_profile]
+    candidate_purpose: "Demonstrate financial risk of inaction under rising carbon pricing."
+    question_examples:
+      - "What is the financial impact of expected carbon taxes or credit prices?"
+      - "How will EBITDA margin be impacted if no decarbonization investments are made?"
+
+  - id: levers
+    domain: strategy
+    release_level: hypothesis_backed
+    content: "Blended cement using supplementary materials can reduce emissions at attractive cost where reliable slag or fly-ash supply exists; deep kiln upgrades take longer and require more capital."
+    dependencies: [emissions_profile]
+    candidate_purpose: "Highlight clinker substitution (slag/fly-ash SCM) as low-cost near-term abatement lever."
+    question_examples:
+      - "What decarbonization technology levers are available to TerraBuild?"
+      - "How does clinker substitution compare to kiln overhaul in cost and speed?"
+
+  - id: plant_variation
+    domain: operations
+    release_level: sharp_question
+    content: "Plants differ in fuel efficiency, access to supplementary materials, customer mix, and remaining equipment life, so one investment sequence would be inefficient."
+    candidate_purpose: "Emphasize plant-specific tailoring: fly-ash access, kiln age, local commercial demand."
+    question_examples:
+      - "Are all manufacturing plants identical or do they differ in raw material access?"
+      - "How does clinker factor and fuel efficiency vary across facilities?"
+
+  - id: economics
+    domain: economics
+    release_level: hypothesis_backed
+    content: "Energy-efficiency projects and selected blended products clear TerraBuild's return threshold before carbon-price upside; carbon capture does not yet clear the same threshold at current scale."
+    dependencies: [levers]
+    candidate_purpose: "Provide MACC economics: energy efficiency and SCM blends are NPV-positive today; CCUS destroys ROIC."
+    question_examples:
+      - "What are the project economics and ROIC across different green initiatives?"
+      - "Does carbon capture and storage (CCUS) meet the internal hurdle rate?"
+
+  - id: quality
+    domain: risk
+    release_level: sharp_question
+    content: "Engineers and customers require product certification and reliable strength performance before changing specifications on major projects."
+    candidate_purpose: "Identify engineering risk: strength certification hurdle on infrastructure tenders."
+    question_examples:
+      - "What technical certifications are required to sell blended cement to major projects?"
+      - "Do structural engineers accept high-blend slag/fly-ash cement?"
+
+  - id: capital
+    domain: financials
+    release_level: broad_context
+    content: "TerraBuild has a constrained capital envelope and cannot fund every plant upgrade, alternative-fuel project, and capture pilot simultaneously."
+    candidate_purpose: "Establish capital rationing constraint: phased sequencing mandatory."
+    question_examples:
+      - "What is TerraBuild's total capital expenditure envelope over 5 years?"
+      - "Can the company finance all decarbonization options concurrently?"
+
+  - id: diagnosis.hidden
+    domain: diagnosis
+    release_level: interviewer_only
+    provenance: source_derived
+    content: "Clinker calcination dominates emissions, threatening EBITDA under rising carbon costs; because capital is constrained and CCUS fails economic hurdle rates today, TerraBuild must sequence investments along the MACC curve: execute NPV-positive waste-heat/energy efficiency first, expand SCM blended cements (fly ash/slag) co-certified with anchor buyers second, and hold CCUS as a long-term technology option."
+    candidate_purpose: "Never disclose directly. Benchmark for evaluator answer-key comparison and interviewer recovery."
+
+  - id: recommendation.sequence
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Prioritise energy efficiency and blended products at plants with strong material access, customer demand, and near-term economic return."
+    candidate_purpose: "Pillar 1: MACC-prioritized plant sequencing (energy efficiency & SCM substitution)."
+
+  - id: recommendation_commercial
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Co-develop certified lower-carbon specifications with anchor customers, linking any premium to verified performance and emissions reduction."
+    candidate_purpose: "Pillar 2: Anchor customer co-certification and green product commercialization."
+
+  - id: recommendation_options
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Preserve options for deeper kiln upgrades and carbon capture through pilots and site readiness, but do not make them the first portfolio-wide spend."
+    candidate_purpose: "Pillar 3: Long-term option preservation for deep kiln upgrades and CCUS."

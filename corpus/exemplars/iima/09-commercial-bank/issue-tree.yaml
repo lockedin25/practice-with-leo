@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.sme-loan-npa
+  label: Contain SME export loan defaults and overhaul risk monitoring.
+nodes:
+- id: default-segmentation
+  type: branch
+  label: Portfolio Segmentation & Export Corridors
+  status: valid_branch
+  evidence: []
+  conclusion: Defaults are exclusive to Western export corridors; domestic SMEs are healthy.
+- id: working-capital-cycle
+  type: branch
+  label: Receivables & Freight Transit Disruption
+  status: valid_branch
+  evidence: []
+  conclusion: Maritime shipping rerouting stretched cash cycles from 60 to 140 days.
+- id: bank-monitoring-systems
+  type: branch
+  label: Credit Monitoring & Data Velocity
+  status: valid_branch
+  evidence: []
+  conclusion: Annual audit reviews lagged real-time liquidity distress by 6 months.
+- id: diagnosis
+  type: diagnosis
+  label: Supply Chain Transit Shock & Lagging Credit Monitoring
+  status: hidden_target
+  evidence:
+  - default-segmentation
+  - working-capital-cycle
+  - bank-monitoring-systems
+  conclusion: NPA surge is driven by global freight delays extending cash cycles to 140 days, which the bank's static audit
+    systems failed to detect in real time.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Trade Credit Turnaround
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Offer bridge invoice factoring, deploy live GST/e-way bill early warning alerts, and proactively restructure
+    viable accounts.
+edges:
+- from: objective.sme-loan-npa
+  to: default-segmentation
+  relation: investigate
+- from: objective.sme-loan-npa
+  to: working-capital-cycle
+  relation: investigate
+- from: objective.sme-loan-npa
+  to: bank-monitoring-systems
+  relation: investigate
+- from: default-segmentation
+  to: diagnosis
+  relation: supports
+- from: working-capital-cycle
+  to: diagnosis
+  relation: supports
+- from: bank-monitoring-systems
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: risk-first
+  sequence:
+  - default-segmentation
+  - working-capital-cycle
+  - bank-monitoring-systems
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from geographic default segmentation to working capital cash cycles.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to compare performance of export SMEs vs domestic SMEs.
+  - Clarify that foreign buyers have not cancelled orders.
+  - Redirect inquiry toward transit shipping lead times and bank early warning systems.
