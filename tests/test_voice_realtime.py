@@ -672,3 +672,24 @@ def test_speech_written_during_the_handshake_is_queued_not_dropped() -> None:
     onopen = onopen[: onopen.index("socket.onmessage")]
     assert "queued.forEach" in onopen
     assert "flush: true" in onopen
+
+
+def test_the_voice_toggle_label_and_action_share_one_source_of_truth() -> None:
+    """A button that reads "Return to chat" must not open the start dialog.
+
+    The label came from the last status event and the click handler asked the
+    island whether it was active. When those disagreed, leaving voice mode
+    reopened the consent modal instead.
+    """
+    from pathlib import Path
+
+    client = (Path(__file__).resolve().parents[1] / "app/static/app.js").read_text()
+
+    assert "state.voiceActive = active;" in client, (
+        "setVoiceState must record whether voice is on, not only paint a label"
+    )
+    assert "state.voiceActive || window.LeoVoice?.active" in client, (
+        "leaving voice mode must win whenever either source thinks voice is on"
+    )
+    # textContent on the button would delete the mic icon inside it.
+    assert "el.voiceToggleLabel.textContent" in client

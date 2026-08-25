@@ -18,7 +18,6 @@ const PHASE_META = {
 };
 const DEFAULT_PHASES = ["clarification", "drill_down", "synthesis"];
 const GENERIC_CATEGORIES = new Set(["case interview", "case", "general"]);
-const DURATION_MINUTES = 30;
 const STORAGE_SESSION = "casecall:session";
 const MAX_COMPOSER_HEIGHT = 190;
 const AUDIO_CUE = /\[(?:warmly|confidently|patiently|empathetically|seriously|enthusiastically|excitedly|chuckles|laughing|sighs)\]\s*/gi;
@@ -37,12 +36,9 @@ const state = {
   phases: [],
   sending: false,
   ending: false,
-  startedAt: null,
-  timerId: null,
-  /* The clock measures time spent in the room, not wall-clock time since the
-   * attempt was created. Otherwise reopening yesterday's case shows 00:00. */
-  elapsedMs: 0,
-  timeUpAnnounced: false,
+  // Whether the room is in voice mode. The toggle's label and its action both
+  // read this, so they cannot drift apart.
+  voiceActive: false,
   endArmedTimer: null,
   endRedirectTimer: null,
   // A practice room is pinned to its chosen case, including after a reload.
@@ -82,8 +78,6 @@ const el = {
   scorecard: document.querySelector("#scorecard"),
   scorecardStatus: document.querySelector("#scorecard-status"),
   scorecardBody: document.querySelector("#scorecard-content"),
-  timer: document.querySelector("#timer"),
-  timerValue: document.querySelector("#timer-value"),
   toasts: document.querySelector("#toasts"),
   userMenu: document.querySelector("#user-menu"),
   userChip: document.querySelector("#user-chip"),
@@ -96,6 +90,7 @@ const el = {
   voiceControls: document.querySelector("#voice-controls"),
   voiceStatus: document.querySelector("#voice-status"),
   voiceToggle: document.querySelector("#voice-toggle"),
+  voiceToggleLabel: document.querySelector("#voice-toggle-label"),
   voiceConsent: document.querySelector("#voice-consent"),
   voiceStart: document.querySelector("#voice-start"),
   voiceCancel: document.querySelector("#voice-cancel"),
@@ -141,7 +136,6 @@ const startAttempt = (caseId = state.selectedCaseId) =>
     body: JSON.stringify({
       ...(caseId ? { case_id: caseId } : {}),
       mode: "realistic",
-      duration_minutes: DURATION_MINUTES,
     }),
   });
 
@@ -177,84 +171,6 @@ function toast(message, kind = "info") {
   }, 4600);
 }
 
-/* --- Timer -------------------------------------------------------------- */
-/* The 30 minutes belong to the interview, not to the calendar. The clock is
- * therefore driven by time accumulated inside the room: it does not start
- * until Leo opens the case, it is banked when the room closes, and it resumes
- * from that total. Reopening a case after a long break no longer greets the
- * candidate with an expired red 00:00 and a "time is up" alert. */
-
-const DURATION_MS = DURATION_MINUTES * 60 * 1000;
-
-function remainingMs() {
-  return Math.max(0, DURATION_MS - state.elapsedMs);
-}
-
-function paintTimer() {
-  const remaining = Math.ceil(remainingMs() / 1000);
-  const minutes = String(Math.floor(remaining / 60)).padStart(2, "0");
-  const seconds = String(remaining % 60).padStart(2, "0");
-  const running = Boolean(state.timerId);
-  const expired = remaining === 0;
-
-  el.timerValue.textContent = `${minutes}:${seconds}`;
-  el.timer.classList.toggle("is-idle", !running && !expired && state.elapsedMs === 0);
-  el.timer.classList.toggle("is-warning", running && remaining <= 300 && remaining > 60);
-  el.timer.classList.toggle("is-critical", running && remaining <= 60 && remaining > 0);
-  el.timer.classList.toggle("is-expired", expired);
-}
-
-function startTimer() {
-  if (state.timerId) return;
-  state.startedAt = Date.now() - state.elapsedMs;
-  // Already over time on resume: show it calmly, never announce it as news.
-  if (!remainingMs()) state.timeUpAnnounced = true;
-  tickTimer();
-  state.timerId = window.setInterval(tickTimer, 1000);
-}
-
-function stopTimer() {
-  window.clearInterval(state.timerId);
-  state.timerId = null;
-}
-
-function tickTimer() {
-  if (state.startedAt !== null) state.elapsedMs = Date.now() - state.startedAt;
-  paintTimer();
-
-  if (!remainingMs()) {
-    const announce = !state.timeUpAnnounced;
-    state.timeUpAnnounced = true;
-    stopTimer();
-    paintTimer();
-    if (announce && !state.attempt?.ended) {
-      toast("Time is up. Land your recommendation, then end the practice.", "warning");
-    }
-  }
-}
-
-/* One place decides whether the clock should be running for this attempt. */
-function syncTimer(attempt) {
-  if (attempt.ended || attempt.ready_to_end) {
-    bankElapsed();
-    stopTimer();
-    paintTimer();
-    return;
-  }
-  if (!attempt.case_started) {
-    stopTimer();
-    state.elapsedMs = 0;
-    state.startedAt = null;
-    paintTimer();
-    return;
-  }
-  startTimer();
-}
-
-function bankElapsed() {
-  if (state.startedAt !== null && state.timerId) state.elapsedMs = Date.now() - state.startedAt;
-}
-
 /* --- Rendering ---------------------------------------------------------- */
 
 function renderAttempt(attempt) {
@@ -265,7 +181,6 @@ function renderAttempt(attempt) {
   setPhaseState(attempt);
   setEndedState(attempt.ended);
   setReadyToEndState(attempt);
-  syncTimer(attempt);
   renderCaseHeader(attempt);
   renderStage(attempt);
   renderFacts(attempt.facts, isNewAttempt);
@@ -705,13 +620,13 @@ function setReadyToEndState(attempt) {
 
 /* --- Voice mode --------------------------------------------------------- */
 
-/* The caption is live interim speech and nothing else.
+/* The caption is the state of the recording in progress, nothing else.
  *
  * It used to fall back to echoing the last transcript message, which meant the
- * HUD permanently mirrored the conversation below it: Leo's case brief rendered
- * twice, several lines tall, pushing the real transcript out of view. Its only
- * job is to show what the candidate is saying in the window before that turn
- * exists as a message. Once it does, the transcript is the record. */
+ * HUD permanently mirrored the conversation below it. Recognition is now batch,
+ * so there is no interim text to show either: what belongs here is how long the
+ * candidate has been speaking and how much of the cap is left. Once a turn is
+ * submitted the transcript below is the record. */
 /* Roughly two lines at the caption's size. Long enough to confirm recognition
  * is tracking, short enough that the HUD never grows. */
 const CAPTION_TAIL = 150;
@@ -765,14 +680,24 @@ function setVoiceState(status = "chat") {
     listening: "Speak naturally · Formulate hypotheses · Ask for facts",
     speaking: "Listen closely to the released evidence and interviewer steer",
     chat: "Chat mode",
-    idle: "Press and release space to take your turn · Esc discards a recording",
-    recording: "Press space again when you have finished speaking",
-    transcribing: "Committing what you said...",
+    idle: "Press space to take the floor · press it again to send · Esc discards",
+    recording: "Recording. Press space when you have finished speaking.",
+    transcribing: "Transcribing your turn...",
     thinking: "Leo is composing an answer",
   };
 
   el.voiceStatus.textContent = labels[status] || "Chat";
-  el.voiceToggle.textContent = active ? "Return to chat" : "Start voice";
+  // The toggle used to be labelled from the last status event while its click
+  // handler asked the island whether it was active. When those two disagreed the
+  // button read "Return to chat" and opened the start-voice dialog. One flag now
+  // drives both.
+  state.voiceActive = active;
+  // Write the label, not the button: textContent would delete the mic icon.
+  if (el.voiceToggleLabel) {
+    el.voiceToggleLabel.textContent = active ? "Return to chat" : "Start voice";
+  } else {
+    el.voiceToggle.textContent = active ? "Return to chat" : "Start voice";
+  }
   el.form.classList.toggle("is-voice-active", active);
 
   const hud = el.voiceHud || el.voiceStage;
@@ -848,7 +773,10 @@ async function returnToChat() {
 el.voiceReturnChat?.addEventListener("click", returnToChat);
 
 el.voiceToggle.addEventListener("click", async () => {
-  if (window.LeoVoice?.active) {
+  // Either source saying voice is on means leave it. returnToChat is safe to
+  // call when it is already off, so the worst case is a no-op, whereas guessing
+  // wrong the other way reopens the consent dialog mid-call.
+  if (state.voiceActive || window.LeoVoice?.active) {
     await returnToChat();
     return;
   }
@@ -906,6 +834,23 @@ window.addEventListener("leo:voice-status", (event) => {
 /* Live transcription of the candidate, before any turn has been submitted. */
 window.addEventListener("leo:voice-caption", (event) => {
   setVoiceCaption(event.detail?.text || "");
+});
+
+const clock = (seconds) => {
+  const whole = Math.max(0, Math.floor(seconds));
+  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
+};
+
+/* Recording length against the cap. A recording with no visible length is
+ * unnerving, and the limit has to be legible before it is reached. */
+window.addEventListener("leo:voice-recording", (event) => {
+  const { seconds = 0, limit = 120 } = event.detail || {};
+  const remaining = limit - seconds;
+  setVoiceCaption(
+    remaining <= 15
+      ? `Recording ${clock(seconds)} · ${clock(remaining)} left before this turn is sent`
+      : `Recording ${clock(seconds)} of ${clock(limit)}`,
+  );
 });
 
 /* The transcript the candidate committed, shown before Leo's reply lands. */
