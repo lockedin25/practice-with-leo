@@ -90,6 +90,22 @@
           </button>
         </div>
 
+        <section class="case-close-prompt hidden" id="case-close-prompt" aria-live="polite" aria-labelledby="case-close-title">
+          <div class="case-close-copy">
+            <p class="eyebrow">
+              <span class="eyebrow-mark" aria-hidden="true"></span>
+              Interview complete
+            </p>
+            <h2 class="case-close-title" id="case-close-title">Finish the case to unlock your debrief</h2>
+            <p class="case-close-note">Leo has closed the interview. End the case to save your transcript and generate your performance review.</p>
+          </div>
+          <button class="btn btn-primary case-close-action" id="complete-attempt" type="button">
+            <span class="case-close-action-label">End case and view debrief</span>
+            <span class="arrow" aria-hidden="true">→</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+        </section>
+
         <div class="composer-field">
           <label class="sr-only" for="candidate-message">Your response</label>
           <textarea

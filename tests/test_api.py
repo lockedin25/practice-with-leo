@@ -105,6 +105,15 @@ def test_case_opening_is_a_brief_not_a_forced_question() -> None:
     assert not opening.endswith("?")
 
 
+def test_practice_room_contains_the_conclusion_handoff() -> None:
+    response = client.get("/practice")
+
+    assert response.status_code == 200
+    assert 'id="case-close-prompt"' in response.text
+    assert 'id="complete-attempt"' in response.text
+    assert "End case and view debrief" in response.text
+
+
 def test_duplicate_turn_id_is_processed_once() -> None:
     started = client.post("/api/attempts", json={"case_id": "bluecurrent-water-v1"}).json()
     assert client.post(
@@ -172,3 +181,47 @@ def test_incomplete_reply_is_regenerated_before_it_can_be_persisted() -> None:
     assert result.reply == "That is a reasonable starting point. Separate revenue, cost, and margin before testing a driver."
     assert session.messages[-1] == {"role": "interviewer", "content": result.reply}
     assert writer.calls == 2
+
+
+def test_llm_close_decision_marks_the_attempt_ready_to_end() -> None:
+    class SequenceChain:
+        def __init__(self, values):
+            self.values = list(values)
+
+        def invoke(self, _inputs):
+            return self.values.pop(0)
+
+    interviewer = LangChainCaseInterviewer.__new__(LangChainCaseInterviewer)
+    interviewer._director = SequenceChain(
+        [
+            DirectorDecision(
+                candidate_intent="The candidate has delivered the final synthesis.",
+                move="close",
+                next_phase="synthesis",
+                fact_ids=[],
+                interviewer_brief="Acknowledge the synthesis and conclude the interview.",
+                case_concluded=True,
+            )
+        ]
+    )
+    interviewer._voice_director = interviewer._director
+    writer = SequenceChain(["Thank you for the synthesis. That concludes the interview."])
+    interviewer._voice = writer
+    interviewer._voice_delivery = writer
+    interviewer._voice_retry = writer
+    interviewer._voice_delivery_retry = writer
+    interviewer._fact_audit = SequenceChain(
+        [FactDeliveryAudit(reply_complete=True, communicated_fact_ids=[])]
+    )
+    interviewer._reply_repair = SequenceChain([])
+    interviewer._reply_repair_retry = SequenceChain([])
+    session = InterviewSession(id="ready-to-end", case=main.CATALOGUE.default_case, mode="realistic")
+    session.stage = "synthesis"
+    session.case_started = True
+    session.candidate_turns = 2
+
+    interviewer.respond(session, "My recommendation is to reprice the contracts and reduce route leakage.")
+
+    assert session.ready_to_end is True
+    assert session.ended is False
+    assert session.candidate_view()["ready_to_end"] is True

@@ -243,6 +243,10 @@ class InterviewSession:
     # state is durable so a reload cannot accidentally start a case before the
     # candidate has explicitly opted in.
     case_started: bool = False
+    # Set only by the LLM's structured turn decision after Leo has formally
+    # concluded the interview. It is distinct from ``ended``: the candidate
+    # still owns the explicit action that saves the attempt and opens debrief.
+    ready_to_end: bool = False
     ended: bool = False
     turn_results: dict[str, dict[str, object]] = field(default_factory=dict)
 
@@ -274,6 +278,7 @@ class InterviewSession:
                 if fact.id in self.disclosed_ids
             ],
             "case_started": self.case_started,
+            "ready_to_end": self.ready_to_end,
             "ended": self.ended,
         }
 

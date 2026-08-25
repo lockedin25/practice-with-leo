@@ -77,7 +77,19 @@ def test_the_control_block_is_read_before_any_speech_is_released() -> None:
 
     assert decision.fact_ids == ["a", "b"]
     assert decision.next_phase == "analysis"
+    assert decision.case_concluded is False
     assert spoken_text_after_control(raw) == "Driver cost rose eleven percent."
+
+
+def test_the_control_block_can_formally_conclude_the_interview() -> None:
+    raw = (
+        '<control>{"fact_ids": [], "next_phase": "synthesis", "move": "close", '
+        '"case_concluded": true}</control>That concludes the interview.'
+    )
+
+    decision = parse_control_block(raw)
+
+    assert decision.case_concluded is True
 
 
 @pytest.mark.parametrize("raw", ["there is no control block here", "<control>{not json</control>x"])
@@ -554,3 +566,47 @@ def test_the_audit_is_skipped_when_no_fact_was_released(monkeypatch, stub_interv
     )
 
     assert called == []
+
+
+# --- Capture ordering in the browser island -------------------------------
+#
+# There is no JavaScript test runner in this project, and the bug these guard
+# against was silent and severe: capture used to begin only after the credential
+# mint and the socket handshake had been awaited, which measured 1675ms cold and
+# 903ms with a prefetched token. Every turn threw away that much speech, so a
+# short question vanished entirely and a longer one arrived clipped. A
+# source-level invariant is crude but it is a real guard.
+
+
+def _island_source() -> str:
+    from pathlib import Path
+
+    return (Path(__file__).resolve().parents[1] / "app/static/voice-realtime.js").read_text()
+
+
+def test_capture_starts_before_the_socket_is_awaited() -> None:
+    source = _island_source()
+    mic_connected = source.index("state.micSource.connect(state.workletNode)")
+    recording_announced = source.index('setPhase("recording")')
+    socket_awaited = source.index("state.scribeReadyPromise = (async () =>")
+
+    assert socket_awaited > mic_connected, (
+        "the microphone must be capturing before the transcription socket is awaited"
+    )
+    assert socket_awaited > recording_announced, (
+        "the candidate must be told to speak before the socket handshake, not after"
+    )
+
+
+def test_audio_captured_before_the_socket_is_buffered_not_dropped() -> None:
+    source = _island_source()
+
+    assert "state.pendingFrames.push(frame)" in source, (
+        "frames arriving before the socket is ready must be held, not discarded"
+    )
+    assert "function flushPendingFrames()" in source
+    # A short utterance can end before the handshake completes; committing then
+    # would lose the whole turn.
+    assert "await state.scribeReadyPromise" in source, (
+        "the commit must wait for the socket rather than fire into a dead one"
+    )

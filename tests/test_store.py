@@ -10,6 +10,7 @@ def test_attempt_survives_a_new_store_instance(tmp_path) -> None:
     world = catalogue.default_case
     database = tmp_path / "casecall.db"
     original = InterviewSession(id="attempt-1", case=world, mode="realistic")
+    original.ready_to_end = True
     original.add_interviewer_turn("Opening")
     original.add_interviewer_turn("Candidate question")
 
@@ -19,3 +20,4 @@ def test_attempt_survives_a_new_store_instance(tmp_path) -> None:
     assert restored is not None
     assert restored.messages == original.messages
     assert restored.mode == "realistic"
+    assert restored.ready_to_end is True

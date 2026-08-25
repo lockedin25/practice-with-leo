@@ -109,6 +109,7 @@ class SessionStore:
                 "messages": session.messages,
                 "candidate_turns": session.candidate_turns,
                 "case_started": session.case_started,
+                "ready_to_end": session.ready_to_end,
                 "ended": session.ended,
                 "turn_results": session.turn_results,
             }
@@ -356,6 +357,7 @@ class SessionStore:
                     ),
                 )
             ),
+            ready_to_end=bool(payload.get("ready_to_end", False)),
             ended=payload["ended"],
             turn_results=payload.get("turn_results", {}),
         )

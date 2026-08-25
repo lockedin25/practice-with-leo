@@ -36,6 +36,7 @@ const state = {
   factsSignature: "",
   phases: [],
   sending: false,
+  ending: false,
   startedAt: null,
   timerId: null,
   /* The clock measures time spent in the room, not wall-clock time since the
@@ -55,6 +56,8 @@ const el = {
   input: document.querySelector("#candidate-message"),
   send: document.querySelector("#send-message"),
   endedBar: document.querySelector("#ended-bar"),
+  closePrompt: document.querySelector("#case-close-prompt"),
+  completeAttempt: document.querySelector("#complete-attempt"),
   completionNote: document.querySelector("#completion-note"),
   endButton: document.querySelector("#end-attempt"),
   restart: document.querySelector("#restart-attempt"),
@@ -231,7 +234,7 @@ function tickTimer() {
 
 /* One place decides whether the clock should be running for this attempt. */
 function syncTimer(attempt) {
-  if (attempt.ended) {
+  if (attempt.ended || attempt.ready_to_end) {
     bankElapsed();
     stopTimer();
     paintTimer();
@@ -260,6 +263,7 @@ function renderAttempt(attempt) {
 
   setPhaseState(attempt);
   setEndedState(attempt.ended);
+  setReadyToEndState(attempt);
   syncTimer(attempt);
   renderCaseHeader(attempt);
   renderStage(attempt);
@@ -273,12 +277,16 @@ function renderAttempt(attempt) {
  * composer and the copy cannot drift apart. */
 function setPhaseState(attempt) {
   const preCase = !attempt.case_started && !attempt.ended;
+  const readyToEnd = Boolean(attempt.ready_to_end && !attempt.ended);
   document.body.classList.toggle("is-pre-case", preCase);
   document.body.classList.toggle("is-ended", Boolean(attempt.ended));
+  document.body.classList.toggle("is-ready-to-end", readyToEnd);
 
   if (el.stageLabel) {
     el.stageLabel.textContent = attempt.ended
       ? "Practice complete"
+      : readyToEnd
+        ? "Interview complete"
       : preCase
         ? "Before we start"
         : "Live interview";
@@ -286,6 +294,8 @@ function setPhaseState(attempt) {
   if (el.sessionStatus) {
     el.sessionStatus.textContent = attempt.ended
       ? "Practice ended"
+      : readyToEnd
+        ? "Ready to finish"
       : preCase
         ? "Waiting for you"
         : "Case in progress";
@@ -556,7 +566,11 @@ function autoGrow() {
 }
 
 function syncSendState() {
-  el.send.disabled = state.sending || !el.input.value.trim() || Boolean(state.attempt?.ended);
+  el.send.disabled =
+    state.sending ||
+    !el.input.value.trim() ||
+    Boolean(state.attempt?.ended) ||
+    Boolean(state.attempt?.ready_to_end);
 }
 
 el.input.addEventListener("input", () => {
@@ -574,7 +588,7 @@ el.input.addEventListener("keydown", (event) => {
 el.form.addEventListener("submit", (event) => {
   event.preventDefault();
   const content = el.input.value.trim();
-  if (!content || state.sending || !state.attempt || state.attempt.ended) return;
+  if (!content || state.sending || !state.attempt || state.attempt.ended || state.attempt.ready_to_end) return;
   sendTurn(content, crypto.randomUUID());
 });
 
@@ -663,6 +677,17 @@ function setEndedState(ended) {
     if (el.dialogDebriefBtn) el.dialogDebriefBtn.href = debriefUrl;
   }
   if (ended) stopTimer();
+  syncSendState();
+}
+
+function setReadyToEndState(attempt) {
+  const ready = Boolean(attempt.ready_to_end && !attempt.ended);
+  el.closePrompt?.classList.toggle("hidden", !ready);
+  el.input.disabled = Boolean(attempt.ended || ready);
+  if (el.voiceToggle) el.voiceToggle.disabled = ready;
+  if (el.endButton && !state.endArmedTimer) {
+    el.endButton.textContent = ready ? "End case" : "End practice";
+  }
   syncSendState();
 }
 
@@ -826,7 +851,7 @@ el.voiceStart.addEventListener("click", async () => {
 });
 
 async function startVoice() {
-  if (!state.attempt || state.attempt.ended || !window.LeoVoice) return;
+  if (!state.attempt || state.attempt.ended || state.attempt.ready_to_end || !window.LeoVoice) return;
   setVoiceState("connecting");
   el.voiceToggle.disabled = true;
   try {
@@ -847,6 +872,10 @@ window.addEventListener("leo:voice-status", (event) => {
     if (!state.attempt?.ended) {
       toast(errorReason ? `Voice disconnected: ${errorReason}` : "Voice ended. You can continue in chat.", "warning");
     }
+    return;
+  }
+  if ((status === "connected" || status === "listening") && state.attempt?.ready_to_end) {
+    void returnToChat();
     return;
   }
   if (status === "connected") setVoiceState("listening");
@@ -920,11 +949,48 @@ function disarmEndButton() {
   window.clearTimeout(state.endArmedTimer);
   state.endArmedTimer = null;
   el.endButton.classList.remove("is-armed");
-  el.endButton.textContent = "End practice";
+  el.endButton.textContent = state.attempt?.ready_to_end ? "End case" : "End practice";
 }
 
+async function finishAttempt() {
+  if (!state.attempt || state.attempt.ended || state.ending) return;
+
+  state.ending = true;
+  disarmEndButton();
+  el.endButton.disabled = true;
+  if (el.completeAttempt) {
+    el.completeAttempt.disabled = true;
+    el.completeAttempt.classList.add("is-loading");
+    const label = el.completeAttempt.querySelector(".case-close-action-label");
+    if (label) label.textContent = "Generating your debrief";
+  }
+  try {
+    await returnToChat();
+    const data = await request(`/api/attempts/${state.attempt.id}/end`, { method: "POST" });
+    window.location.href = data.debrief_url || `/attempts/${state.attempt.id}/debrief`;
+  } catch (error) {
+    toast(error.message || "The practice could not be ended.", "error");
+    el.endButton.disabled = false;
+    if (el.completeAttempt) {
+      el.completeAttempt.disabled = false;
+      el.completeAttempt.classList.remove("is-loading");
+      const label = el.completeAttempt.querySelector(".case-close-action-label");
+      if (label) label.textContent = "End case and view debrief";
+    }
+  } finally {
+    state.ending = false;
+  }
+}
+
+el.completeAttempt?.addEventListener("click", finishAttempt);
+
 el.endButton.addEventListener("click", async () => {
-  if (!state.attempt || state.attempt.ended) return;
+  if (!state.attempt || state.attempt.ended || state.ending) return;
+
+  if (state.attempt.ready_to_end) {
+    await finishAttempt();
+    return;
+  }
 
   if (!state.endArmedTimer) {
     el.endButton.classList.add("is-armed");
@@ -933,29 +999,7 @@ el.endButton.addEventListener("click", async () => {
     return;
   }
 
-  disarmEndButton();
-  el.endButton.disabled = true;
-  try {
-    await returnToChat();
-    const data = await request(`/api/attempts/${state.attempt.id}/end`, { method: "POST" });
-    const debriefUrl = data.debrief_url || `/attempts/${state.attempt.id}/debrief`;
-
-    // Immediately display completion dialog and forward candidate to debrief
-    if (el.dialogDebriefBtn) el.dialogDebriefBtn.href = debriefUrl;
-    if (el.viewDebriefBtn) el.viewDebriefBtn.href = debriefUrl;
-    
-    if (el.caseCompleteDialog) {
-      el.caseCompleteDialog.showModal();
-      window.setTimeout(() => {
-        window.location.href = debriefUrl;
-      }, 750);
-    } else {
-      window.location.href = debriefUrl;
-    }
-  } catch (error) {
-    toast(error.message || "The practice could not be ended.", "error");
-    el.endButton.disabled = false;
-  }
+  await finishAttempt();
 });
 
 function renderScorecard(scorecard) {

@@ -50,6 +50,13 @@ class DirectorDecision(BaseModel):
     next_phase: str = Field(description="The authored phase to hold or advance to.")
     fact_ids: list[str] = Field(default_factory=list, description="Eligible fact IDs to disclose this turn.")
     interviewer_brief: str = Field(description="A short non-solution instruction for the voice interviewer.")
+    case_concluded: bool = Field(
+        default=False,
+        description=(
+            "True only after the candidate has delivered a final synthesis and Leo should formally conclude "
+            "the interview. False while any interview work remains."
+        ),
+    )
 
 
 class FactDeliveryAudit(BaseModel):
@@ -127,7 +134,10 @@ class LangChainCaseInterviewer:
                     "Use probe only when one focused question would genuinely advance a promising line of reasoning. "
                     "If the candidate has already been unable to advance after a prior probe, select the narrowest "
                     "eligible fact that helps them and use answer or redirect. Do not repeat probes for the same impasse. "
-                    "Write a brief that guides the voice interviewer without revealing unreleased evidence.",
+                    "Write a brief that guides the voice interviewer without revealing unreleased evidence. "
+                    "Set case_concluded true only after the candidate has delivered a final synthesis and the "
+                    "interview should now end. In that turn use move close, release no new facts, and ask no "
+                    "further question. Keep it false at every earlier point.",
                 ),
                 MessagesPlaceholder("history"),
                 (
@@ -166,7 +176,9 @@ class LangChainCaseInterviewer:
                     "approved answer directly instead of asking another question. If no fact is approved, follow the "
                     "director brief without inventing information. Occasionally, when the candidate has made a concrete "
                     "useful point or expressed uncertainty, open with a very short acknowledgement of that exact point. "
-                    "Use this sparingly, roughly one turn in five when it is genuinely earned, never mechanically.",
+                    "Use this sparingly, roughly one turn in five when it is genuinely earned, never mechanically. "
+                    "When Case concluded is true, briefly acknowledge the synthesis, clearly state that the interview "
+                    "is complete, and ask no question.",
                 ),
                 MessagesPlaceholder("history"),
                 (
@@ -176,6 +188,7 @@ class LangChainCaseInterviewer:
                     "Turn pacing policy: {turn_pacing_policy}\n"
                     "Director move: {move}\n"
                     "Director brief: {interviewer_brief}\n"
+                    "Case concluded: {case_concluded}\n"
                     "Delivery instruction: {delivery_instruction}\n"
                     "Approved factual context for this reply: {approved_facts}\n"
                     "Candidate's latest turn: {candidate_turn}",
@@ -300,6 +313,11 @@ class LangChainCaseInterviewer:
                 if is_early_precision_turn
                 else session.case.validate_phase_transition(session.stage, decision.next_phase)
             )
+            case_concluded = bool(
+                decision.case_concluded
+                and next_phase == session.case.phases[-1].id
+                and decision.move == "close"
+            )
             approved_facts = "\n".join(f"- {fact.content}" for fact in facts) or "None"
             writer = self._voice_delivery if spoken else self._voice
             writer_retry = self._voice_delivery_retry if spoken else self._voice_retry
@@ -310,6 +328,7 @@ class LangChainCaseInterviewer:
                 "turn_pacing_policy": turn_pacing_policy,
                 "move": decision.move,
                 "interviewer_brief": decision.interviewer_brief,
+                "case_concluded": case_concluded,
                 "approved_facts": approved_facts,
                 "candidate_turn": candidate_turn,
                 "delivery_instruction": (
@@ -375,6 +394,7 @@ class LangChainCaseInterviewer:
             raise InterviewerUnavailable("The interviewer provider did not complete this turn.") from error
 
         session.apply_director_decision(next_phase, facts)
+        session.ready_to_end = case_concluded
         session.add_interviewer_turn(reply)
         return InterviewTurn(reply=reply, facts=facts, spoken_reply=spoken_reply if spoken else None)
 

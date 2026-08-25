@@ -66,12 +66,14 @@ candidate. You are direct, precise and respectful, never theatrical or overly en
 Every reply has exactly two parts, in this order.
 
 First, one line of control data and nothing else:
-<control>{"fact_ids": [...], "next_phase": "...", "move": "..."}</control>
+<control>{"fact_ids": [...], "next_phase": "...", "move": "...", "case_concluded": false}</control>
   fact_ids   Zero or more IDs, chosen only from the eligible facts given below, listing the facts
              you are about to communicate. Order them by importance: only the first few are
              released, so put the fact your answer leans on first. Never invent an ID.
   next_phase One of the authored phase IDs. Hold the current phase or advance exactly one.
   move       One of answer, probe, challenge, redirect, invite, close.
+  case_concluded True only after the candidate has delivered a final synthesis and this spoken
+             turn formally concludes the interview. Otherwise false.
 
 Then, immediately after the closing tag, the words you actually speak. Nothing else follows them.
 
@@ -86,6 +88,9 @@ Rules for the spoken part:
 - If the candidate is stuck after an earlier probe, give the answer directly rather than asking again.
 - Occasionally, about one turn in five and only when genuinely earned, open with a very short
   acknowledgement of the candidate's exact point.
+- When the candidate has delivered a final synthesis, set case_concluded true, use move close,
+  list no new facts, briefly acknowledge the synthesis, state that the interview is complete,
+  and ask no question.
 - Never begin an answer you do not finish."""
 
 
@@ -94,6 +99,7 @@ class ControlDecision:
     fact_ids: list[str]
     next_phase: str
     move: str
+    case_concluded: bool = False
 
 
 class ControlBlockMissing(RuntimeError):
@@ -120,6 +126,7 @@ def parse_control_block(text: str) -> ControlDecision:
         fact_ids=fact_ids,
         next_phase=str(parsed.get("next_phase") or ""),
         move=str(parsed.get("move") or "answer"),
+        case_concluded=parsed.get("case_concluded") is True,
     )
 
 
@@ -273,6 +280,7 @@ class SpokenInterviewer:
         spoken = ""
         control: ControlDecision | None = None
         facts: list[Fact] = []
+        case_concluded = False
         try:
             stream = self._client.stream(
                 [
@@ -320,6 +328,11 @@ class SpokenInterviewer:
                         )
                     )
                     session.apply_director_decision(next_phase, facts)
+                    case_concluded = bool(
+                        control.case_concluded
+                        and next_phase == session.case.phases[-1].id
+                        and control.move == "close"
+                    )
                     yield ("control", facts)
                     tail = spoken_text_after_control(accumulated)
                     if tail:
@@ -353,6 +366,7 @@ class SpokenInterviewer:
             self._rewind(session)
             raise ControlBlockMissing("The spoken completion had a control block but no speech")
         session.add_interviewer_turn(reply)
+        session.ready_to_end = case_concluded
         yield ("done", InterviewTurn(reply=reply, facts=facts, spoken_reply=reply))
 
     @staticmethod
