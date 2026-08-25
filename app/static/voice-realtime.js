@@ -55,6 +55,11 @@ const state = {
   audioArrived: false,
   speechBroken: false,
   audioWatchdog: null,
+  // Sentences written before the synthesis handshake completed, and whether the
+  // reply finished during it. Dropping either produced a reply with text but no
+  // audio and no explanation.
+  pendingSpeech: [],
+  flushWhenOpen: false,
 };
 
 function setPhase(phase, extra = {}) {
@@ -129,10 +134,16 @@ function stopPlayback() {
 }
 
 function openSynthesisSocket(url) {
-  // Opened before Leo has any words so the handshake overlaps the candidate
-  // still speaking. By the time a sentence exists the socket is warm.
   const socket = new WebSocket(url);
   state.speechBroken = false;
+  state.pendingSpeech = [];
+
+  // Every handler below checks that it still owns state.tts. The previous
+  // turn's socket closes asynchronously, so without this its close handler
+  // fired after the next socket had been assigned and nulled it, and every
+  // sentence of the new reply was then dropped into a closed socket.
+  const isCurrent = () => socket === state.tts;
+
   socket.onopen = () => {
     socket.send(
       JSON.stringify({
@@ -140,8 +151,19 @@ function openSynthesisSocket(url) {
         voice_settings: { stability: 0.5, similarity_boost: 0.75, speed: 1.0 },
       }),
     );
+    if (!isCurrent()) return;
+    // Anything written while the handshake was still in flight.
+    const queued = state.pendingSpeech;
+    state.pendingSpeech = [];
+    queued.forEach((chunk) => socket.send(JSON.stringify({ text: chunk })));
+    if (state.flushWhenOpen) {
+      state.flushWhenOpen = false;
+      socket.send(JSON.stringify({ text: " ", flush: true }));
+    }
   };
+
   socket.onmessage = (event) => {
+    if (!isCurrent()) return;
     let payload;
     try {
       payload = JSON.parse(event.data);
@@ -154,15 +176,18 @@ function openSynthesisSocket(url) {
       playChunk(payload.audio);
     }
   };
+
   // Without these the HUD would sit on "Leo is thinking" forever whenever
   // synthesis fails: no audio chunk ever arrives, so nothing moves the state
   // machine on. The reply text still reached the transcript, so the turn is
   // recoverable by reading rather than lost.
   socket.onerror = () => {
+    if (!isCurrent()) return;
     console.error("Leo voice: synthesis socket error");
     markSpeechBroken("Leo's voice could not be reached. His reply is in the transcript.");
   };
   socket.onclose = (event) => {
+    if (!isCurrent()) return;
     if (!event.wasClean && !state.audioArrived) {
       markSpeechBroken("Leo's voice dropped out. His reply is in the transcript.");
     }
@@ -174,19 +199,33 @@ function markSpeechBroken(message) {
   if (state.speechBroken) return;
   state.speechBroken = true;
   state.tts = null;
+  state.pendingSpeech = [];
   if (["thinking", "speaking", "transcribing"].includes(state.phase)) {
     setPhase("idle", { error: message });
   }
 }
 
 function speak(text) {
-  if (!state.tts || state.tts.readyState !== WebSocket.OPEN || !text.trim()) return;
+  if (!text.trim() || !state.tts) return;
   // ElevenLabs requires a trailing space on every text chunk.
-  state.tts.send(JSON.stringify({ text: `${text.trim()} ` }));
+  const chunk = `${text.trim()} `;
+  if (state.tts.readyState === WebSocket.CONNECTING) {
+    // Queue rather than drop. Leo's first sentence can be ready before the
+    // handshake completes, and dropping it silently produced a reply with no
+    // audio and no explanation.
+    state.pendingSpeech.push(chunk);
+    return;
+  }
+  if (state.tts.readyState !== WebSocket.OPEN) return;
+  state.tts.send(JSON.stringify({ text: chunk }));
 }
 
 function flushSynthesis() {
-  if (state.tts?.readyState === WebSocket.OPEN) {
+  if (state.tts?.readyState === WebSocket.CONNECTING) {
+    // A short reply can be complete before the handshake is. Flushing now would
+    // be dropped, and the queued text would then never be generated.
+    state.flushWhenOpen = true;
+  } else if (state.tts?.readyState === WebSocket.OPEN) {
     state.tts.send(JSON.stringify({ text: " ", flush: true }));
   }
   // An open socket that never answers is the one failure the error and close
@@ -202,6 +241,10 @@ function flushSynthesis() {
 
 function closeSynthesis() {
   if (state.tts?.readyState === WebSocket.OPEN) state.tts.send(JSON.stringify({ text: "" }));
+  // Cleared before the reference drops, so nothing queued for the old socket
+  // leaks into the next turn.
+  state.pendingSpeech = [];
+  state.flushWhenOpen = false;
   state.tts = null;
 }
 

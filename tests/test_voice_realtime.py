@@ -638,3 +638,37 @@ def test_a_recording_is_capped_and_cannot_grow_without_bound() -> None:
     assert "max_utterance_seconds" in source
     # Reaching the cap yields the floor and keeps what was said.
     assert "stopRecording();" in source
+
+
+def test_a_stale_synthesis_socket_cannot_disable_the_current_one() -> None:
+    """The previous turn's socket closes asynchronously.
+
+    Without an ownership check its close handler ran after the next socket had
+    been assigned, nulled it, and every sentence of the new reply was dropped
+    into nothing. The candidate saw the reply as text and was told Leo's voice
+    did not respond.
+    """
+    source = _island_source()
+
+    assert "const isCurrent = () => socket === state.tts;" in source
+    # Each handler that can mutate shared state has to be guarded.
+    guarded = source[source.index("function openSynthesisSocket(") : source.index("function markSpeechBroken(")]
+    for handler in ("socket.onmessage", "socket.onerror", "socket.onclose"):
+        body = guarded[guarded.index(handler) :]
+        assert "if (!isCurrent()) return;" in body[: body.index("};")], (
+            f"{handler} must ignore events from a socket it no longer owns"
+        )
+
+
+def test_speech_written_during_the_handshake_is_queued_not_dropped() -> None:
+    """Leo's first sentence can be ready before the socket finishes opening, and
+    a short reply can finish entirely during it."""
+    source = _island_source()
+
+    assert "state.pendingSpeech.push(chunk)" in source, "early sentences must be queued"
+    assert "state.flushWhenOpen = true;" in source, "a flush during the handshake must be deferred"
+    # Both are replayed once the socket is usable.
+    onopen = source[source.index("socket.onopen = () => {") :]
+    onopen = onopen[: onopen.index("socket.onmessage")]
+    assert "queued.forEach" in onopen
+    assert "flush: true" in onopen
