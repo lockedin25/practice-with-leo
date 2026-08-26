@@ -229,6 +229,13 @@ holds the compiled case world for the active milestone resident in memory so the
 turn does not pay a storage round trip, and returns only the approved interviewer
 utterance to the voice transport.
 
+> **SUPERSEDED.** The paragraphs below describe a Cloudflare Workers and
+> Durable Objects deployment with `worker/index.ts`, `vite.config.ts` and
+> `.openai/hosting.json`. None of those exist in this repository, which is a
+> FastAPI application with SQLite and Jinja templates. They are kept only as
+> a record of an earlier direction. For how this actually deploys, see
+> [deployment-plan.md](deployment-plan.md).
+
 **The bare-bones build uses an in-process `Map` behind `AttemptStore`.**
 `.openai/hosting.json` declares `d1: null` and no Durable Object binding, and the
 runtime does not need either to prove itself in text mode, where requests from one

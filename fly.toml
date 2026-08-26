@@ -1,0 +1,73 @@
+# Fly deployment manifest.
+#
+# Change `app` to whatever name you created with `fly apps create`, and keep the
+# OAuth redirect URI in Google Cloud Console pointing at the matching hostname:
+#   https://<app>.fly.dev/auth/google/callback
+
+app = "leo-case-prep"
+primary_region = "bom"   # Mumbai, closest to the users
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  # Lives on the volume mounted below. Anywhere else and every account,
+  # transcript and evaluation is destroyed on the next deploy.
+  DATABASE_PATH = "/data/casecall.db"
+  VOICE_ENABLED = "true"
+  ELEVENLABS_VOICE_MODE = "realtime"
+
+# Secrets are never listed here. `fly secrets set` injects them at runtime and
+# keeps them out of the image and out of version control:
+#   OPENROUTER_API_KEY, OPENROUTER_MODEL, OPENROUTER_FALLBACK_MODELS,
+#   VOICE_OPENROUTER_MODEL, ELEVENLABS_API_KEY, ELEVENLABS_VOICE_ID,
+#   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, OAUTH_REDIRECT_URI,
+#   ADMIN_EMAILS, SESSION_SECRET
+
+[[mounts]]
+  source = "leo_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  # getUserMedia and AudioWorklet both require a secure context. Over plain HTTP
+  # the entire voice feature fails at the microphone, so this is a functional
+  # requirement rather than a hardening step.
+  force_https = true
+
+  # Fly's generated default is auto_stop with min_machines_running = 0, which
+  # sleeps the machine when idle. That would put a container start, an
+  # interpreter start and a 69-case catalogue load in front of the first turn
+  # after a quiet period, landing on exactly the latency this was built to
+  # protect. One machine stays warm instead.
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  # SQLite has a single writer, so one machine is the correct answer until the
+  # move to Postgres. Raising this without that migration would corrupt, not
+  # scale.
+  processes = ["app"]
+
+  [http_service.concurrency]
+    type = "requests"
+    # A spoken turn holds its connection for the whole SSE stream, so these are
+    # deliberately generous relative to a typical request-per-second service.
+    soft_limit = 40
+    hard_limit = 60
+
+[[http_service.checks]]
+  grace_period = "45s"
+  interval = "30s"
+  method = "GET"
+  timeout = "5s"
+  path = "/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  # Measured at 148 MiB at rest with the full catalogue loaded. 1GB is roughly
+  # seven times that, which buys headroom for concurrent turns and, more to the
+  # point, avoids an out-of-memory kill being the first thing this deploy
+  # teaches us. It costs about $2.50 a month more than 512MB.
+  memory = "1gb"
+  cpus = 1

@@ -6,6 +6,8 @@ between the browser creating an attempt and sending its next turn.
 
 from __future__ import annotations
 
+from app import db
+
 import json
 import sqlite3
 from dataclasses import dataclass
@@ -459,7 +461,7 @@ class SessionStore:
         return cursor.rowcount == 1
 
     def _connect(self) -> sqlite3.Connection:
-        return sqlite3.connect(self._database_path, timeout=5)
+        return db.connect(self._database_path)
 
 
 class EvaluationStore:
@@ -603,4 +605,4 @@ class EvaluationStore:
         ]
 
     def _connect(self) -> sqlite3.Connection:
-        return sqlite3.connect(self._database_path, timeout=5)
+        return db.connect(self._database_path)

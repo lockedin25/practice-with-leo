@@ -4,6 +4,7 @@ import hmac
 import hashlib
 import json
 import logging
+import os
 import time
 from pathlib import Path
 from typing import Literal
@@ -22,6 +23,7 @@ from app.admin import router as admin_router
 from app.attempt_service import AttemptAlreadyEnded, AttemptTurnService, TurnSubmission
 from app.auth import router as auth_router
 from app.case_runtime import CaseCatalogue, InterviewSession
+from app import db
 from app.evaluator import FallbackCaseEvaluator, EvaluatorUnavailable, create_evaluator, load_rubric
 from app.interviewer import InterviewerUnavailable, create_interviewer
 from app.store import ActiveVoiceSessionExists, EvaluationStore, SessionStore, VoiceSession
@@ -57,7 +59,10 @@ STATIC_DIR = ROOT / "app" / "static"
 TEMPLATES = Jinja2Templates(directory=str(ROOT / "app" / "templates"))
 RESERVOIR_DIR = ROOT / "reservoir"
 load_dotenv(ROOT / ".env")
-DATABASE_PATH = ROOT / "data" / "casecall.db"
+# Env-overridable so a container can point this at a mounted volume. On an
+# ephemeral filesystem the schema is recreated on every deploy and all
+# accounts, transcripts and evaluations are lost, silently.
+DATABASE_PATH = db.database_path(ROOT)
 CATALOGUE = CaseCatalogue.from_reservoir(ROOT)
 INTERVIEWER = create_interviewer()
 STORE = SessionStore(DATABASE_PATH)
@@ -100,7 +105,49 @@ EVALUATOR = _create_evaluator_safely()
 EVALUATIONS = EvaluationStore(DATABASE_PATH)
 
 app = FastAPI(title="Leo", version="0.1.0")
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+class CachedStaticFiles(StaticFiles):
+    """Serve assets with an explicit caching contract instead of a guess.
+
+    With no Cache-Control at all the browser falls back to heuristic freshness,
+    which in practice means revalidating every asset on every page load: correct,
+    but a round trip per file for a body it already holds.
+
+    Requests carrying the deploy's version are safe to cache forever, because a
+    new deploy changes the URL. Anything unversioned is told to revalidate, which
+    is deliberately the conservative half: a stale voice island would resurface
+    exactly the class of bug this transport has already produced several times.
+    """
+
+    def file_response(self, full_path, stat_result, scope, status_code: int = 200) -> Response:
+        response = super().file_response(full_path, stat_result, scope, status_code)
+        # Starlette hands the raw ASGI scope here, not a Request, so the query
+        # string is bytes and has to be read directly.
+        versioned = b"v=" in scope.get("query_string", b"")
+        response.headers["Cache-Control"] = (
+            "public, max-age=31536000, immutable" if versioned else "no-cache"
+        )
+        return response
+
+
+app.mount("/static", CachedStaticFiles(directory=STATIC_DIR), name="static")
+
+
+# Changes once per deploy, which is exactly when cached assets must stop being
+# reused. Fly exposes its release version; the start time is a correct fallback
+# for a local run, where the only cost of a miss is one reload.
+ASSET_VERSION = (
+    os.getenv("FLY_MACHINE_VERSION")
+    or os.getenv("BUILD_ID")
+    or str(int(time.time()))
+)[:16]
+
+
+def asset_url(path: str) -> str:
+    """Version a static URL so it can be cached indefinitely and still update."""
+    return f"/static/{path}?v={ASSET_VERSION}"
+
+
+TEMPLATES.env.globals["asset_url"] = asset_url
 
 # The auth and admin routers read these off app state rather than importing this
 # module, so account handling never reaches back into the interview API.

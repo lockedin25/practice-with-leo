@@ -125,11 +125,11 @@ Netlify*: not suitable, this is a stateful long-request Python server.
 Six changes in the repository. None are large; all of them break something in
 production if skipped.
 
-1. **WAL on every SQLite connection.** Four call sites: `app/store.py:461`,
-   `app/store.py:605`, `app/accounts.py:248`, and the inline connections in
-   `app/admin.py`. Set `journal_mode=WAL`, `synchronous=NORMAL`,
-   `busy_timeout=5000`. Worth 4.6× per the table above. Best done as one shared
-   helper so a fifth call site cannot forget.
+1. **WAL on every SQLite connection**, and one configurable database location.
+   Six call sites now route through `app/db.py`, which also resolves
+   `DATABASE_PATH`. The path mattered as much as the pragmas: it was a hardcoded
+   constant, so a container would have written to its own ephemeral disk and lost
+   everything on each deploy without erroring.
 2. **`Cache-Control` on static assets.** Currently absent, so every asset
    revalidates on every page load. Hash the filenames or set a long max-age with
    an explicit revalidation path.
@@ -137,9 +137,12 @@ production if skipped.
    volume; with a volume that survives, but it must not depend on that.
 4. **Production `OAUTH_REDIRECT_URI`** plus the matching authorised redirect URI
    registered in Google Cloud Console.
-5. **Set `ALLOWED_EMAIL_DOMAINS`.** Unset means any Google account can register and
-   spend the API budget. For a pilot of 10–20 this is the cheapest possible abuse
-   control.
+5. **Leave `ALLOWED_EMAIL_DOMAINS` unset.** A deliberate decision: any Google
+   account may sign in, and the OAuth consent screen is published rather than in
+   testing so no user list has to be maintained. The accepted consequence is that
+   an authenticated stranger can spend API credit, which key security does not
+   defend against. The reversal is one environment variable and no redeploy of
+   code, which is why it is safe to start open.
 6. **Retire the stale design section.** Mark `docs/engineering-design.md` §10
    superseded and point it here.
 
@@ -164,9 +167,14 @@ A two-stage build, pinned to `python:3.13-slim`.
 - **`HEALTHCHECK` against `/health`**, which already exists and reports whether the
   interviewer and evaluator constructed.
 
-Verification, in order: the image builds; the suite passes inside it; the
-container serves `/health` locally with a bind-mounted `data/`; the room loads and
-a typed turn completes. Only then push.
+Verification, in order: the image builds; the container serves `/health` with a
+bind-mounted volume; the login and landing pages render; a versioned asset comes
+back `immutable` and an unversioned one `no-cache`; the database is created on
+the volume in WAL mode. Only then push.
+
+Note that the suite deliberately cannot run inside the runtime image, because it
+is built `--no-dev` and has no pytest. Test on the host against the same Python
+the image pins, which is how 3.13 was chosen.
 
 ## 6. Phase 2 — first deploy
 

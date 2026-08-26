@@ -3,7 +3,7 @@
 {% block title %}Leo · AI Case Interviewer for MBB Candidates{% endblock %}
 {% block description %}Practise consulting cases with Leo, an AI case interviewer who follows your reasoning and releases evidence when you earn it.{% endblock %}
 {% block stylesheets %}
-<link rel="stylesheet" href="/static/landing.css" />
+<link rel="stylesheet" href="{{ asset_url('landing.css') }}" />
 {% endblock %}
 {% block content %}
 <main class="landing">
@@ -159,4 +159,4 @@
   <p class="footer-bottom">© Leo MBB Prep · Built for strategic rigor.</p>
 </footer>
 {% endblock %}
-{% block scripts %}<script src="/static/landing.js"></script>{% endblock %}
+{% block scripts %}<script src="{{ asset_url('landing.js') }}"></script>{% endblock %}

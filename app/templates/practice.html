@@ -4,7 +4,7 @@
 {% block description %}Consulting case interview practice with Leo and evidence-based feedback.{% endblock %}
 {% block body_class %}room{% endblock %}
 {% block stylesheets %}
-<link rel="stylesheet" href="/static/room.css" />
+<link rel="stylesheet" href="{{ asset_url('room.css') }}" />
 {% endblock %}
 {% block content %}
   {% include "_practice_toolbar.html" %}
@@ -293,4 +293,4 @@
     </article>
   </template>
 {% endblock %}
-{% block scripts %}<script src="/static/app.js"></script>{% endblock %}
+{% block scripts %}<script src="{{ asset_url('app.js') }}"></script>{% endblock %}

@@ -1,0 +1,43 @@
+# The first entry is the one that matters most. Copying .env into an image bakes
+# the OpenRouter, ElevenLabs and Google credentials into a layer that anyone who
+# can pull the image can read, and rebuilding does not remove it from history.
+# Secrets reach the container through the platform's secret store instead.
+.env
+.env.*
+!.env.example
+
+# Local state. data/ holds the SQLite database, the generated session secret and
+# every transcript. In production it is a mounted volume, so shipping a copy of
+# the development one would both leak local accounts and be overwritten anyway.
+data/
+*.db
+*.db-wal
+*.db-shm
+
+# Built on the target platform from uv.lock, and 94MB of the wrong architecture
+# if copied from a Mac.
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# 10MB of history the runtime never reads.
+.git/
+.gitignore
+
+# Development and authoring material, not runtime inputs.
+tests/
+docs/
+scripts/
+.agents/
+.claude/
+.gstack/
+*.md
+!README.md
+
+# Editor and OS noise.
+.DS_Store
+.vscode/
+.idea/

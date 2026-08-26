@@ -4,7 +4,7 @@
 {% block description %}Your evidence-based case debrief: scores, cited moments, and what to practise next.{% endblock %}
 {% block body_class %}debrief-body{% endblock %}
 {% block stylesheets %}
-<link rel="stylesheet" href="/static/debrief.css" />
+<link rel="stylesheet" href="{{ asset_url('debrief.css') }}" />
 {% endblock %}
 {% block content %}
 <main class="debrief" aria-label="Case debrief">
@@ -214,4 +214,4 @@
   </figure>
 </template>
 {% endblock %}
-{% block scripts %}<script src="/static/debrief.js"></script>{% endblock %}
+{% block scripts %}<script src="{{ asset_url('debrief.js') }}"></script>{% endblock %}

@@ -194,8 +194,10 @@ def test_t4_real_world_debrief_page_delivery_scenario(candidate_client) -> None:
     assert 'id="debrief-report"' in debrief_html_resp.text
     
     # 3. Check theme switcher script is linked
-    assert '<script src="/static/theme.js"></script>' in debrief_html_resp.text
-    assert '<script src="/static/debrief.js"></script>' in debrief_html_resp.text
+    # Asset URLs carry a per-deploy version so they can be cached immutably, so
+    # match the file rather than the exact tag.
+    assert "/static/theme.js?v=" in debrief_html_resp.text
+    assert "/static/debrief.js?v=" in debrief_html_resp.text
     assert 'id="checklist-status-filter"' in debrief_html_resp.text
     assert 'class="action-disclosure"' in debrief_html_resp.text
 

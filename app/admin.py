@@ -8,6 +8,8 @@ even from an administrator.
 
 from __future__ import annotations
 
+from app import db
+
 import json
 import sqlite3
 from collections import Counter
@@ -69,7 +71,7 @@ def _attempt_rows(database_path: Path) -> list[dict[str, Any]]:
         LIMIT ?
     """
     try:
-        with sqlite3.connect(database_path, timeout=5) as connection:
+        with db.connect(database_path) as connection:
             raw = connection.execute(query, (ROW_LIMIT,)).fetchall()
     except sqlite3.OperationalError:
         # Fallback if evaluations or user columns are structured differently
@@ -83,7 +85,7 @@ def _attempt_rows(database_path: Path) -> list[dict[str, Any]]:
             LIMIT ?
         """
         try:
-            with sqlite3.connect(database_path, timeout=5) as connection:
+            with db.connect(database_path) as connection:
                 legacy_raw = connection.execute(fallback_query, (ROW_LIMIT,)).fetchall()
                 raw = [
                     (r[0], r[1], r[2], r[5], r[3], r[4], r[5], r[6], r[7], r[8], None, None, None)
@@ -168,7 +170,7 @@ def _user_rows(database_path: Path) -> list[dict[str, Any]]:
         LIMIT ?
     """
     try:
-        with sqlite3.connect(database_path, timeout=5) as connection:
+        with db.connect(database_path) as connection:
             raw = connection.execute(query, (ROW_LIMIT,)).fetchall()
     except sqlite3.OperationalError:
         return []

@@ -2,7 +2,7 @@
 {% block title %}Admin Console · Leo{% endblock %}
 {% block body_class %}console-body{% endblock %}
 {% block stylesheets %}
-<link rel="stylesheet" href="/static/admin.css" />
+<link rel="stylesheet" href="{{ asset_url('admin.css') }}" />
 {% endblock %}
 {% block content %}
 <main class="console shell" aria-label="Admin console">
@@ -124,4 +124,4 @@
   </article>
 </template>
 {% endblock %}
-{% block scripts %}<script src="/static/admin.js"></script>{% endblock %}
+{% block scripts %}<script src="{{ asset_url('admin.js') }}"></script>{% endblock %}

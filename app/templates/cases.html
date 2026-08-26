@@ -3,7 +3,7 @@
 {% block title %}Case Library · Leo MBB Case Prep{% endblock %}
 {% block description %}Browse authentic MBB case interview scenarios. Practice profitability, growth, M&A, and operations cases with Leo.{% endblock %}
 {% block stylesheets %}
-<link rel="stylesheet" href="/static/cases.css" />
+<link rel="stylesheet" href="{{ asset_url('cases.css') }}" />
 {% endblock %}
 {% block content %}
 <main class="page-main shell">
@@ -140,4 +140,4 @@
 
 {% include "_footer.html" %}
 {% endblock %}
-{% block scripts %}<script src="/static/cases.js"></script>{% endblock %}
+{% block scripts %}<script src="{{ asset_url('cases.js') }}"></script>{% endblock %}

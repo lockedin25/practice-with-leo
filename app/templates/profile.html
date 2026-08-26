@@ -5,7 +5,7 @@
 {% block description %}Your Leo case interview practice history, competency profile, and debrief reports.{% endblock %}
 {% block body_class %}profile-body{% endblock %}
 {% block stylesheets %}
-<link rel="stylesheet" href="/static/profile.css" />
+<link rel="stylesheet" href="{{ asset_url('profile.css') }}" />
 {% endblock %}
 {% block content %}
 <main class="profile shell" aria-label="Your progress">
@@ -163,4 +163,4 @@
   </article>
 </template>
 {% endblock %}
-{% block scripts %}<script src="/static/profile.js"></script>{% endblock %}
+{% block scripts %}<script src="{{ asset_url('profile.js') }}"></script>{% endblock %}

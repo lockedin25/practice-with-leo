@@ -10,6 +10,8 @@ the standard library, which is sufficient for an opaque, server-issued token.
 
 from __future__ import annotations
 
+from app import db
+
 import base64
 import hashlib
 import hmac
@@ -245,7 +247,7 @@ class AccountStore:
         return row[0] if row else None
 
     def _connect(self) -> sqlite3.Connection:
-        return sqlite3.connect(self._database_path, timeout=5)
+        return db.connect(self._database_path)
 
 
 def _user_from_row(row: tuple[Any, ...]) -> User:
