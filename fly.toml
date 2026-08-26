@@ -5,7 +5,7 @@
 #   https://<app>.fly.dev/auth/google/callback
 
 app = "leo-case-prep"
-primary_region = "bom"   # Mumbai, closest to the users
+primary_region = "sin"   # Singapore. Fly has no India region; see the plan.
 
 [build]
   dockerfile = "Dockerfile"
@@ -14,15 +14,17 @@ primary_region = "bom"   # Mumbai, closest to the users
   # Lives on the volume mounted below. Anywhere else and every account,
   # transcript and evaluation is destroyed on the next deploy.
   DATABASE_PATH = "/data/casecall.db"
-  VOICE_ENABLED = "true"
-  ELEVENLABS_VOICE_MODE = "realtime"
 
 # Secrets are never listed here. `fly secrets set` injects them at runtime and
 # keeps them out of the image and out of version control:
 #   OPENROUTER_API_KEY, OPENROUTER_MODEL, OPENROUTER_FALLBACK_MODELS,
 #   VOICE_OPENROUTER_MODEL, ELEVENLABS_API_KEY, ELEVENLABS_VOICE_ID,
-#   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, OAUTH_REDIRECT_URI,
-#   ADMIN_EMAILS, SESSION_SECRET
+#   ELEVENLABS_VOICE_MODE, VOICE_ENABLED, GOOGLE_CLIENT_ID,
+#   GOOGLE_CLIENT_SECRET, OAUTH_REDIRECT_URI, ADMIN_EMAILS, SESSION_SECRET
+#
+# VOICE_ENABLED and ELEVENLABS_VOICE_MODE are not secret, but they are set that
+# way, so they are deliberately not repeated in [env] above. One value, one
+# place to change it.
 
 [[mounts]]
   source = "leo_data"

@@ -101,12 +101,23 @@ was just rebuilt to protect.
 **Docker-native**, which is wanted anyway, and streams SSE and WebSockets without
 buffering.
 
-**Region pinning.** `bom` (Mumbai) puts the server next to the users. Note what
-this does and does not affect: speech-to-text upload and speech synthesis go
-browser-to-ElevenLabs directly, so they are unaffected by server location. What
-moves is the two browser-to-server round trips per turn, and the server-to-
-OpenRouter hop, which moves the other way. Measure before assuming; the model call
-dominates either way.
+**Region: `sin` (Singapore).** Corrected after checking rather than assuming.
+I originally specified `bom` (Mumbai) and cited proximity to the users as a
+reason to prefer Fly. **Fly has no India region at all** — zero of its 29 regions
+are in India — so that argument was worth nothing and should not have been made
+without verifying it.
+
+The practical cost is small, which is the only reason this is a footnote rather
+than a reason to change platform. Singapore is roughly 70ms from India against
+Mumbai's 20ms, across two browser-to-server round trips per turn, so about 100ms
+on a ~4.2s turn: near 2%. The two large audio transfers, the speech-to-text
+upload and the synthesis stream, go browser-to-ElevenLabs directly and are
+unaffected by server location entirely.
+
+Worth stating plainly: with the region advantage gone, Fly and Render are
+separated only by cost and streaming behaviour, both of which still favour Fly
+mildly. Had this been checked before the platform was set up, the choice would
+have been closer to a coin toss.
 
 Cost at this scale: one `shared-cpu-1x` machine with 512MB–1GB and a 1–3GB volume
 is roughly $5–15/month.
@@ -178,8 +189,8 @@ the image pins, which is how 3.13 was chosen.
 
 ## 6. Phase 2 — first deploy
 
-1. `fly launch --no-deploy`, one machine, region `bom`.
-2. Create and mount a volume at `/data`; point `DATABASE_PATH` at it.
+1. `fly apps create`, one machine, region `sin`.
+2. Create and mount a volume at `/data` **in the same region as the machine**; point `DATABASE_PATH` at it. A machine cannot attach a volume in another region, and the failure arrives at deploy time.
 3. `fly secrets set` for every value currently in `.env`. Secrets are
    environment-injected and never written to an image layer.
 4. Register the Fly hostname as an authorised redirect URI in Google Cloud
