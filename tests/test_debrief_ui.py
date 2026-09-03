@@ -296,6 +296,55 @@ def test_t5_debrief_js_dimension_labels_has_all_five() -> None:
         assert dim in js_content, f"DIMENSION_LABELS missing: {dim}"
 
 
+def test_t5_debrief_js_hides_empty_case_insight_slots() -> None:
+    """Missing insight content collapses with its micro-label instead of
+    rendering a blank masterclass slot."""
+    js_content = JS_PATH.read_text(encoding="utf-8")
+    assert "function fillInsightSlot" in js_content
+    assert 'slot.closest(".masterclass-item")?.classList.toggle("hidden", !text)' in js_content
+    assert "fillInsightSlot(el.caseCoreMechanism, data.core_mechanism)" in js_content
+    assert "fillInsightSlot(el.casePivotalInsight, data.pivotal_insight)" in js_content
+
+
+def test_t5_case_insight_card_serves_the_authored_essence(stub_interviewer) -> None:
+    """ROADMAP item 6 acceptance: the evaluation response for an attempt on a
+    case whose decision question differs from its case_essence carries the
+    authored mechanism and pivotal insight, never the prompt question and never
+    a malformed 'isolates Why...' gap sentence."""
+    client = TestClient(main.app)
+    sign_in(client, "insight-card@casecall.test")
+
+    started = client.post("/api/attempts", json={"case_id": "meridian-cold-chain-v1"}).json()
+    attempt_id = started["id"]
+    turn = client.post(
+        f"/api/attempts/{attempt_id}/turn",
+        json={
+            "content": "The margin decline splits into price, volume, and mix; I will start with the mix shift.",
+            "turn_id": "t1",
+        },
+    )
+    assert turn.status_code == 200
+    ended = client.post(f"/api/attempts/{attempt_id}/end")
+    assert ended.status_code == 200
+
+    card = ended.json()["evaluation"]["what_the_case_wanted_to_test"]
+    assert "Why has EBITDA margin fallen" not in card["core_mechanism"], "the prompt question must not pose as the mechanism"
+    assert "load factor" in card["core_mechanism"], "the authored mechanism must be revealed"
+    assert "route density" in card["pivotal_insight"], "the authored insight must be revealed"
+
+    gap = card["candidate_vs_optimal_gap"]
+    assert gap.startswith("The optimal MBB path")
+    assert "isolates Why" not in gap
+    assert gap.endswith(".")
+
+    # The same authored card is what the debrief surface later reads back.
+    stored = client.get(f"/api/attempts/{attempt_id}/evaluation")
+    assert stored.status_code == 200
+    stored_card = stored.json()["report"]["what_the_case_wanted_to_test"]
+    assert "load factor" in stored_card["core_mechanism"]
+    assert "route density" in stored_card["pivotal_insight"]
+
+
 def test_t5_debrief_js_uses_5_scale_not_10() -> None:
     """Verify JS score bars use /5 scale, not /10."""
     js_content = JS_PATH.read_text(encoding="utf-8")
