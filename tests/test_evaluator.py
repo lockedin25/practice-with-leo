@@ -406,6 +406,33 @@ def test_fallback_evaluator_produces_rich_report_on_valid_session() -> None:
     assert report.dimension_scores["structuring"].score == report.dimensions[0].score
 
 
+def test_fallback_structures_from_the_actual_framework_turn() -> None:
+    """A bare greeting opening must not be graded as the structuring turn.
+
+    The fallback used to grade structuring against the literal first candidate
+    turn. When that turn is just a greeting, no restatement or MECE words
+    match, evidence stays empty, and dimension_counts_toward_score silently
+    drops structuring out of the weighted overall entirely.
+    """
+    session = InterviewSession(id="framework-turn-fixture", case=CATALOGUE.get("meridian-cold-chain-v1"), mode="realistic")
+    session.add_interviewer_turn(session.case.opening)
+    session.record_candidate_turn("Hi Leo, good to be here, thanks for having me.")
+    session.add_interviewer_turn("Go ahead.")
+    session.record_candidate_turn(
+        "I would split this into revenue drivers, price versus volume mix, and cost drivers, "
+        "fixed versus variable, tailored to the cold chain business."
+    )
+    session.ended = True
+
+    report = generate_fallback_evaluation(session, ROOT / "reservoir")
+
+    structuring = next(d for d in report.dimensions if d.name == "structuring")
+    assert structuring.score > 1.0
+    assert len(structuring.evidence) >= 1
+    assert structuring.evidence[0].message_index == 3
+    assert "structuring" not in report.excluded_dimensions
+
+
 def test_create_evaluator_supports_fallback_flag(monkeypatch) -> None:
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     with pytest.raises(RuntimeError):
