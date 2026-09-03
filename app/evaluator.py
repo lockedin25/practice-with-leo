@@ -912,6 +912,49 @@ def _tree_conclusions(tree: dict[str, Any]) -> list[dict[str, str]]:
 # --- Deterministic Heuristic Fallback Engine --------------------------------
 
 
+def _select_structuring_turn(
+    cand_turns: list[tuple[int, str]],
+    restate_words: list[str],
+    mece_words: list[str],
+) -> tuple[int, str]:
+    """Pick the candidate turn to grade for structuring.
+
+    The literal first candidate turn is frequently a bare greeting ("Hi Leo")
+    with no framework content. Grading structuring against it leaves the
+    evidence list empty, which silently drops the whole dimension out of the
+    weighted overall via ``dimension_counts_toward_score``. Prefer the first
+    turn that actually shows restatement or MECE signal, fall back to
+    whichever turn shows the most signal, and only fall back to the literal
+    first turn when nothing in the transcript shows any structuring signal.
+    """
+    best_idx, best_text, best_strength = cand_turns[0][0], cand_turns[0][1], -1
+    for idx, text in cand_turns:
+        norm = normalize_text(text)
+        restate_hit = any(w in norm for w in restate_words)
+        mece_hits = sum(1 for w in mece_words if w in norm)
+        if restate_hit or mece_hits >= 2:
+            return idx, text
+        strength = (1 if restate_hit else 0) + mece_hits
+        if strength > best_strength:
+            best_idx, best_text, best_strength = idx, text, strength
+    return best_idx, best_text
+
+
+def _word_boundary_excerpt(text: str, start: int, end: int) -> str:
+    """Expand a character span to whole-word boundaries.
+
+    Evidence quotes are built from raw character offsets; without this, a
+    quote can open or close mid-word, which is not a citable excerpt.
+    """
+    start = max(0, min(start, len(text)))
+    end = max(start, min(end, len(text)))
+    while start > 0 and text[start - 1].isalnum():
+        start -= 1
+    while end < len(text) and text[end].isalnum():
+        end += 1
+    return text[start:end].strip()
+
+
 def generate_fallback_evaluation(
     session: InterviewSession,
     reservoir_root: Path,
@@ -1055,36 +1098,41 @@ def generate_fallback_evaluation(
     struct_obs: list[str] = []
     struct_imps: list[str] = []
 
-    opening_norm = normalize_text(opening_text)
     # Check objective restatement
     restate_words = ["restate", "objective", "target", "margin", "understand", "clarify", "scope", "timeline", "horizon"]
-    has_restate = any(w in opening_norm for w in restate_words)
+    # Check MECE decomposition
+    mece_words = ["revenue", "cost", "price", "volume", "fixed", "variable", "split", "branches", "segments", "channels"]
+
+    struct_idx, struct_text = _select_structuring_turn(cand_turns, restate_words, mece_words)
+    struct_norm = normalize_text(struct_text)
+
+    has_restate = any(w in struct_norm for w in restate_words)
     if has_restate:
         struct_score += 0.6
         struct_obs.append("Paraphrased and confirmed the case objective upfront.")
         # Find first matching excerpt
         for w in restate_words:
-            if w in opening_norm:
-                start_pos = opening_norm.find(w)
-                struct_evidence.append(Citation(message_index=opening_idx, quote=opening_text[max(0, start_pos - 10):start_pos + 30].strip()))
+            if w in struct_norm:
+                start_pos = struct_norm.find(w)
+                quote = _word_boundary_excerpt(struct_text, start_pos - 10, start_pos + 30)
+                struct_evidence.append(Citation(message_index=struct_idx, quote=quote))
                 break
     else:
         struct_imps.append("Confirm the client's quantified objective and time horizon before structuring.")
 
-    # Check MECE decomposition in opening or early turns
-    mece_words = ["revenue", "cost", "price", "volume", "fixed", "variable", "split", "branches", "segments", "channels"]
-    matched_mece = [w for w in mece_words if w in opening_norm]
+    matched_mece = [w for w in mece_words if w in struct_norm]
     if len(matched_mece) >= 2:
         struct_score += 0.8
         struct_obs.append("Employed MECE-by-construction decomposition (e.g. price vs volume or fixed vs variable).")
         if not struct_evidence:
-            struct_evidence.append(Citation(message_index=opening_idx, quote=opening_text[:min(50, len(opening_text))].strip()))
+            quote = _word_boundary_excerpt(struct_text, 0, min(50, len(struct_text)))
+            struct_evidence.append(Citation(message_index=struct_idx, quote=quote))
     else:
         struct_imps.append("Ensure Level-1 splits are MECE by construction via mathematical formulas.")
 
     # Tailoring
     industry_keywords = [w.lower() for w in session.case.title.split() if len(w) > 3]
-    if any(k in opening_norm for k in industry_keywords):
+    if any(k in struct_norm for k in industry_keywords):
         struct_score += 0.4
         struct_obs.append("Tailored issue tree branches to the client's industry context.")
 
