@@ -20,6 +20,7 @@ const DEFAULT_PHASES = ["clarification", "drill_down", "synthesis"];
 const GENERIC_CATEGORIES = new Set(["case interview", "case", "general"]);
 const STORAGE_SESSION = "casecall:session";
 const MAX_COMPOSER_HEIGHT = 190;
+const MIN_SUBSTANTIVE_TURNS = 2;
 const AUDIO_CUE = /\[(?:warmly|confidently|patiently|empathetically|seriously|enthusiastically|excitedly|chuckles|laughing|sighs)\]\s*/gi;
 
 const state = {
@@ -925,6 +926,10 @@ window.addEventListener("leo:voice-sync", async () => {
   }
 });
 
+function endDisposition() {
+  return state.attempt?.substantive_turns >= MIN_SUBSTANTIVE_TURNS ? "scored" : "abandoned";
+}
+
 function disarmEndButton() {
   window.clearTimeout(state.endArmedTimer);
   state.endArmedTimer = null;
@@ -948,8 +953,11 @@ async function finishAttempt() {
   }
   try {
     await returnToChat();
-    const data = await request(`/api/attempts/${state.attempt.id}/end`, { method: "POST" });
-    window.location.href = data.debrief_url || `/attempts/${state.attempt.id}/debrief`;
+    const data = await request(`/api/attempts/${state.attempt.id}/end`, {
+      method: "POST",
+      body: JSON.stringify({ disposition: endDisposition() }),
+    });
+    window.location.href = data.next_url || data.debrief_url || "/profile";
   } catch (error) {
     toast(error.message || "The practice could not be ended.", "error");
     el.endButton.disabled = false;
@@ -976,7 +984,7 @@ el.endButton.addEventListener("click", async () => {
 
   if (!state.endArmedTimer) {
     el.endButton.classList.add("is-armed");
-    el.endButton.textContent = "Confirm end";
+    el.endButton.textContent = endDisposition() === "abandoned" ? "Save without scoring" : "Confirm end";
     state.endArmedTimer = window.setTimeout(disarmEndButton, 6000);
     return;
   }

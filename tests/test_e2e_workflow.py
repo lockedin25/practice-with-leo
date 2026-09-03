@@ -158,7 +158,7 @@ def test_scenario_1_full_case_lifecycle_on_reservoir_case(monkeypatch, stub_inte
     assert turn2_resp.status_code == 200
 
     # 5. Candidate ends attempt -> auto-triggers evaluation and updates progress
-    end_resp = client.post(f"/api/attempts/{attempt_id}/end")
+    end_resp = client.post(f"/api/attempts/{attempt_id}/end", json={"disposition": "scored"})
     assert end_resp.status_code == 200
     end_data = end_resp.json()
     assert end_data["attempt"]["ended"] is True
@@ -225,7 +225,7 @@ def test_scenario_3_debrief_page_delivery_with_5_dimensions_and_golden_rewrites(
         f"/api/attempts/{att_id}/turn",
         json={"content": "Let me restate the objective of Meridian Cold Chain.", "turn_id": "t1"},
     )
-    client.post(f"/api/attempts/{att_id}/end")
+    client.post(f"/api/attempts/{att_id}/end", json={"disposition": "scored"})
 
     # Fetch rich evaluation report
     resp = client.get(f"/api/attempts/{att_id}/evaluation")
@@ -345,7 +345,7 @@ def test_scenario_5_deterministic_fallback_under_missing_llm(candidate_client, m
     )
 
     # End attempt -> must not crash, must return scorecard
-    end_resp = client.post(f"/api/attempts/{att_id}/end")
+    end_resp = client.post(f"/api/attempts/{att_id}/end", json={"disposition": "scored"})
     assert end_resp.status_code == 200
     end_data = end_resp.json()
     assert end_data["attempt"]["ended"] is True

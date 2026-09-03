@@ -487,7 +487,7 @@ def evaluation_api(monkeypatch, stub_interviewer):
 def test_end_returns_the_evaluation_report_and_stores_it(evaluation_api) -> None:
     client, attempt_id, stub = evaluation_api
 
-    ended = client.post(f"/api/attempts/{attempt_id}/end")
+    ended = client.post(f"/api/attempts/{attempt_id}/end", json={"disposition": "scored"})
 
     assert ended.status_code == 200
     body = ended.json()
@@ -524,7 +524,7 @@ def test_an_attempt_ending_while_the_evaluator_is_down_still_gets_a_full_debrief
     sign_in(client, "offline@casecall.test")
     started = client.post("/api/attempts", json={}).json()
 
-    ended = client.post(f"/api/attempts/{started['id']}/end")
+    ended = client.post(f"/api/attempts/{started['id']}/end", json={"disposition": "scored"})
     fetch = client.get(f"/api/attempts/{started['id']}/evaluation")
 
     assert ended.status_code == 200

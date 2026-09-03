@@ -17,6 +17,11 @@ if TYPE_CHECKING:
     from app.personas import Persona
 
 
+# The welcome/readiness exchange is not performance evidence. Two actual case
+# turns is enough to make an end-of-practice score useful.
+MIN_SUBSTANTIVE_TURNS = 2
+
+
 @dataclass(frozen=True)
 class Fact:
     id: str
@@ -369,6 +374,9 @@ class InterviewSession:
     disclosed_ids: set[str] = field(default_factory=set)
     messages: list[dict[str, str]] = field(default_factory=list)
     candidate_turns: int = 0
+    # Readiness remains in ``candidate_turns`` for transcript fidelity, but it
+    # must not turn an early exit into scored performance.
+    substantive_turns: int = 0
     # The welcome is deliberately separate from the authored case brief.  This
     # state is durable so a reload cannot accidentally start a case before the
     # candidate has explicitly opted in.
@@ -378,6 +386,7 @@ class InterviewSession:
     # still owns the explicit action that saves the attempt and opens debrief.
     ready_to_end: bool = False
     ended: bool = False
+    disposition: str | None = None
     turn_results: dict[str, dict[str, object]] = field(default_factory=dict)
     # Persona disclosure budget. Durable, because a reload that reset these would
     # hand the candidate a free fact and quietly make every persona easier than
@@ -425,9 +434,15 @@ class InterviewSession:
         if counts_toward_floor:
             self.consecutive_precise_misses += 1
 
-    def record_candidate_turn(self, content: str) -> None:
+    def record_candidate_turn(self, content: str, *, substantive: bool = True) -> None:
         self.candidate_turns += 1
+        if substantive:
+            self.substantive_turns += 1
         self.messages.append({"role": "candidate", "content": content})
+
+    @property
+    def default_end_disposition(self) -> str:
+        return "scored" if self.substantive_turns >= MIN_SUBSTANTIVE_TURNS else "abandoned"
 
     def apply_director_decision(self, proposed_phase: str, facts: list[Fact]) -> None:
         self.stage = self.case.validate_phase_transition(self.stage, proposed_phase)
@@ -452,6 +467,7 @@ class InterviewSession:
             },
             "stage": self.stage,
             "messages": self.messages,
+            "substantive_turns": self.substantive_turns,
             "facts": [
                 {"id": fact.id, "content": fact.content}
                 for fact in self.case.facts
@@ -460,6 +476,7 @@ class InterviewSession:
             "case_started": self.case_started,
             "ready_to_end": self.ready_to_end,
             "ended": self.ended,
+            "disposition": self.disposition,
         }
 
     def scorecard(self) -> dict[str, Any]:

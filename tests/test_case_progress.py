@@ -66,33 +66,59 @@ def test_start_case_control_submits_a_readiness_turn_to_open_the_timer_gate() ->
     assert "syncTimer(attempt);" in client_code
 
 
-def test_case_progress_is_user_scoped_solved_and_resettable(candidate_client, monkeypatch) -> None:
+def test_early_exit_is_retained_abandoned_and_scored_practice_updates_progress(
+    candidate_client, monkeypatch, stub_interviewer
+) -> None:
     client, _ = candidate_client
     monkeypatch.setattr(main, "EVALUATOR", None)
     started = client.post("/api/attempts", json={}).json()
     case_id = started["case"]["id"]
 
-    progress = client.get("/api/me/case-progress").json()["progress"]
-    current = next(item for item in progress if item["case_id"] == case_id)
-    assert current["status"] == "in_progress"
-    assert current["attempts_count"] >= 1
+    readiness = client.post(
+        f"/api/attempts/{started['id']}/turn",
+        json={"content": "I am ready to begin.", "turn_id": "ready"},
+    )
+    assert readiness.status_code == 200
 
     ended = client.post(f"/api/attempts/{started['id']}/end")
     assert ended.status_code == 200
+    assert ended.json()["attempt"]["disposition"] == "abandoned"
+    assert ended.json()["evaluation"] is None
+
+    history = client.get("/api/me/practice-history").json()
+    abandoned = next(item for item in history["attempts"] if item["id"] == started["id"])
+    assert abandoned["disposition"] == "abandoned"
+    assert abandoned["feedback"] is None
+    assert history["summary"]["abandoned"] >= 1
+
+    profile = client.get("/api/me/profile").json()
+    assert profile["summary"]["average_feedback_score"] is None
+    assert profile["performance"] == []
+
+    progress = client.get("/api/me/case-progress").json()["progress"]
+    current = next(item for item in progress if item["case_id"] == case_id)
+    assert current["status"] == "not_started"
+
+    # A real two-turn case is scored by default and contributes normally.
+    scored = client.post("/api/attempts", json={"case_id": case_id}).json()
+    client.post(
+        f"/api/attempts/{scored['id']}/turn",
+        json={"content": "I am ready to begin.", "turn_id": "scored-ready"},
+    )
+    for index in range(2):
+        turn = client.post(
+            f"/api/attempts/{scored['id']}/turn",
+            json={"content": f"I will test driver {index} before drawing a conclusion.", "turn_id": f"case-{index}"},
+        )
+        assert turn.status_code == 200
+
+    scored_end = client.post(f"/api/attempts/{scored['id']}/end")
+    assert scored_end.status_code == 200
+    assert scored_end.json()["attempt"]["disposition"] == "scored"
+    assert scored_end.json()["evaluation"] is not None
+
+    profile = client.get("/api/me/profile").json()
+    assert profile["summary"]["average_feedback_score"] is not None
+    assert profile["performance"]
     performance = client.get(f"/api/me/cases/{case_id}/performance").json()
     assert performance["progress"]["status"] == "solved"
-    assert any(item["id"] == started["id"] for item in performance["attempts"])
-
-    blocked = client.post("/api/attempts", json={"case_id": case_id})
-    assert blocked.status_code == 409
-    assert "Reset the test" in blocked.json()["detail"]
-
-    reset = client.post(f"/api/cases/{case_id}/reset")
-    assert reset.status_code == 200
-    assert reset.json()["progress"]["status"] == "not_started"
-    # A reset must not delete a user's attempt or its eventual feedback.
-    retained = client.get(f"/api/me/cases/{case_id}/performance").json()
-    assert any(item["id"] == started["id"] for item in retained["attempts"])
-
-    restarted = client.post("/api/attempts", json={"case_id": case_id})
-    assert restarted.status_code == 200

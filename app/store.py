@@ -35,7 +35,7 @@ class ActiveVoiceSessionExists(RuntimeError):
 
 
 class SessionStore:
-    SCHEMA_VERSION = 3
+    SCHEMA_VERSION = 4
 
     def __init__(self, database_path: Path) -> None:
         self._database_path = database_path
@@ -118,9 +118,11 @@ class SessionStore:
                 "disclosed_ids": sorted(session.disclosed_ids),
                 "messages": session.messages,
                 "candidate_turns": session.candidate_turns,
+                "substantive_turns": session.substantive_turns,
                 "case_started": session.case_started,
                 "ready_to_end": session.ready_to_end,
                 "ended": session.ended,
+                "disposition": session.disposition,
                 "turn_results": session.turn_results,
                 "release_credits": session.release_credits,
                 "consecutive_precise_misses": session.consecutive_precise_misses,
@@ -236,6 +238,19 @@ class SessionStore:
                 (user_id, case_id, attempt_id, score),
             )
 
+    def mark_case_abandoned(self, user_id: str, case_id: str, attempt_id: str) -> None:
+        """Clear the temporary open-attempt marker while retaining its transcript."""
+        with self._connect() as connection:
+            connection.execute(
+                """
+                UPDATE user_case_progress
+                SET status = 'not_started', latest_attempt_id = NULL,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE user_id = ? AND case_id = ? AND latest_attempt_id = ?
+                """,
+                (user_id, case_id, attempt_id),
+            )
+
     def reset_case_progress(self, user_id: str, case_id: str) -> bool:
         """Reset the library status only; historic transcripts and feedback remain intact."""
         with self._connect() as connection:
@@ -305,7 +320,9 @@ class SessionStore:
             "mode": session.get("mode"),
             "stage": session.get("stage"),
             "candidate_turns": int(session.get("candidate_turns", 0)),
+            "substantive_turns": int(session.get("substantive_turns", 0)),
             "ended": bool(session.get("ended", False)),
+            "disposition": session.get("disposition") if session.get("disposition") in {"abandoned", "scored"} else None,
             "messages": list(session.get("messages", [])),
             "facts_released": len(session.get("disclosed_ids", [])),
             "started_at": created_at,
@@ -344,7 +361,7 @@ class SessionStore:
         # same core transcript fields as v2. Treat them as a supported legacy
         # shape so an old completed case can still receive its first debrief.
         schema_version = payload.get("schema_version", 1)
-        if schema_version not in {1, 2, self.SCHEMA_VERSION}:
+        if schema_version not in {1, 2, 3, self.SCHEMA_VERSION}:
             return None
         messages = payload.get("messages", [])
         candidate_turns = payload.get("candidate_turns")
@@ -354,6 +371,12 @@ class SessionStore:
                 for message in messages
                 if isinstance(message, dict) and message.get("role") == "candidate"
             )
+        substantive_turns = payload.get("substantive_turns")
+        if not isinstance(substantive_turns, int):
+            substantive_turns = max(candidate_turns - 1, 0) if payload.get("case_started") else 0
+        disposition = payload.get("disposition")
+        if disposition not in {"abandoned", "scored"}:
+            disposition = None
         return InterviewSession(
             id=attempt_id,
             case=case,
@@ -362,6 +385,7 @@ class SessionStore:
             disclosed_ids=set(payload["disclosed_ids"]),
             messages=messages,
             candidate_turns=candidate_turns,
+            substantive_turns=substantive_turns,
             case_started=bool(
                 payload.get(
                     "case_started",
@@ -374,6 +398,7 @@ class SessionStore:
             ),
             ready_to_end=bool(payload.get("ready_to_end", False)),
             ended=payload["ended"],
+            disposition=disposition,
             turn_results=payload.get("turn_results", {}),
             # Attempts written before personas have no budget recorded. Zero is the
             # correct default: the next turn accrues the persona's rate before any
