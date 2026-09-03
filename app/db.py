@@ -37,6 +37,28 @@ from pathlib import Path
 BUSY_TIMEOUT_MS = 5_000
 
 
+class DatabaseBusy(RuntimeError):
+    """A write waited out the busy timeout without ever acquiring the lock.
+
+    The busy timeout absorbs ordinary contention, so reaching this exception
+    means a writer held the database far longer than any normal save. Nothing
+    was written, which makes resending the exact same request safe; a request
+    path that lets this escape unanswered turns a busy moment into a bare 500
+    and a candidate's lost turn.
+    """
+
+
+def is_busy_error(error: BaseException) -> bool:
+    """True when ``error`` is SQLite reporting an exhausted busy timeout.
+
+    ``database is locked`` is the one database failure the API can honestly
+    answer with "please resend": the statement never ran. Every other
+    ``OperationalError`` — a missing table, a malformed query — is a real fault
+    and must keep surfacing as a 500 rather than being mislabelled retryable.
+    """
+    return isinstance(error, sqlite3.OperationalError) and "database is locked" in str(error)
+
+
 def database_path(root: Path) -> Path:
     """Resolve the database location, preferring an explicit deployment value."""
     configured = os.getenv("DATABASE_PATH", "").strip()

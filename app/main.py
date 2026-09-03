@@ -5,6 +5,7 @@ import hashlib
 import json
 import logging
 import os
+import sqlite3
 import time
 from pathlib import Path
 from typing import Literal
@@ -12,7 +13,7 @@ from urllib.parse import urlencode
 from uuid import uuid4
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
-from fastapi.responses import RedirectResponse, StreamingResponse
+from fastapi.responses import JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
@@ -486,11 +487,37 @@ def submit_turn(
         )
     except AttemptAlreadyEnded as error:
         raise HTTPException(status_code=409, detail=str(error)) from error
+    except sqlite3.OperationalError as error:
+        # Contention that outlasts the busy timeout is a full write lock, not a
+        # crashed statement: nothing was saved, so the turn is safe to resend.
+        if not db.is_busy_error(error):
+            raise
+        raise db.DatabaseBusy("the attempt save waited out the database busy timeout") from error
     except (RuntimeError, VoiceOnboardingUnavailable) as error:
         raise HTTPException(status_code=503, detail="Leo is temporarily unavailable. Please resend your response.") from error
     except InterviewerUnavailable as error:
         raise HTTPException(status_code=503, detail="Leo is temporarily unavailable. Please resend your response.") from error
     return {**result.candidate_result(), "attempt": session.candidate_view()}
+
+
+@app.exception_handler(db.DatabaseBusy)
+def _database_busy(request: Request, error: db.DatabaseBusy) -> JSONResponse:
+    """One safe failure mode for an exhausted database write lock.
+
+    ``detail`` stays a plain string because the browser surfaces it verbatim,
+    while ``error`` and ``retryable`` make the body machine-checkable for API
+    clients deciding whether to resend. ``Retry-After`` keeps a hammering
+    client from compounding the contention it just hit.
+    """
+    return JSONResponse(
+        status_code=503,
+        headers={"Retry-After": "1"},
+        content={
+            "detail": "Leo is busy saving another response. Please resend this one.",
+            "error": "database_busy",
+            "retryable": True,
+        },
+    )
 
 
 def _overall_for(report_payload: dict[str, object]) -> dict[str, object]:
