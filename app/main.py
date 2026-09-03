@@ -22,11 +22,29 @@ from app.accounts import AccountStore, User, current_user, require_user
 from app.admin import router as admin_router
 from app.attempt_service import AttemptAlreadyEnded, AttemptTurnService, TurnSubmission
 from app.auth import router as auth_router
-from app.case_runtime import CaseCatalogue, InterviewSession
+from app.case_runtime import CaseCatalogue, CaseWorld, InterviewSession
+from app.case_author import (
+    ExtractionState,
+    ExtractionUnavailable,
+    SYNTHESIS_THRESHOLD,
+    create_case_author,
+    describe_missing,
+)
+from app.case_synthesis import SynthesisUnavailable, create_case_synthesiser
+from app.case_validator import validate_package
+from app.case_solver import SolverUnavailable, create_case_solver
+from app import personas
 from app import db
 from app.evaluator import FallbackCaseEvaluator, EvaluatorUnavailable, create_evaluator, load_rubric
 from app.interviewer import InterviewerUnavailable, create_interviewer
-from app.store import ActiveVoiceSessionExists, EvaluationStore, SessionStore, VoiceSession
+from app.store import (
+    ActiveVoiceSessionExists,
+    CaseStore,
+    ContributionStore,
+    EvaluationStore,
+    SessionStore,
+    VoiceSession,
+)
 from app.voice import (
     ElevenLabsProvider,
     VoiceConfigurationError,
@@ -63,6 +81,11 @@ load_dotenv(ROOT / ".env")
 # ephemeral filesystem the schema is recreated on every deploy and all
 # accounts, transcripts and evaluations are lost, silently.
 DATABASE_PATH = db.database_path(ROOT)
+# Authored packages are compiled from disk before any request is served, so a
+# malformed one still fails at start-up rather than at a candidate's first turn.
+# The registry itself is mutable, which is what lets a contributed case join
+# without a restart. Note this is the same object as ``app.state.catalogue``:
+# ``register()`` mutates in place, so both views stay consistent.
 CATALOGUE = CaseCatalogue.from_reservoir(ROOT)
 INTERVIEWER = create_interviewer()
 STORE = SessionStore(DATABASE_PATH)
@@ -103,6 +126,60 @@ def _create_evaluator_safely():
 
 EVALUATOR = _create_evaluator_safely()
 EVALUATIONS = EvaluationStore(DATABASE_PATH)
+# Contributed cases and per-case attempt counts. Authored packages stay on disk
+# and in git, where the corpus rights discipline can review them.
+CASES = CaseStore(DATABASE_PATH)
+CONTRIBUTIONS = ContributionStore(DATABASE_PATH)
+# All three degrade to None without a provider key, matching how voice and the
+# evaluator behave: contribution becomes unavailable rather than breaking boot.
+CASE_AUTHOR = create_case_author()
+CASE_SYNTHESISER = create_case_synthesiser()
+CASE_SOLVER = create_case_solver()
+
+
+def reload_contributed_cases() -> int:
+    """Reconcile the live catalogue with the published contributed cases.
+
+    Called at start-up and again whenever an admin publishes or withdraws, so a
+    decision takes effect without a deploy.
+
+    This reconciles rather than only adding. An add-only reload would leave an
+    unpublished case playable until the next restart, which would make the
+    admin's withdrawal button quietly do nothing, and withdrawal is the lever
+    that exists for a case found to be broken or unsafe.
+
+    A single malformed package is logged and skipped rather than raised: one bad
+    contribution must not take down a library of 69 working cases.
+    """
+    registered = 0
+    published_ids: set[str] = set()
+    for record in CASES.published_packages():
+        payload = record["package"]
+        try:
+            world = CaseWorld.from_mapping(
+                payload["case"],
+                payload["facts"],
+                payload["conversation_policy"],
+                version=record["version"],
+            )
+        except Exception:
+            logging.getLogger(__name__).exception(
+                "Skipping unloadable contributed case %s v%s",
+                record["case_id"],
+                record["version"],
+            )
+            continue
+        CATALOGUE.register(world)
+        published_ids.add(world.id)
+        registered += 1
+
+    # Withdraw anything community-sourced that is no longer published. Authored
+    # cases are never touched here: they come from disk, not from this table, and
+    # an empty table must not empty the library.
+    for case_id, world in list(CATALOGUE.cases.items()):
+        if world.source == "community" and case_id not in published_ids:
+            CATALOGUE.unregister(case_id)
+    return registered
 
 app = FastAPI(title="Leo", version="0.1.0")
 class CachedStaticFiles(StaticFiles):
@@ -133,18 +210,32 @@ app.mount("/static", CachedStaticFiles(directory=STATIC_DIR), name="static")
 
 
 # Changes once per deploy, which is exactly when cached assets must stop being
-# reused. Fly exposes its release version; the start time is a correct fallback
-# for a local run, where the only cost of a miss is one reload.
-ASSET_VERSION = (
-    os.getenv("FLY_MACHINE_VERSION")
-    or os.getenv("BUILD_ID")
-    or str(int(time.time()))
+# reused. Fly exposes its release version; BUILD_ID covers any other builder.
+# Empty means this is not a deploy, so asset_url falls back to file mtimes.
+DEPLOY_VERSION = (
+    os.getenv("FLY_MACHINE_VERSION") or os.getenv("BUILD_ID") or ""
 )[:16]
 
 
 def asset_url(path: str) -> str:
-    """Version a static URL so it can be cached indefinitely and still update."""
-    return f"/static/{path}?v={ASSET_VERSION}"
+    """Version a static URL so it can be cached indefinitely and still update.
+
+    A deploy stamps every asset with the one release version. Without a deploy
+    we are running locally, where the process outlives many edits: templates
+    reload per request, so a version pinned at start-up would serve today's
+    HTML against a year-long immutable cache entry holding the stylesheet as it
+    was when the server booted. That is not a miss costing one reload, it is an
+    edit that stays invisible until restart. The file's mtime gives every saved
+    change its own URL.
+    """
+    if DEPLOY_VERSION:
+        return f"/static/{path}?v={DEPLOY_VERSION}"
+    try:
+        stamp = int((STATIC_DIR / path).stat().st_mtime)
+    except OSError:
+        # A path the caller got wrong should 404 loudly, not be made uncacheable.
+        stamp = int(time.time())
+    return f"/static/{path}?v={stamp}"
 
 
 TEMPLATES.env.globals["asset_url"] = asset_url
@@ -154,16 +245,27 @@ TEMPLATES.env.globals["asset_url"] = asset_url
 app.state.accounts = ACCOUNTS
 app.state.store = STORE
 app.state.catalogue = CATALOGUE
+app.state.cases = CASES
+app.state.contributions = CONTRIBUTIONS
 app.state.database_path = DATABASE_PATH
 app.state.evaluator = EVALUATOR
 app.state.evaluations = EVALUATIONS
 app.include_router(auth_router)
 app.include_router(admin_router)
 
+# Contributed cases live in the database, so they join after the on-disk packages
+# have been compiled. Doing this at import time keeps the invariant that the
+# catalogue is complete before the first request is served.
+reload_contributed_cases()
+
 
 class StartAttemptRequest(BaseModel):
     case_id: str = CATALOGUE.default_case.id
-    mode: str = Field(default="realistic", pattern="^(coached|realistic|pressure)$")
+    # This is the interviewer persona. These values predate personas and are already
+    # persisted on every attempt, so they are reused rather than duplicated into a
+    # second field that could disagree: coached=The Coach, realistic=The Operator,
+    # pressure=The Skeptic. See app/personas.py.
+    mode: str = Field(default=personas.DEFAULT_PERSONA_ID, pattern="^(coached|realistic|pressure)$")
     duration_minutes: int = Field(default=30, ge=1)
 
 
@@ -237,6 +339,14 @@ def practice_room(request: Request) -> Response:
     return TEMPLATES.TemplateResponse(request, "practice.html", _shell_context(request))
 
 
+@app.get("/contribute")
+def contribute_page(request: Request) -> Response:
+    """The extraction conversation. Contribution is authenticated, always."""
+    if current_user(request) is None:
+        return RedirectResponse("/login?next=/contribute", status_code=303)
+    return TEMPLATES.TemplateResponse(request, "contribute.html", _shell_context(request))
+
+
 @app.get("/profile")
 def profile_page(request: Request) -> Response:
     if current_user(request) is None:
@@ -286,7 +396,28 @@ def health() -> dict[str, str | None]:
 @app.get("/api/cases")
 def list_cases() -> dict[str, list[dict[str, object]]]:
     """Expose candidate-safe library metadata for the public landing page."""
-    return {"cases": CATALOGUE.catalogue_items()}
+    # Counts are merged here rather than held on CaseWorld, which is frozen and
+    # compiled once: an attempt count changes constantly and does not belong in an
+    # immutable world. One query returns the whole map, so this stays a single
+    # round trip however many cases the library holds.
+    stats = CASES.stats()
+    items = []
+    for item in CATALOGUE.catalogue_items():
+        counts = stats.get(str(item["id"]), {})
+        items.append(
+            {
+                **item,
+                "times_attempted": counts.get("times_attempted", 0),
+                "times_completed": counts.get("times_completed", 0),
+            }
+        )
+    return {"cases": items}
+
+
+@app.get("/api/personas")
+def list_personas() -> dict[str, list[dict[str, object]]]:
+    """The interviewer presets a candidate may choose before starting a case."""
+    return {"personas": personas.catalogue()}
 
 
 @app.post("/api/attempts")
@@ -311,6 +442,8 @@ def start_attempt(request: StartAttemptRequest, user: User = Depends(require_use
     STORE.save(session, user_id=user.id)
     ACCOUNTS.claim_attempt(session.id, user.id)
     STORE.record_case_started(user.id, case.id, session.id)
+    # Library-wide count, distinct from the per-candidate progress row above.
+    CASES.record_attempt_started(case.id)
     return session.candidate_view()
 
 
@@ -422,6 +555,7 @@ def end_attempt(attempt_id: str, user: User = Depends(require_user)) -> dict[str
         session.id,
         score=_report_score(report),
     )
+    CASES.record_attempt_completed(session.case.id)
     return {
         "attempt": session.candidate_view(),
         "evaluation": evaluation,
@@ -492,6 +626,191 @@ def get_evaluation(attempt_id: str, user: User = Depends(require_user)) -> dict[
         **stored,
         "overall": stored.get("overall") or overall,
         "debrief_url": f"/attempts/{attempt_id}/debrief",
+    }
+
+
+class ContributionTurnRequest(BaseModel):
+    content: str = Field(min_length=1, max_length=8_000)
+
+
+class ContributionPauseRequest(BaseModel):
+    draft: str = Field(default="", max_length=8_000)
+
+
+def _contribution_view(record: dict[str, object]) -> dict[str, object]:
+    """Contributor-facing projection of an extraction conversation.
+
+    Deliberately excludes nothing sensitive, because there is nothing sensitive
+    here: it is the contributor's own account of their own interview. What it does
+    do is surface progress, since a long conversation with no visible end is what
+    makes people abandon one.
+    """
+    state = ExtractionState.from_dict(dict(record["state"]))  # type: ignore[arg-type]
+    missing = state.extracted.missing_required()
+    missing_anchors = state.extracted.missing_synthesis_anchors()
+    can_submit = state.can_submit()
+    return {
+        "id": record["id"],
+        "status": record["status"],
+        "phase": state.phase,
+        "turns": state.turns,
+        "messages": state.messages,
+        "completeness": state.completeness(),
+        "sufficiency_score": state.sufficiency_score(),
+        "sufficiency_threshold": SYNTHESIS_THRESHOLD,
+        "missing": missing,
+        "missing_label": describe_missing(missing),
+        "missing_anchors": missing_anchors,
+        "missing_anchors_label": describe_missing(missing_anchors),
+        "completion_tracker": state.extracted.completion_tracker(),
+        "fully_complete": not missing,
+        "completion_rule": (
+            "Client and industry context, the decision question, the underlying mechanism, "
+            "the turning-point insight, and two plausible wrong answers."
+        ),
+        # Compatibility alias for the first contribution client. Readiness is now
+        # a weighted runtime decision, never the model's stored opinion.
+        "ready_to_submit": can_submit,
+        "can_submit": can_submit,
+        "draft": state.draft_text,
+        "case_id": record.get("case_id"),
+    }
+
+
+def _require_contribution(session_id: str, user: User) -> dict[str, object]:
+    record = CONTRIBUTIONS.get(session_id)
+    if record is None or record["user_id"] != user.id:
+        # Same response for missing and not-yours, so the endpoint cannot be used
+        # to discover whether another contributor's session exists.
+        raise HTTPException(status_code=404, detail="Contribution not found")
+    return record
+
+
+@app.post("/api/contributions")
+def start_contribution(user: User = Depends(require_user)) -> dict[str, object]:
+    """Open the extraction conversation, or resume the one already open."""
+    if CASE_AUTHOR is None:
+        raise HTTPException(status_code=503, detail="Contribution is not available right now.")
+
+    existing = CONTRIBUTIONS.live_for_user(user.id)
+    if existing is not None:
+        # Resuming rather than refusing: a contributor who closed the tab halfway
+        # through should land back in their conversation, not be told off.
+        return _contribution_view(existing)
+
+    state = ExtractionState()
+    state.messages.append({"role": "agent", "content": CASE_AUTHOR.opening_prompt()})
+    session_id = str(uuid4())
+    CONTRIBUTIONS.create(session_id, user.id, state.as_dict())
+    return _contribution_view(CONTRIBUTIONS.get(session_id))
+
+
+@app.get("/api/contributions/{session_id}")
+def read_contribution(session_id: str, user: User = Depends(require_user)) -> dict[str, object]:
+    return _contribution_view(_require_contribution(session_id, user))
+
+
+@app.post("/api/contributions/{session_id}/pause")
+def pause_contribution(
+    session_id: str,
+    request: ContributionPauseRequest,
+    user: User = Depends(require_user),
+) -> dict[str, object]:
+    """Persist unsent composer text; the next visit resumes the same session."""
+    record = _require_contribution(session_id, user)
+    if record["status"] != "in_progress":
+        raise HTTPException(status_code=409, detail="This contribution has already been submitted.")
+    state = ExtractionState.from_dict(dict(record["state"]))  # type: ignore[arg-type]
+    state.draft_text = request.draft.strip()
+    CONTRIBUTIONS.save_state(session_id, state.as_dict())
+    return {"status": "saved", "resume_url": "/contribute"}
+
+
+@app.post("/api/contributions/{session_id}/reset")
+def reset_contribution(session_id: str, user: User = Depends(require_user)) -> dict[str, object]:
+    """Abandon the current reconstruction and return a clean conversation."""
+    if CASE_AUTHOR is None:
+        raise HTTPException(status_code=503, detail="Contribution is not available right now.")
+    _require_contribution(session_id, user)
+    state = ExtractionState()
+    state.messages.append({"role": "agent", "content": CASE_AUTHOR.opening_prompt()})
+    new_session_id = str(uuid4())
+    try:
+        CONTRIBUTIONS.restart(session_id, user.id, new_session_id, state.as_dict())
+    except ValueError:
+        raise HTTPException(status_code=409, detail="This contribution cannot be restarted.")
+    return _contribution_view(CONTRIBUTIONS.get(new_session_id))
+
+
+@app.post("/api/contributions/{session_id}/turn")
+def contribution_turn(
+    session_id: str, request: ContributionTurnRequest, user: User = Depends(require_user)
+) -> dict[str, object]:
+    if CASE_AUTHOR is None:
+        raise HTTPException(status_code=503, detail="Contribution is not available right now.")
+    record = _require_contribution(session_id, user)
+    if record["status"] != "in_progress":
+        raise HTTPException(status_code=409, detail="This contribution has already been submitted.")
+
+    state = ExtractionState.from_dict(dict(record["state"]))  # type: ignore[arg-type]
+    try:
+        state = CASE_AUTHOR.respond(state, request.content)
+    except ExtractionUnavailable:
+        raise HTTPException(status_code=502, detail="That did not go through. Try sending it again.")
+
+    CONTRIBUTIONS.save_state(session_id, state.as_dict())
+    return _contribution_view(CONTRIBUTIONS.get(session_id))
+
+
+@app.post("/api/contributions/{session_id}/submit")
+def submit_contribution(session_id: str, user: User = Depends(require_user)) -> dict[str, object]:
+    """Synthesise, validate, and queue for review. Never publishes."""
+    if CASE_SYNTHESISER is None:
+        raise HTTPException(status_code=503, detail="Contribution is not available right now.")
+    record = _require_contribution(session_id, user)
+    if record["status"] != "in_progress":
+        raise HTTPException(status_code=409, detail="This contribution has already been submitted.")
+
+    state = ExtractionState.from_dict(dict(record["state"]))  # type: ignore[arg-type]
+    if not state.can_submit():
+        missing_anchors = state.extracted.missing_synthesis_anchors()
+        if missing_anchors:
+            needed = describe_missing(missing_anchors)
+        else:
+            needed = "one more concrete detail about the situation, turning point, traps, or numbers"
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"Not quite enough to build the case yet. Leo still needs {needed}. "
+                "Keep going and it will ask one focused question."
+            ),
+        )
+
+    try:
+        package = CASE_SYNTHESISER.synthesise(state.extracted, contributor_id=user.id)
+    except SynthesisUnavailable:
+        raise HTTPException(status_code=502, detail="The case could not be assembled. Try again.")
+
+    verdict = validate_package(package)
+    package["validation"] = verdict.as_dict()
+    case_id = str(package["case"]["case_id"])
+    # 'validated' and 'needs_changes' are both pre-publication. The distinction is
+    # for the admin's queue ordering, not for the contributor, who in either case
+    # has finished and is waiting on a human.
+    status = "validated" if verdict.passed else "needs_changes"
+    version = CASES.save_package(
+        case_id, package, status=status, contributor_id=user.id
+    )
+    CONTRIBUTIONS.finish(session_id, status="submitted", case_id=case_id)
+
+    return {
+        "case_id": case_id,
+        "version": version,
+        "status": status,
+        "validation": verdict.as_dict(),
+        "message": (
+            "Thank you. Your case is with the reviewer and will appear in the library once approved."
+        ),
     }
 
 

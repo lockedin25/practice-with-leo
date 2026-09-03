@@ -15,11 +15,15 @@ const libraryCount = document.querySelector("#library-count");
 const proofCount = document.querySelector("#proof-case-count");
 
 const PREVIEW_SIZE = 10;
-const CORE_SCHOOL = "MBB Core";
+/* Cases that ship with the product, as opposed to community contributions. The
+ * previous constant keyed off a B-school name, which the library no longer
+ * surfaces. */
+const CURATED_SOURCE = "curated";
+const sourceOf = (item) => (item.source === "community" ? "community" : "curated");
 
 /* The path climbs on purpose: two foundation diagnostics, a broad spread of
  * Round 1 staples, then advanced M&A and sustainability work. Ids missing
- * from the catalogue are backfilled from MBB Core, so the preview never
+ * from the catalogue are backfilled from the curated set, so the preview never
  * renders short because a case was renamed. */
 const CURATED_IDS = [
   "meridian-cold-chain-v1",
@@ -49,7 +53,7 @@ function element(tag, className, text) {
   return node;
 }
 
-/** The curated slots first, then MBB Core, then anything, never duplicating. */
+/** The hand-picked slots first, then any curated case, then anything, never duplicating. */
 function startingPath(cases) {
   const byId = new Map(cases.map((item) => [item.id, item]));
   const chosen = [];
@@ -62,7 +66,7 @@ function startingPath(cases) {
   };
 
   CURATED_IDS.forEach((id) => take(byId.get(id)));
-  cases.filter((item) => item.school === CORE_SCHOOL).forEach(take);
+  cases.filter((item) => sourceOf(item) === CURATED_SOURCE).forEach(take);
   cases.forEach(take);
   return chosen;
 }
@@ -110,21 +114,16 @@ function renderPath(cases) {
   grid.replaceChildren(...chosen.map(pathRow));
 }
 
-/* One content rule for the whole product: the library total is every scenario,
- * of which MBB Core is a named subset. */
+/* One content rule for the whole product: the library total is every scenario.
+ * The split it reports is curated versus community, never the institutions the
+ * source material came from. */
 function libraryLine(cases) {
   const total = cases.length;
-  const core = cases.filter((item) => item.school === CORE_SCHOOL).length;
-  const rest = total - core;
-  const schools = [...new Set(cases.map((item) => item.school).filter((name) => name && name !== CORE_SCHOOL))].sort();
-
-  if (!core || !rest || !schools.length) {
-    return `${total} scenarios in the full library.`;
-  }
-
-  const sources =
-    schools.length > 1 ? `${schools.slice(0, -1).join(", ")}, and ${schools[schools.length - 1]}` : schools[0];
-  return `${total} scenarios in the full library: ${core} MBB Core plus ${rest} exemplars from ${sources}.`;
+  const community = cases.filter((item) => sourceOf(item) === "community").length;
+  if (!community) return `${total} scenarios in the full library, all free.`;
+  return `${total} scenarios in the full library, all free: ${
+    total - community
+  } curated plus ${community} contributed by the community.`;
 }
 
 fetch("/api/cases")

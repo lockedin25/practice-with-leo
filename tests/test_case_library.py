@@ -37,25 +37,38 @@ def test_runtime_can_cap_an_early_turn_to_one_atomic_fact() -> None:
     assert len(facts) == 1
 
 
-def test_catalogue_contains_all_target_schools() -> None:
+def test_the_catalogue_exposes_only_the_curated_community_axis() -> None:
+    """The library no longer tells a candidate which institution a case came from.
+
+    The corpus is mixed-provenance, so naming any one school was both inaccurate
+    and a claim the product should not make publicly. What a candidate actually
+    needs to know is whether a case shipped with Leo or came from another candidate.
+    """
     catalogue = CaseCatalogue.from_reservoir(Path(__file__).resolve().parents[1])
     items = catalogue.catalogue_items()
-    schools = {item["school"] for item in items}
-    assert schools == {"MBB Core", "IIM-A", "IIM-B", "IIM-C", "ISB"}
+
+    assert {item["source"] for item in items} == {"curated"}
+    assert all("school" not in item for item in items)
 
 
-def test_catalogue_school_breakdown_counts() -> None:
+def test_no_institution_name_reaches_the_candidate_facing_catalogue() -> None:
+    """Regression guard for the removal, checked against the serialized payload.
+
+    Asserting on the whole projection rather than one field is deliberate: a name
+    reintroduced through the title, summary or skills list would be just as public
+    as one in a dedicated field.
+    """
+    import json
+
     catalogue = CaseCatalogue.from_reservoir(Path(__file__).resolve().parents[1])
-    items = catalogue.catalogue_items()
-    iima = [i for i in items if i["school"] == "IIM-A"]
-    iimb = [i for i in items if i["school"] == "IIM-B"]
-    iimc = [i for i in items if i["school"] == "IIM-C"]
-    isb = [i for i in items if i["school"] == "ISB"]
-    core = [i for i in items if i["school"] == "MBB Core"]
+    payload = json.dumps(catalogue.catalogue_items()).lower()
 
-    assert len(core) == 12
-    assert len(iima) == 25
-    assert len(iimb) == 10
-    assert len(iimc) == 10
-    assert len(isb) == 12
-    assert len(items) == 69
+    for banned in ("iim-", "iim ", "ahmedabad", "bangalore", "calcutta", "hyderabad", "casebook"):
+        assert banned not in payload, f"{banned!r} leaked into the public catalogue"
+
+
+def test_every_authored_case_still_loads_after_the_source_change() -> None:
+    """The count is the migration check: 12 reservoir packages plus 57 exemplars."""
+    catalogue = CaseCatalogue.from_reservoir(Path(__file__).resolve().parents[1])
+
+    assert len(catalogue.catalogue_items()) == 69

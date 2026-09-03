@@ -94,6 +94,115 @@ class FactItem(BaseModel):
         default="source_derived",
         description="Source provenance of the fact.",
     )
+    formula: str = Field(
+        default="",
+        description=(
+            "For a derived fact, the arithmetic that produces it, in terms of the names in "
+            "'depends_on'. Present so the case-world rule that derived facts are reproducible "
+            "becomes machine-checkable instead of aspirational. Evaluated by app.expressions, "
+            "never by a model."
+        ),
+    )
+    depends_on: dict[str, str] = Field(
+        default_factory=dict,
+        description=(
+            "Maps each name in 'formula' to the fact ID supplying its value. Separate from "
+            "'dependencies', which gates disclosure order rather than arithmetic."
+        ),
+    )
+    numeric_value: float | None = Field(
+        default=None,
+        description="The fact's value as a number, when it has one. Required for a formula input.",
+    )
+
+
+class QuantStep(BaseModel):
+    """One calculation the case expects the candidate to perform.
+
+    Modelled on how consulting math is actually graded rather than on arithmetic:
+    deriving the approach and stating assumptions matter more than the digits, and
+    an order-of-magnitude error is far worse than a small slip caught on a sanity
+    check. Optional per case, permanently. A case with no quantitative surface is
+    a valid case, not an incomplete one.
+    """
+
+    id: str = Field(..., description="Unique step identifier (e.g. 'quant.pharma-contribution').")
+    intent: str = Field(..., description="What the candidate is expected to compute, in plain language.")
+    kind: Literal[
+        "market_sizing",
+        "breakeven",
+        "profitability",
+        "growth",
+        "unit_economics",
+        "exhibit_read",
+    ] = Field(default="unit_economics", description="The family of consulting math being tested.")
+    release_level: str = Field(
+        default="hypothesis_backed",
+        description="When the interviewer may ask for this calculation, using the fact release ladder.",
+    )
+    inputs: dict[str, str] = Field(
+        default_factory=dict,
+        description="Maps each formula variable to the fact ID that supplies it.",
+    )
+    formula: str = Field(default="", description="The arithmetic, in terms of the input names.")
+    expected_value: float | None = Field(default=None, description="The value the formula produces.")
+    unit: str = Field(default="", description="Unit of the expected value, e.g. 'INR per kg'.")
+    close_tolerance: float = Field(
+        default=0.25,
+        description="Relative band counted as a correct answer. Generous, because aggressive rounding is correct practice.",
+    )
+    magnitude_factor: float = Field(
+        default=2.0,
+        description="Factor within which an answer is still the right order of magnitude.",
+    )
+    graded_behaviours: list[str] = Field(
+        default_factory=lambda: [
+            "states_formula_before_computing",
+            "names_assumptions_explicitly",
+            "sanity_checks_plausibility",
+            "states_commercial_so_what",
+        ],
+        description="Process behaviours scored alongside the number, and weighted above it.",
+    )
+    interviewer_behaviour: str = Field(
+        default="Ask the candidate to set it up. Confirm or correct the setup. Never supply the arithmetic.",
+        description="How the interviewer handles this step.",
+    )
+
+
+class QuantPackage(BaseModel):
+    """Container for a case's quantitative steps. Absent for a qualitative case."""
+
+    schema_version: str = Field(default="quant-v1")
+    quant_steps: list[QuantStep] = Field(default_factory=list)
+
+
+class ProvenanceModel(BaseModel):
+    """Where a case came from, and how its contributor may be credited.
+
+    Month precision on the interview date is deliberate. A full date plus a firm
+    plus a round is close to identifying for someone in a live process.
+    """
+
+    source_type: Literal["authored", "interview_recall"] = Field(default="authored")
+    firm: str | None = Field(default=None, description="Firm the case was asked at, when recalled.")
+    round: int | None = Field(default=None, description="Interview round, when recalled.")
+    geography: str | None = Field(default=None)
+    interview_month: str | None = Field(
+        default=None, description="Month precision only, as YYYY-MM. Never a full date."
+    )
+    contributor_id: str | None = Field(default=None)
+    attribution_mode: Literal["anonymous", "pseudonymous", "public"] = Field(
+        default="pseudonymous",
+        description="Only 'public' contributors may ever be named on a public surface.",
+    )
+    embargo_until: str | None = Field(
+        default=None,
+        description=(
+            "ISO date before which the case stays unpublished. Lets a candidate still in a live "
+            "process contribute now and publish after their process closes."
+        ),
+    )
 
 
 class FactsPackage(BaseModel):
@@ -192,12 +301,19 @@ class CaseManifest(BaseModel):
     category: str
     industry: str
     difficulty: Literal["foundation", "intermediate", "advanced"] = Field(default="intermediate")
-    school: str | None = Field(default=None, description="Originating B-school (e.g. IIM-A, IIM-B, IIM-C, ISB)")
+    # The candidate-facing origin axis. Deliberately not an institution: cases come
+    # from a mix of sources and naming any one school on a public surface is both
+    # inaccurate and not something the product should assert.
+    source: Literal["curated", "community"] = Field(
+        default="curated",
+        description="'curated' for cases shipped with the product, 'community' for contributed ones.",
+    )
     supported_durations: list[int] = Field(default_factory=lambda: [30])
     skills_tested: list[str] = Field(default_factory=list)
     candidate_opening: CandidateOpeningModel
     objective_function: ObjectiveFunctionModel
     case_essence: CaseEssenceModel
+    provenance: ProvenanceModel | None = None
     session_contract: dict[str, Any] | None = None
     reservoir_files: list[str] = Field(default_factory=list)
 
@@ -209,6 +325,7 @@ class CasePackage(BaseModel):
     facts: FactsPackage
     issue_tree: IssueTreePackage | None = None
     conversation_policy: ConversationPolicyPackage | None = None
+    quant: QuantPackage | None = None
     validation_notes: str = ""
     package_dir: str = ""
 

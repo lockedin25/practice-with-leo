@@ -64,7 +64,7 @@ const DIMENSION_DISPLAY_NAMES = {
 const LABEL_ACRONYMS = new Map(Object.entries({
   saas: "SaaS", b2b: "B2B", b2c: "B2C", bnpl: "BNPL", fmcg: "FMCG",
   cpg: "CPG", msme: "MSME", qsr: "QSR", ev: "EV", ai: "AI", it: "IT",
-  kpi: "KPI", ebitda: "EBITDA", mbb: "MBB", iim: "IIM", isb: "ISB",
+  kpi: "KPI", ebitda: "EBITDA", mbb: "MBB",
   bcg: "BCG", "m&a": "M&A", roi: "ROI", "r&d": "R&D",
 }));
 
@@ -385,7 +385,13 @@ function renderHistoryView() {
       const caseCell = document.createElement("td");
       caseCell.append(
         node("p", "history-case", attempt.case.title),
-        node("p", "history-meta", `${attempt.case.school || "MBB Core"} · ${titleCase(attempt.case.category || "case")}`),
+        node(
+          "p",
+          "history-meta",
+          `${attempt.case.source === "community" ? "Community" : "Curated"} · ${titleCase(
+            attempt.case.category || "case"
+          )}`
+        ),
       );
 
       const stageCell = document.createElement("td");

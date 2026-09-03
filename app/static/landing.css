@@ -84,7 +84,47 @@ a {
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* --- Maker byline -------------------------------------------------------- */
+/* The line that carries the two things a first-time visitor wants: a person
+   behind the product, and the price. It jumps to the full story below. */
+
+.hero-maker {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
   margin-bottom: var(--band-gap);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--ink-secondary);
+  transition: color var(--transition-fast);
+}
+
+.hero-maker:hover {
+  color: var(--ink-primary);
+}
+
+.hero-maker-photo {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--line-base);
+  background: var(--bg-subtle);
+}
+
+.hero-maker-text b {
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.hero-maker-free {
+  font-weight: 600;
+  color: var(--brand-primary);
 }
 
 .hero-proof {
@@ -523,6 +563,170 @@ a {
   min-height: 44px;
 }
 
+/* --- Who made this ------------------------------------------------------- */
+/* The one place on the page written in the first person. It reads as a note
+   from a person rather than a product section, so it gets a warmer surface,
+   a wider measure, and no card hover. */
+
+/* No top padding and no rule: unlike the flat bands above it, this section is
+   a bordered card that separates itself, so the path section's own bottom
+   padding is the whole gap. With both it was 193px of empty page with a
+   hairline stranded in the middle of it. */
+.maker {
+  padding: 0 0 var(--section-y);
+}
+
+.maker-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+  /* The note is short and the bio card is tall, so the two are optically
+     centred against each other rather than top-aligned, which would leave the
+     prose trailing off above a quarter of empty card. */
+  align-items: center;
+  gap: 56px;
+  padding: clamp(28px, 4vw, 48px);
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-2xl);
+  background: var(--bg-subtle);
+}
+
+/* Portrait, caption and credential rail read as one bio card. Keeping the rail
+   here rather than under the prose is what stops the short column from
+   trailing off into half a metre of empty ivory. */
+.maker-aside {
+  display: grid;
+  align-content: start;
+  gap: 26px;
+}
+
+.maker-portrait {
+  display: grid;
+  gap: 16px;
+}
+
+.maker-portrait img {
+  width: 100%;
+  max-width: 260px;
+  /* The width and height attributes on the tag reserve layout space before the
+     file arrives. Without this the 640px height hint wins over aspect-ratio and
+     the portrait renders as a tall crop. */
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--r-xl);
+  border: 1px solid var(--line-base);
+  box-shadow: var(--shadow-lg);
+}
+
+/* The portrait is a studio shot on a pale backdrop. In dark mode that pane of
+   near-white would out-shout everything around it, so it is settled down
+   rather than replaced. */
+:root[data-theme="dark"] .maker-portrait img,
+:root[data-theme="dark"] .hero-maker-photo {
+  filter: brightness(0.82) contrast(1.02);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .maker-portrait img,
+  :root:not([data-theme="light"]) .hero-maker-photo {
+    filter: brightness(0.82) contrast(1.02);
+  }
+}
+
+.maker-portrait figcaption {
+  display: grid;
+  gap: 3px;
+}
+
+.maker-portrait figcaption b {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink-primary);
+}
+
+.maker-portrait figcaption span {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+.maker-copy .eyebrow {
+  margin-bottom: 16px;
+}
+
+.maker-copy h2 {
+  max-width: 20ch;
+  margin-bottom: 22px;
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: var(--ink-primary);
+}
+
+.maker-copy h2 em {
+  font-style: italic;
+  color: var(--brand-primary);
+}
+
+.maker-copy p {
+  max-width: 62ch;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--ink-secondary);
+}
+
+.maker-signature {
+  margin-top: 4px;
+  font-family: var(--font-serif);
+  font-size: 1.375rem;
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ink-primary);
+}
+
+.maker-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-base);
+  list-style: none;
+}
+
+/* The square is the 44px touch target; the mark inside is 18px. Pulling only
+   the first item left by the square's own side padding lines the LinkedIn mark
+   up with the text above it, without dragging the divider off the column. */
+.maker-links li:first-child {
+  margin-left: -13px;
+}
+
+.maker-links a {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
+  color: var(--ink-muted);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.maker-links a:hover {
+  color: var(--brand-primary);
+  background: var(--brand-tint);
+}
+
+.maker-links svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
 /* --- Closing ------------------------------------------------------------- */
 
 .closing {
@@ -643,6 +847,11 @@ a {
     grid-template-columns: minmax(0, 145px) minmax(0, 1fr);
     gap: 16px;
   }
+
+  .maker-inner {
+    grid-template-columns: minmax(0, 220px) minmax(0, 1fr);
+    gap: 40px;
+  }
 }
 
 @media (max-width: 900px) {
@@ -689,6 +898,40 @@ a {
   .diff-item {
     grid-template-columns: minmax(0, 1fr);
     gap: 5px;
+  }
+
+  /* The portrait moves above the story and sits beside its caption, so a
+     single column does not open with a 300px block of photograph. */
+  .maker-inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
+  }
+
+  /* The aside stops being a column and hands its two children straight to the
+     page grid, so the rail can fall after the story instead of wedging itself
+     between the portrait and the first sentence. */
+  .maker-aside {
+    display: contents;
+  }
+
+  .maker-portrait {
+    grid-template-columns: 104px minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+  }
+
+  .maker-portrait img {
+    max-width: none;
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-md);
+  }
+
+  .maker-links {
+    order: 1;
+  }
+
+  .maker-copy h2 {
+    max-width: none;
   }
 
   .closing {
@@ -756,6 +999,10 @@ a {
 
   .path-title {
     font-size: 1.125rem;
+  }
+
+  .hero-maker {
+    align-items: flex-start;
   }
 
   .footer-inner {

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% set nav_active = "cases" %}
 {% block title %}Case Library · Leo MBB Case Prep{% endblock %}
-{% block description %}Browse authentic MBB case interview scenarios. Practice profitability, growth, M&A, and operations cases with Leo.{% endblock %}
+{% block description %}Browse authentic MBB case interview scenarios, all free. Practice profitability, growth, M&A, and operations cases with Leo.{% endblock %}
 {% block stylesheets %}
 <link rel="stylesheet" href="{{ asset_url('cases.css') }}" />
 {% endblock %}
@@ -14,7 +14,8 @@
     <h1 class="lib-title">What should you practice next?</h1>
     <p class="lib-lede">
       Every case runs about 30 minutes across three phases: clarification, drill down, synthesis.
-      Leo releases evidence only when your reasoning has earned it.
+      Leo releases evidence only when your reasoning has earned it. Every one of them is free
+      to practise, as many times as you like.
     </p>
     <p class="lib-scale" id="lib-scale">Loading the library…</p>
   </header>
@@ -76,7 +77,7 @@
     </div>
 
     <!-- Tier two: type and difficulty live behind the Filters button.
-         School and source stay one level further back. -->
+         Source and interviewer stay one level further back. -->
     <div class="filters-scrim hidden" id="filters-scrim"></div>
     <div class="filters-panel hidden" id="filters-panel" role="group" aria-label="Filters">
       <div class="filters-panel-head">
@@ -100,9 +101,28 @@
         </fieldset>
 
         <fieldset class="filter-group filter-group-quiet">
-          <legend class="filter-legend">School or source</legend>
-          <p class="filter-hint">Only matters if you are targeting one school's style.</p>
-          <select class="select select-block" id="school-select" aria-label="School or source"></select>
+          <legend class="filter-legend">Source</legend>
+          <p class="filter-hint">Curated cases ship with Leo. Community cases come from other candidates.</p>
+          <select class="select select-block" id="source-select" aria-label="Source"></select>
+        </fieldset>
+
+        <!-- Not a filter. This picks the interviewer any case you start runs
+             against, because a persona is fixed once an attempt exists. -->
+        <fieldset class="filter-group">
+          <legend class="filter-legend">Interviewer</legend>
+          <p class="filter-hint" id="persona-hint">
+            How hard the interviewer makes you work for each fact.
+          </p>
+          <select
+            class="select select-block"
+            id="persona-select"
+            aria-label="Interviewer persona"
+            aria-describedby="persona-hint"
+          >
+            <option value="coached">The Coach · answers readily, helps you recover</option>
+            <option value="realistic" selected>The Operator · answers exactly what you asked</option>
+            <option value="pressure">The Skeptic · gives almost nothing away</option>
+          </select>
         </fieldset>
       </div>
 

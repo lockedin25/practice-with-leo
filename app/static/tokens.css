@@ -310,6 +310,15 @@
   display: none !important;
 }
 
+/* The `hidden` attribute is only styled by the user-agent stylesheet, so any
+   class that sets `display` outranks it. `.btn { display: inline-flex }` below
+   silently defeated it, leaving a `hidden` submit button fully visible and
+   clickable. Defending the attribute here makes it behave the way every author
+   expects, rather than requiring everyone to remember the `.hidden` class. */
+[hidden] {
+  display: none !important;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -535,6 +544,14 @@
 .btn-ghost:hover {
   background: var(--brand-light);
   color: var(--brand-primary);
+}
+
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  transform: none !important;
 }
 
 
@@ -1279,6 +1296,12 @@ ol {
   color: var(--brand-primary);
 }
 
+/* The phone menu's footer row only appears inside the open sheet. Its mobile
+   override must come later in the cascade. */
+.nav-mobile-foot {
+  display: none;
+}
+
 /* --- Responsive shell ---------------------------------------------------- */
 @media (max-width: 1200px) {
   .shell {
@@ -1337,11 +1360,6 @@ ol {
   }
 }
 
-/* The phone menu's footer row only exists inside the sheet. */
-.nav-mobile-foot {
-  display: none;
-}
-
 /* The document must never scroll sideways: the audit measured a 385px wide
    document in a 375px viewport. */
 html,
@@ -1351,9 +1369,9 @@ body {
 }
 
 
-/* --- Header identity block (admin console's viewer chip) ------------------ */
-/* Rendered by the shared header, so it belongs to the system rather than to
-   admin.css, which is the only page stylesheet that used to define it. */
+/* --- Shared identity block (admin console's viewer chip) ----------------- */
+/* Kept in the shared token layer because the user identity treatment is part
+   of the application system even when a page renders it in local content. */
 .person {
   display: flex;
   align-items: center;

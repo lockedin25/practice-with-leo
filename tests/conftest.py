@@ -14,7 +14,7 @@ from pathlib import Path
 import pytest
 
 from app.accounts import SESSION_COOKIE, AccountStore, User
-from app.store import EvaluationStore, SessionStore
+from app.store import CaseStore, ContributionStore, EvaluationStore, SessionStore
 
 _TEMPORARY_ROOT: Path | None = None
 
@@ -30,10 +30,14 @@ def pytest_configure(config: pytest.Config) -> None:
     main.ACCOUNTS = AccountStore(database)
     main.STORE = SessionStore(database)
     main.EVALUATIONS = EvaluationStore(database)
+    main.CASES = CaseStore(database)
+    main.CONTRIBUTIONS = ContributionStore(database)
     main.app.state.accounts = main.ACCOUNTS
     main.app.state.store = main.STORE
     main.app.state.database_path = database
     main.app.state.evaluations = main.EVALUATIONS
+    main.app.state.cases = main.CASES
+    main.app.state.contributions = main.CONTRIBUTIONS
 
 
 def pytest_unconfigure(config: pytest.Config) -> None:

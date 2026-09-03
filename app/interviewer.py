@@ -17,6 +17,7 @@ from typing import Any, Protocol
 from pydantic import BaseModel, Field
 
 from app.case_runtime import Fact, InterviewSession
+from app.personas import allowance_for, resolve_release
 from app.llm_budget import (
     COMPLETION_TOKENS,
     TRUNCATED_RETRY_TOKENS,
@@ -46,6 +47,17 @@ def _without_audio_tags(reply: str) -> str:
 
 class DirectorDecision(BaseModel):
     candidate_intent: str = Field(description="The candidate's intent in plain language.")
+    question_precision: str = Field(
+        default="partial",
+        description=(
+            "How targeted the candidate's latest turn was, judged independently of whether "
+            "it was correct. Use 'targeted' when it names the specific quantity, segment, "
+            "driver or comparison it wants and implies why that matters. Use 'partial' when "
+            "it names a relevant area but not what within it. Use 'vague' for a general "
+            "request, a restatement, thinking aloud, or a broad ask such as 'tell me more "
+            "about the costs'."
+        ),
+    )
     move: str = Field(description="One of answer, probe, challenge, redirect, invite, or close.")
     next_phase: str = Field(description="The authored phase to hold or advance to.")
     fact_ids: list[str] = Field(default_factory=list, description="Eligible fact IDs to disclose this turn.")
@@ -130,10 +142,12 @@ class LangChainCaseInterviewer:
                     "Infer the candidate's intent from the transcript, choose only the relevant "
                     "fact IDs from the supplied eligible facts, and choose the next authored phase. "
                     "Do not state a diagnosis, invent a fact, or select an ID not present in the facts. "
-                    "Default to an answer, challenge, or concise redirection rather than a question. "
+                    "Grade question_precision honestly on how targeted the turn was, not on how much you "
+                    "want to help: the runtime uses it to decide whether this persona discloses anything, "
+                    "so inflating it silently defeats the chosen difficulty. "
+                    "Follow the persona disclosure and pushback policies supplied for this turn; they, not "
+                    "your own instinct, decide how freely evidence moves and how hard you challenge. "
                     "Use probe only when one focused question would genuinely advance a promising line of reasoning. "
-                    "If the candidate has already been unable to advance after a prior probe, select the narrowest "
-                    "eligible fact that helps them and use answer or redirect. Do not repeat probes for the same impasse. "
                     "Write a brief that guides the voice interviewer without revealing unreleased evidence. "
                     "Set case_concluded true only after the candidate has delivered a final synthesis and the "
                     "interview should now end. In that turn use move close, release no new facts, and ask no "
@@ -147,6 +161,9 @@ class LangChainCaseInterviewer:
                     "Current phase goal: {phase_goal}\n"
                     "Candidate turn number: {candidate_turn_number}\n"
                     "Turn pacing policy: {turn_pacing_policy}\n"
+                    "Persona disclosure policy: {persona_disclosure_policy}\n"
+                    "Persona pushback policy: {persona_pushback_policy}\n"
+                    "Disclosure allowance this turn: {disclosure_allowance}\n"
                     "Authored phases, in order: {phase_ids}\n"
                     "Eligible facts: {eligible_facts}\n"
                     "Candidate's latest turn: {candidate_turn}",
@@ -160,8 +177,10 @@ class LangChainCaseInterviewer:
             [
                 (
                     "system",
-                    "You are Leo, a calm, incisive consulting case interviewer. You are direct, precise, "
-                    "and respectful, never theatrical or overly encouraging. "
+                    "You are Leo, an incisive consulting case interviewer. Your register for this "
+                    "interview is set by the persona demeanour supplied below; follow it rather than "
+                    "defaulting to a neutral or encouraging tone. Never be theatrical, and never "
+                    "demean the candidate personally whatever the demeanour. "
                     "Use only the approved facts in this prompt. Never reveal a solution, hidden context, "
                     "or a future fact. Write this exact turn afresh: do not use templates, canned phrasing, "
                     "or fixed dialogue. Treat approved facts as source material and paraphrase them naturally. "
@@ -172,11 +191,13 @@ class LangChainCaseInterviewer:
                     "adjacent facts, broad context, or a diagnosis. "
                     "Do not end every turn with a question. A concise declarative answer is the normal response when "
                     "a fact is approved. Ask at most one focused question only when the director move is probe and it "
-                    "would help the candidate progress. When the candidate remains stuck after a prior probe, give the "
-                    "approved answer directly instead of asking another question. If no fact is approved, follow the "
-                    "director brief without inventing information. Occasionally, when the candidate has made a concrete "
+                    "would help the candidate progress. If no fact is approved, follow the "
+                    "director brief without inventing information: turn the question back, ask what they expect and "
+                    "why, or ask them to commit to a hypothesis. Never imply that no fact exists, and never apologise "
+                    "for withholding. Occasionally, when the candidate has made a concrete "
                     "useful point or expressed uncertainty, open with a very short acknowledgement of that exact point. "
-                    "Use this sparingly, roughly one turn in five when it is genuinely earned, never mechanically. "
+                    "Use this sparingly, roughly one turn in five when it is genuinely earned, never mechanically, and "
+                    "only if the persona demeanour permits warmth. "
                     "When Case concluded is true, briefly acknowledge the synthesis, clearly state that the interview "
                     "is complete, and ask no question.",
                 ),
@@ -186,6 +207,8 @@ class LangChainCaseInterviewer:
                     "Current phase: {current_phase}\n"
                     "Candidate turn number: {candidate_turn_number}\n"
                     "Turn pacing policy: {turn_pacing_policy}\n"
+                    "Persona demeanour: {persona_demeanour}\n"
+                    "Persona pushback policy: {persona_pushback_policy}\n"
                     "Director move: {move}\n"
                     "Director brief: {interviewer_brief}\n"
                     "Case concluded: {case_concluded}\n"
@@ -270,6 +293,13 @@ class LangChainCaseInterviewer:
             else AIMessage(content=message["content"])
             for message in session.messages[-7:-1]
         ]
+        persona = session.persona
+        # Accrue before deciding, so the first turn of a one-fact-per-turn persona
+        # already has an allowance and does not open with an unearned refusal. The
+        # pre-accrual balance is kept for an exact refund on provider failure:
+        # subtracting the rate would over-refund whenever accrual hit the cap.
+        credits_before_turn = session.release_credits
+        session.accrue_release_credit()
         current_phase = session.case.phase(session.stage)
         is_early_precision_turn = session.candidate_turns <= 2
         turn_pacing_policy = (
@@ -277,9 +307,11 @@ class LangChainCaseInterviewer:
             "fact that directly answers the candidate's exact question. Hold the current phase. Do not "
             "volunteer adjacent information, context, or an inferred diagnosis."
             if is_early_precision_turn
-            else "NORMAL PACING: Answer the candidate's relevant question with the narrowest useful fact. "
-            "If the candidate remains stuck after a prior probe or cannot advance, provide one additional "
-            "narrow fact that unblocks them rather than repeating a question."
+            else "NORMAL PACING: Answer the candidate's relevant question with the narrowest useful fact, "
+            "within the persona disclosure policy."
+        )
+        allowance = allowance_for(
+            persona, session.release_credits, session.consecutive_precise_misses
         )
         try:
             decision = (self._voice_director if spoken else self._director).invoke(
@@ -290,24 +322,53 @@ class LangChainCaseInterviewer:
                     "phase_goal": current_phase.interviewer_goal,
                     "candidate_turn_number": session.candidate_turns,
                     "turn_pacing_policy": turn_pacing_policy,
+                    "persona_disclosure_policy": persona.disclosure_policy,
+                    "persona_pushback_policy": persona.pushback_policy,
+                    "disclosure_allowance": allowance.brief,
                     "phase_ids": json.dumps([phase.id for phase in session.case.phases]),
                     "eligible_facts": json.dumps(
-                        session.case.eligible_facts_for_director(session.stage, session.disclosed_ids)
+                        session.case.eligible_facts_for_director(
+                            session.stage,
+                            session.disclosed_ids,
+                            reveal_level_bonus=persona.reveal_level_bonus,
+                        )
                     ),
                     "candidate_turn": candidate_turn,
                 }
             )
-            max_facts = 1 if is_early_precision_turn else 2
+            # The runtime, not the prompt, decides whether anything is disclosed.
+            # The director grades how targeted the question was; resolve_release
+            # decides whether that clears the persona's bar and whether the budget
+            # can pay for it. Leaving either judgement to the prompt would make the
+            # chosen difficulty advisory.
+            release = resolve_release(
+                persona,
+                allowance,
+                precision=decision.question_precision,
+                is_early_precision_turn=is_early_precision_turn,
+            )
+            max_facts = release.max_facts
             # Truncate to the cap before validating. validate_fact_selection
             # slices in authored order, so an over-selection could otherwise
             # keep the director's third choice and drop its second, leaving the
             # reply narrating a fact the ledger never recorded.
             facts = session.case.validate_fact_selection(
-                decision.fact_ids[:max_facts],
+                decision.fact_ids[:max_facts] if max_facts else [],
                 session.stage,
                 session.disclosed_ids,
                 max_facts=max_facts,
+                reveal_level_bonus=persona.reveal_level_bonus,
             )
+            if allowance.floor_reached and not facts:
+                # The floor exists precisely for the case where the director
+                # nominated nothing usable, so it cannot depend on its selection.
+                forced = session.case.narrowest_eligible_fact(
+                    session.stage,
+                    session.disclosed_ids,
+                    reveal_level_bonus=persona.reveal_level_bonus,
+                )
+                if forced is not None:
+                    facts = [forced]
             next_phase = (
                 session.stage
                 if is_early_precision_turn
@@ -326,6 +387,8 @@ class LangChainCaseInterviewer:
                 "current_phase": next_phase,
                 "candidate_turn_number": session.candidate_turns,
                 "turn_pacing_policy": turn_pacing_policy,
+                "persona_demeanour": persona.demeanour_policy,
+                "persona_pushback_policy": persona.pushback_policy,
                 "move": decision.move,
                 "interviewer_brief": decision.interviewer_brief,
                 "case_concluded": case_concluded,
@@ -391,8 +454,16 @@ class LangChainCaseInterviewer:
             # Remove the unserved candidate turn so a retry preserves a coherent transcript.
             session.messages.pop()
             session.candidate_turns -= 1
+            # Restore the allowance too. A failed provider call must not cost the
+            # candidate a fact they never received, which on the Skeptic could
+            # otherwise mean six more turns of silence.
+            session.release_credits = credits_before_turn
             raise InterviewerUnavailable("The interviewer provider did not complete this turn.") from error
 
+        if facts:
+            session.spend_release_credit()
+        else:
+            session.record_withheld_turn(counts_toward_floor=release.counts_toward_floor)
         session.apply_director_decision(next_phase, facts)
         session.ready_to_end = case_concluded
         session.add_interviewer_turn(reply)

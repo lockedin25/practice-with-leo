@@ -26,7 +26,7 @@ from app.llm_budget import COMPLETION_TOKENS, REPORT_COMPLETION_TOKENS
 
 logger = logging.getLogger(__name__)
 
-EVALUATOR_VERSION = "evaluator-v2"
+EVALUATOR_VERSION = "evaluator-v3"
 CONTENT_ROOT = Path(__file__).resolve().parents[1] / "evaluation"
 PROMPTS_DIR = CONTENT_ROOT / "prompts"
 
@@ -99,6 +99,32 @@ class DimensionScore(BaseModel):
     improvements: list[str] = Field(default_factory=list)
     confidence: Literal["high", "medium", "low"] = "medium"
     notes: str = Field(default="", description="Summary observation notes")
+    assessed: bool = Field(
+        default=True,
+        description=(
+            "False when this case gave the candidate no opportunity to demonstrate the dimension, "
+            "for example a case with no quantitative surface. An unassessed dimension is excluded "
+            "from the overall score and its weight redistributes across the assessed dimensions."
+        ),
+    )
+    unassessed_reason: str = Field(
+        default="",
+        description="Required when assessed is False. Why the case could not exercise this dimension.",
+    )
+
+
+def dimension_counts_toward_score(dimension: DimensionScore) -> bool:
+    """Whether a dimension contributes to the weighted overall score.
+
+    Two conditions, and both matter for different reasons. ``assessed`` is the
+    explicit declaration that the case never gave the candidate a chance at this
+    dimension, which is the honest signal. The evidence check is the older,
+    implicit one and is kept because reports written by ``evaluator-v2`` predate
+    the flag: they default ``assessed`` to True, so dropping the evidence
+    condition would silently pull previously excluded dimensions back into
+    historical scores and shift every stored number.
+    """
+    return dimension.assessed and bool(dimension.evidence)
 
 
 class WhatTheCaseWantedToTest(BaseModel):
@@ -225,6 +251,11 @@ class EvaluationReport(BaseModel):
     next_drill: str = ""
     drill_detail: TargetedDrillPayload | None = None
     suggested_readings: list[SuggestedReading] = Field(default_factory=list)
+    # Recorded so a stored score can be re-derived later. Without these, a
+    # rubric or assessability change silently reinterprets historical reports.
+    weights_used: dict[str, float] = Field(default_factory=dict)
+    assessed_dimensions: list[str] = Field(default_factory=list)
+    excluded_dimensions: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _sync_report_data(self) -> "EvaluationReport":
@@ -442,6 +473,15 @@ def completeness_violations(report: EvaluationReport, checklist_ids: list[str]) 
     if len(report.priority_improvements) > 5:
         violations.append("priority_improvements holds at most five entries")
     for dimension in report.dimensions:
+        if not dimension.assessed:
+            # Demanding a citation for a dimension the case never exercised is
+            # what previously pushed the writer to manufacture one, which is how
+            # an unearnable dimension ended up carrying weight in the score.
+            if not dimension.unassessed_reason.strip():
+                violations.append(
+                    f"dimension {dimension.name} is marked unassessed and must give an unassessed_reason"
+                )
+            continue
         if not dimension.evidence and dimension.confidence != "low":
             violations.append(f"dimension {dimension.name} needs evidence or explicit low confidence")
     for item in report.checklist:
@@ -453,24 +493,62 @@ def completeness_violations(report: EvaluationReport, checklist_ids: list[str]) 
 
 
 def weighted_overall(report: EvaluationReport, rubric: dict[str, Any]) -> dict[str, Any]:
-    """Deterministic weighted mean; unassessed dimensions redistribute weight."""
+    """Deterministic weighted mean; unassessed dimensions redistribute weight.
+
+    Dividing by the assessed weight rather than by 1.0 is what makes a case with
+    no quantitative surface score the candidate only on what it actually asked of
+    them. ``weights_used`` is returned so a stored score stays auditable after a
+    rubric change, instead of the reweighting being invisible after the fact.
+    """
     weights = {
         entry["name"]: float(entry["weight"])
         for entry in rubric.get("dimensions", [])
     }
-    assessed = [dimension for dimension in report.dimensions if dimension.evidence]
+    assessed = [d for d in report.dimensions if dimension_counts_toward_score(d)]
     total_weight = sum(weights.get(dimension.name, 0.0) for dimension in assessed)
     overall = None
+    weights_used: dict[str, float] = {}
     if assessed and total_weight > 0:
         overall = round(
             sum(dimension.score * weights.get(dimension.name, 0.20) for dimension in assessed) / total_weight,
             2,
         )
+        weights_used = {
+            dimension.name: round(weights.get(dimension.name, 0.20) / total_weight, 4)
+            for dimension in assessed
+        }
     return {
         "overall": overall,
         "assessed_dimensions": [dimension.name for dimension in assessed],
-        "excluded_dimensions": [dimension.name for dimension in report.dimensions if not dimension.evidence],
+        "excluded_dimensions": [
+            dimension.name
+            for dimension in report.dimensions
+            if not dimension_counts_toward_score(dimension)
+        ],
+        "weights_used": weights_used,
     }
+
+
+def stamp_overall(report: EvaluationReport, rubric: dict[str, Any]) -> EvaluationReport:
+    """Make the report's own headline score the redistributed one, and record how.
+
+    The profile reads ``report.overall_score`` while the durable practice score
+    comes from ``weighted_overall()`` via ``main._overall_for``. Those were
+    computed by different code with different weights, so one attempt could show
+    two different numbers in two places. Stamping the deterministic value onto the
+    report leaves a single source of truth, and the badge and band are recomputed
+    from it so they cannot drift away from the number they describe.
+    """
+    summary = weighted_overall(report, rubric)
+    overall = summary["overall"]
+    report.weights_used = summary["weights_used"]
+    report.assessed_dimensions = summary["assessed_dimensions"]
+    report.excluded_dimensions = summary["excluded_dimensions"]
+    if isinstance(overall, (int, float)):
+        report.overall_score = float(overall)
+        report.mbb_rating_badge = compute_mbb_rating_badge(report.overall_score)
+        report.overall_band = compute_overall_band(report.overall_score)
+    return report
 
 
 # --- Attempt context and tools -----------------------------------------------
@@ -1025,6 +1103,9 @@ def generate_fallback_evaluation(
     num_pattern = re.compile(r"\b\d+(?:\.\d+)?%?\b")
     math_turns = [(idx, text) for idx, text in cand_turns if num_pattern.search(text) and any(w in normalize_text(text) for w in ["percent", "%", "million", "margin", "ebitda", "cost", "price", "equal", "calculated", "total"])]
 
+    quant_assessed = True
+    quant_unassessed_reason = ""
+
     if math_turns:
         quant_score = 3.5
         q_idx, q_text = math_turns[0]
@@ -1039,10 +1120,18 @@ def generate_fallback_evaluation(
             quant_imps.append("Always follow arithmetic calculations with a commercial 'so what?' interpretation.")
         quant_conf = "high"
     else:
-        quant_score = 2.5
+        # No quantitative work occurred. Until a case carries an authored
+        # quantitative surface, this is a property of the case rather than of
+        # the candidate, so it must not be scored as a weakness. Marking it
+        # unassessed redistributes its weight instead of charging a default 2.5
+        # against a candidate who was never asked to compute anything.
+        quant_assessed = False
         quant_conf = "low"
-        quant_obs.append("No explicit quantitative calculations were performed in this attempt.")
-        quant_imps.append("Identify quantitative opportunities to compute unit margins, break-evens, or financial targets.")
+        quant_unassessed_reason = (
+            "This case presented no quantitative surface, so no calculation was requested "
+            "or possible. The dimension is excluded from the overall score."
+        )
+        quant_obs.append("This case did not call for quantitative work, so numeracy was not assessed.")
 
     quant_score = round(max(1.0, min(5.0, quant_score)), 1)
     quant_band = compute_overall_band(quant_score)
@@ -1124,14 +1213,23 @@ def generate_fallback_evaluation(
     dimension_scores = [
         DimensionScore(name="structuring", score=struct_score, band=struct_band, evidence=struct_evidence, observations=struct_obs, improvements=struct_imps, confidence="high"),
         DimensionScore(name="problem_solving", score=prob_score, band=prob_band, evidence=prob_evidence, observations=prob_obs, improvements=prob_imps, confidence="high"),
-        DimensionScore(name="quantitative", score=quant_score, band=quant_band, evidence=quant_evidence, observations=quant_obs, improvements=quant_imps, confidence=quant_conf),
+        DimensionScore(name="quantitative", score=quant_score, band=quant_band, evidence=quant_evidence, observations=quant_obs, improvements=quant_imps, confidence=quant_conf, assessed=quant_assessed, unassessed_reason=quant_unassessed_reason),
         DimensionScore(name="synthesis", score=synth_score, band=synth_band, evidence=synth_evidence, observations=synth_obs, improvements=synth_imps, confidence="high"),
         DimensionScore(name="communication", score=comm_score, band=comm_band, evidence=comm_evidence, observations=comm_obs, improvements=comm_imps, confidence="high"),
     ]
 
-    # Weighted overall
+    # Weighted overall. This deliberately reuses the same redistribution the
+    # primary path uses, because the profile reads report.overall_score while the
+    # stored practice score comes from weighted_overall(). Computing them two
+    # different ways is how one attempt ends up showing two different numbers.
     weights = {"structuring": 0.25, "problem_solving": 0.25, "quantitative": 0.15, "synthesis": 0.20, "communication": 0.15}
-    overall_score = round(sum(d.score * weights[d.name] for d in dimension_scores), 2)
+    scored = [d for d in dimension_scores if dimension_counts_toward_score(d)] or dimension_scores
+    total_weight = sum(weights[d.name] for d in scored)
+    overall_score = round(sum(d.score * weights[d.name] for d in scored) / total_weight, 2)
+    weights_used = {d.name: round(weights[d.name] / total_weight, 4) for d in scored}
+    scored_names = {d.name for d in scored}
+    assessed_names = [d.name for d in dimension_scores if d.name in scored_names]
+    excluded_names = [d.name for d in dimension_scores if d.name not in scored_names]
     mbb_badge = compute_mbb_rating_badge(overall_score)
     overall_band = compute_overall_band(overall_score)
 
@@ -1321,7 +1419,7 @@ def generate_fallback_evaluation(
 
     report = EvaluationReport(
         attempt_id=session.id,
-        evaluator_version="evaluator-v2|heuristic-fallback",
+        evaluator_version=f"{EVALUATOR_VERSION}|heuristic-fallback",
         overall_score=overall_score,
         mbb_rating_badge=mbb_badge,
         overall_band=overall_band,
@@ -1339,6 +1437,9 @@ def generate_fallback_evaluation(
         next_drill=drill_prompt,
         drill_detail=drill_detail,
         suggested_readings=suggested_readings,
+        weights_used=weights_used,
+        assessed_dimensions=assessed_names,
+        excluded_dimensions=excluded_names,
     )
     _strip_em_dashes(report)
     return report
@@ -1363,7 +1464,9 @@ class FallbackCaseEvaluator:
             rubric=self._rubric,
         )
         report.evaluator_version = self.version
-        return report
+        # Normalise against the rubric file rather than the heuristic's own
+        # duplicated weight table, so both evaluators answer to one source.
+        return stamp_overall(report, self._rubric)
 
     def overall(self, report: EvaluationReport) -> dict[str, Any]:
         return weighted_overall(report, self._rubric)
@@ -1453,7 +1556,7 @@ class LangChainCaseEvaluator:
         report = self._write_report(context, history)
         report = self._enforce_boundaries(report, context, history)
         report.evaluator_version = self.version
-        return report
+        return stamp_overall(report, self._rubric)
 
     # -- Planner ----------------------------------------------------------
 

@@ -94,7 +94,7 @@ def test_profile_page_requires_authentication() -> None:
     assert response.headers["location"] in ("/login?next=/profile", "/login?next=%2Fprofile")
 
 
-def test_profile_recent_attempts_contain_debrief_url_and_school(candidate_client) -> None:
+def test_profile_recent_attempts_contain_debrief_url_and_source(candidate_client) -> None:
     client, _ = candidate_client
     started = client.post("/api/attempts", json={"case_id": "01-beer-manufacturer-v1"}).json()
     attempt_id = started["id"]
@@ -104,7 +104,7 @@ def test_profile_recent_attempts_contain_debrief_url_and_school(candidate_client
     body = response.json()
     attempt = next(item for item in body["recent_attempts"] if item["id"] == attempt_id)
     assert attempt["debrief_url"] == f"/attempts/{attempt_id}/debrief"
-    assert attempt["case"]["school"] == "IIM-A"
+    assert attempt["case"]["source"] == "curated"
     assert attempt["case"]["title"] == "Beer Manufacturer"
 
 

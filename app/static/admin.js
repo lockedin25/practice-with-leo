@@ -104,7 +104,7 @@ function relativeTime(value) {
 const LABEL_ACRONYMS = new Map(Object.entries({
   saas: "SaaS", b2b: "B2B", b2c: "B2C", bnpl: "BNPL", fmcg: "FMCG",
   cpg: "CPG", msme: "MSME", qsr: "QSR", ev: "EV", ai: "AI", it: "IT",
-  kpi: "KPI", ebitda: "EBITDA", mbb: "MBB", iim: "IIM", isb: "ISB",
+  kpi: "KPI", ebitda: "EBITDA", mbb: "MBB",
   bcg: "BCG", "m&a": "M&A", roi: "ROI", "r&d": "R&D",
 }));
 

@@ -12,6 +12,7 @@ import json
 import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from app.case_runtime import CaseCatalogue, CaseWorld, InterviewSession
 
@@ -58,6 +59,13 @@ class SessionStore:
             if "created_at" not in attempt_columns:
                 connection.execute("ALTER TABLE attempts ADD COLUMN created_at TEXT")
                 connection.execute("UPDATE attempts SET created_at = updated_at WHERE created_at IS NULL")
+            if "case_version" not in attempt_columns:
+                # Attempts written before case versioning ran against packages on
+                # disk, which are all version 1, so backfilling that is accurate
+                # rather than a guess.
+                connection.execute(
+                    "ALTER TABLE attempts ADD COLUMN case_version INTEGER NOT NULL DEFAULT 1"
+                )
             connection.execute("CREATE INDEX IF NOT EXISTS attempts_user_updated ON attempts(user_id, updated_at DESC)")
             connection.executescript(
                 """
@@ -114,19 +122,22 @@ class SessionStore:
                 "ready_to_end": session.ready_to_end,
                 "ended": session.ended,
                 "turn_results": session.turn_results,
+                "release_credits": session.release_credits,
+                "consecutive_precise_misses": session.consecutive_precise_misses,
+                "turns_since_release": session.turns_since_release,
             }
         )
         with self._connect() as connection:
             connection.execute(
                 """
-                INSERT INTO attempts (id, case_id, user_id, session_json, created_at)
-                VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+                INSERT INTO attempts (id, case_id, case_version, user_id, session_json, created_at)
+                VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
                 ON CONFLICT(id) DO UPDATE SET
                     session_json = excluded.session_json,
                     user_id = COALESCE(excluded.user_id, attempts.user_id),
                     updated_at = CURRENT_TIMESTAMP
                 """,
-                (session.id, session.case.id, user_id, payload),
+                (session.id, session.case.id, session.case.version, user_id, payload),
             )
 
     def backfill_attempt_users(self) -> None:
@@ -314,17 +325,19 @@ class SessionStore:
         """Restore an attempt against the case version recorded at creation time."""
         with self._connect() as connection:
             row = connection.execute(
-                "SELECT case_id, session_json FROM attempts WHERE id = ?",
+                "SELECT case_id, session_json, case_version FROM attempts WHERE id = ?",
                 (attempt_id,),
             ).fetchone()
         if row is None:
             return None
 
-        case_id, session_json = row
+        case_id, session_json, case_version = row
         try:
-            case = catalogue.get(case_id)
+            case = catalogue.get(case_id, case_version)
         except ValueError:
-            # A retired or removed case should not be silently substituted.
+            # A retired or removed case should not be silently substituted, and
+            # neither should a superseded version: resuming a candidate into an
+            # edited world would score them on evidence they were never shown.
             return None
         payload = json.loads(session_json)
         # Attempts written before the schema marker was introduced have the
@@ -362,6 +375,13 @@ class SessionStore:
             ready_to_end=bool(payload.get("ready_to_end", False)),
             ended=payload["ended"],
             turn_results=payload.get("turn_results", {}),
+            # Attempts written before personas have no budget recorded. Zero is the
+            # correct default: the next turn accrues the persona's rate before any
+            # disclosure decision, so a resumed attempt is neither given a free
+            # fact nor stalled.
+            release_credits=float(payload.get("release_credits", 0.0)),
+            consecutive_precise_misses=int(payload.get("consecutive_precise_misses", 0)),
+            turns_since_release=int(payload.get("turns_since_release", 0)),
         )
 
     # -- voice transport metadata -----------------------------------------
@@ -603,6 +623,366 @@ class EvaluationStore:
             }
             for attempt_id, version, payload, created, uid in rows
         ]
+
+    def _connect(self) -> sqlite3.Connection:
+        return db.connect(self._database_path)
+
+
+class CaseStore:
+    """Durable storage for contributed cases and per-case aggregate counts.
+
+    Authored packages deliberately stay on the filesystem and in git, where the
+    rights discipline in ``corpus/README.md`` can review them. Only contributed
+    cases live here, because they are user data, they arrive after start-up, and
+    they must survive a deploy on the mounted volume rather than in the image.
+
+    Versions are kept rather than overwritten. An admin editing a published case
+    creates a new row, and the old one stays resolvable so an attempt pinned to it
+    can still be resumed and scored against the world it actually saw.
+    """
+
+    SCHEMA_VERSION = 1
+
+    STATUSES = ("draft", "submitted", "validated", "published", "needs_changes", "unpublished")
+
+    def __init__(self, database_path: Path) -> None:
+        self._database_path = database_path
+        self._database_path.parent.mkdir(parents=True, exist_ok=True)
+        with self._connect() as connection:
+            connection.executescript(
+                """
+                CREATE TABLE IF NOT EXISTS cases (
+                    case_id        TEXT NOT NULL,
+                    version        INTEGER NOT NULL,
+                    source         TEXT NOT NULL CHECK(source IN ('authored', 'contributed')),
+                    status         TEXT NOT NULL CHECK(status IN
+                                     ('draft','submitted','validated','published','needs_changes','unpublished')),
+                    package_json   TEXT NOT NULL,
+                    contributor_id TEXT,
+                    created_at     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at     TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (case_id, version)
+                );
+                CREATE INDEX IF NOT EXISTS cases_published
+                    ON cases(status, case_id, version DESC);
+                CREATE INDEX IF NOT EXISTS cases_contributor
+                    ON cases(contributor_id, updated_at DESC);
+
+                CREATE TABLE IF NOT EXISTS case_stats (
+                    case_id         TEXT PRIMARY KEY,
+                    times_attempted INTEGER NOT NULL DEFAULT 0,
+                    times_completed INTEGER NOT NULL DEFAULT 0,
+                    updated_at      TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+                """
+            )
+
+    # -- contributed case packages ---------------------------------------
+
+    def next_version(self, case_id: str) -> int:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT MAX(version) FROM cases WHERE case_id = ?", (case_id,)
+            ).fetchone()
+        return int((row[0] or 0)) + 1
+
+    def save_package(
+        self,
+        case_id: str,
+        package: dict[str, Any],
+        *,
+        status: str,
+        contributor_id: str | None,
+        version: int | None = None,
+        source: str = "contributed",
+    ) -> int:
+        """Write one case version and return the version number used."""
+        if status not in self.STATUSES:
+            raise ValueError(f"Unknown case status: {status}")
+        resolved = version if version is not None else self.next_version(case_id)
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO cases (case_id, version, source, status, package_json, contributor_id)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(case_id, version) DO UPDATE SET
+                    status = excluded.status,
+                    package_json = excluded.package_json,
+                    updated_at = CURRENT_TIMESTAMP
+                """,
+                (case_id, resolved, source, status, json.dumps(package), contributor_id),
+            )
+        return resolved
+
+    def set_status(self, case_id: str, version: int, status: str) -> bool:
+        if status not in self.STATUSES:
+            raise ValueError(f"Unknown case status: {status}")
+        with self._connect() as connection:
+            cursor = connection.execute(
+                "UPDATE cases SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE case_id = ? AND version = ?",
+                (status, case_id, version),
+            )
+        return cursor.rowcount == 1
+
+    def get_package(self, case_id: str, version: int) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT package_json FROM cases WHERE case_id = ? AND version = ?",
+                (case_id, version),
+            ).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def published_packages(self) -> list[dict[str, Any]]:
+        """Every case the library should currently offer, latest version each.
+
+        The window function picks one row per case rather than filtering in
+        Python, so a case with several published versions cannot register twice
+        and leave the registry's two indexes disagreeing.
+        """
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT case_id, version, package_json, contributor_id
+                FROM (
+                    SELECT case_id, version, package_json, contributor_id,
+                           ROW_NUMBER() OVER (PARTITION BY case_id ORDER BY version DESC) AS rank
+                    FROM cases
+                    WHERE status = 'published'
+                )
+                WHERE rank = 1
+                ORDER BY case_id
+                """
+            ).fetchall()
+        return [
+            {
+                "case_id": case_id,
+                "version": version,
+                "package": json.loads(package_json),
+                "contributor_id": contributor_id,
+            }
+            for case_id, version, package_json, contributor_id in rows
+        ]
+
+    def list_all_versions(self) -> list[dict[str, Any]]:
+        """Every stored case version and its status, newest first.
+
+        The admin console needs the full history of a case, not only what is
+        currently in the review queue, to see what was published and withdrawn.
+        """
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT case_id, version, status, contributor_id, updated_at
+                FROM cases
+                ORDER BY updated_at DESC, case_id, version DESC
+                """
+            ).fetchall()
+        return [
+            {
+                "case_id": case_id,
+                "version": version,
+                "status": status,
+                "contributor_id": contributor_id,
+                "updated_at": updated_at,
+            }
+            for case_id, version, status, contributor_id, updated_at in rows
+        ]
+
+    def list_for_review(self, *, limit: int = 100) -> list[dict[str, Any]]:
+        """The admin queue: everything awaiting a decision, oldest first."""
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT case_id, version, status, contributor_id, updated_at
+                FROM cases
+                WHERE status IN ('submitted', 'validated')
+                ORDER BY updated_at ASC
+                LIMIT ?
+                """,
+                (max(1, min(limit, 250)),),
+            ).fetchall()
+        return [
+            {
+                "case_id": case_id,
+                "version": version,
+                "status": status,
+                "contributor_id": contributor_id,
+                "updated_at": updated_at,
+            }
+            for case_id, version, status, contributor_id, updated_at in rows
+        ]
+
+    # -- aggregate counts -------------------------------------------------
+
+    def record_attempt_started(self, case_id: str) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO case_stats (case_id, times_attempted)
+                VALUES (?, 1)
+                ON CONFLICT(case_id) DO UPDATE SET
+                    times_attempted = case_stats.times_attempted + 1,
+                    updated_at = CURRENT_TIMESTAMP
+                """,
+                (case_id,),
+            )
+
+    def record_attempt_completed(self, case_id: str) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO case_stats (case_id, times_attempted, times_completed)
+                VALUES (?, 0, 1)
+                ON CONFLICT(case_id) DO UPDATE SET
+                    times_completed = case_stats.times_completed + 1,
+                    updated_at = CURRENT_TIMESTAMP
+                """,
+                (case_id,),
+            )
+
+    def stats(self) -> dict[str, dict[str, int]]:
+        """Attempt counts for every case, keyed by case ID.
+
+        Read on every library page load, so it is one query returning the whole
+        map rather than a lookup per card.
+        """
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT case_id, times_attempted, times_completed FROM case_stats"
+            ).fetchall()
+        return {
+            case_id: {"times_attempted": attempted, "times_completed": completed}
+            for case_id, attempted, completed in rows
+        }
+
+    def _connect(self) -> sqlite3.Connection:
+        return db.connect(self._database_path)
+
+
+class ContributionStore:
+    """One live extraction conversation per contributor, and its drafts.
+
+    Kept separate from ``attempts`` because a contribution is not an interview:
+    it has no case, no disclosure ledger and no score, and folding it into the
+    attempt table would mean every attempt query had to start excluding rows.
+    """
+
+    STATUSES = ("in_progress", "abandoned", "submitted")
+
+    def __init__(self, database_path: Path) -> None:
+        self._database_path = database_path
+        self._database_path.parent.mkdir(parents=True, exist_ok=True)
+        with self._connect() as connection:
+            connection.executescript(
+                """
+                CREATE TABLE IF NOT EXISTS contribution_sessions (
+                    id          TEXT PRIMARY KEY,
+                    user_id     TEXT NOT NULL,
+                    status      TEXT NOT NULL CHECK(status IN ('in_progress', 'abandoned', 'submitted')),
+                    state_json  TEXT NOT NULL,
+                    case_id     TEXT,
+                    created_at  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at  TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                );
+                CREATE INDEX IF NOT EXISTS contribution_user
+                    ON contribution_sessions(user_id, updated_at DESC);
+                -- One live conversation per contributor. A partial index rather
+                -- than an application check, so two racing requests cannot both
+                -- pass the check and create a second session.
+                CREATE UNIQUE INDEX IF NOT EXISTS contribution_one_live_per_user
+                    ON contribution_sessions(user_id)
+                    WHERE status = 'in_progress';
+                """
+            )
+
+    def create(self, session_id: str, user_id: str, state: dict[str, Any]) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO contribution_sessions (id, user_id, status, state_json)
+                VALUES (?, ?, 'in_progress', ?)
+                """,
+                (session_id, user_id, json.dumps(state)),
+            )
+
+    def save_state(self, session_id: str, state: dict[str, Any]) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                """
+                UPDATE contribution_sessions
+                SET state_json = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+                """,
+                (json.dumps(state), session_id),
+            )
+
+    def restart(
+        self,
+        session_id: str,
+        user_id: str,
+        new_session_id: str,
+        state: dict[str, Any],
+    ) -> None:
+        """Abandon one live draft and create its replacement atomically."""
+        with self._connect() as connection:
+            cursor = connection.execute(
+                """
+                UPDATE contribution_sessions
+                SET status = 'abandoned', updated_at = CURRENT_TIMESTAMP
+                WHERE id = ? AND user_id = ? AND status = 'in_progress'
+                """,
+                (session_id, user_id),
+            )
+            if cursor.rowcount != 1:
+                raise ValueError("Contribution is not available to restart")
+            connection.execute(
+                """
+                INSERT INTO contribution_sessions (id, user_id, status, state_json)
+                VALUES (?, ?, 'in_progress', ?)
+                """,
+                (new_session_id, user_id, json.dumps(state)),
+            )
+
+    def get(self, session_id: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT id, user_id, status, state_json, case_id FROM contribution_sessions WHERE id = ?",
+                (session_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        return {
+            "id": row[0],
+            "user_id": row[1],
+            "status": row[2],
+            "state": json.loads(row[3]),
+            "case_id": row[4],
+        }
+
+    def live_for_user(self, user_id: str) -> dict[str, Any] | None:
+        """The contributor's open conversation, so a reload resumes it."""
+        with self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT id FROM contribution_sessions
+                WHERE user_id = ? AND status = 'in_progress'
+                """,
+                (user_id,),
+            ).fetchone()
+        return self.get(row[0]) if row else None
+
+    def finish(self, session_id: str, *, status: str, case_id: str | None = None) -> None:
+        if status not in self.STATUSES:
+            raise ValueError(f"Unknown contribution status: {status}")
+        with self._connect() as connection:
+            connection.execute(
+                """
+                UPDATE contribution_sessions
+                SET status = ?, case_id = COALESCE(?, case_id), updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+                """,
+                (status, case_id, session_id),
+            )
 
     def _connect(self) -> sqlite3.Connection:
         return db.connect(self._database_path)

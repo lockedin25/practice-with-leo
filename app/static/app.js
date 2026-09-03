@@ -130,12 +130,31 @@ async function request(url, options = {}) {
   return response.json();
 }
 
+/* The interviewer persona is fixed for the life of an attempt, because the score
+ * is only meaningful against a known disclosure regime. So it has to be chosen
+ * before the attempt exists: an explicit ?persona= wins for a shared link, then
+ * the choice the candidate last made in the library, then the neutral default. */
+const PERSONA_IDS = ["coached", "realistic", "pressure"];
+const STORAGE_PERSONA = "leo.persona";
+
+function chosenPersona() {
+  const requested = new URLSearchParams(window.location.search).get("persona");
+  if (PERSONA_IDS.includes(requested)) return requested;
+  try {
+    const stored = localStorage.getItem(STORAGE_PERSONA);
+    if (PERSONA_IDS.includes(stored)) return stored;
+  } catch {
+    /* Private browsing can throw on access; the default is a fine answer. */
+  }
+  return "realistic";
+}
+
 const startAttempt = (caseId = state.selectedCaseId) =>
   request("/api/attempts", {
     method: "POST",
     body: JSON.stringify({
       ...(caseId ? { case_id: caseId } : {}),
-      mode: "realistic",
+      mode: chosenPersona(),
     }),
   });
 
@@ -225,13 +244,17 @@ function renderCaseHeader(attempt) {
   const { title, category, difficulty, skills_tested: skills } = attempt.case;
   document.title = `${title} · Leo`;
   el.title.textContent = title;
-  el.sessionMode.textContent = attempt.mode;
+  /* Show the persona's name, not the raw mode value. The candidate has to be able
+   * to tell which interviewer produced their score. */
+  el.sessionMode.textContent = attempt.persona?.label || attempt.mode;
+  if (attempt.persona?.blurb) el.sessionMode.title = attempt.persona.blurb;
 
   /* Duration and mode are already stated by the clock and the toolbar chip, so
    * the header keeps only what identifies the case. */
   const labels = [
     GENERIC_CATEGORIES.has(String(category).toLowerCase()) ? null : titleCase(category),
     `${titleCase(difficulty)} difficulty`,
+    attempt.persona?.label || null,
   ].filter(Boolean);
 
   el.tags.replaceChildren(

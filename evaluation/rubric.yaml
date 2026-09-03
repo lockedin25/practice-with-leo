@@ -74,14 +74,32 @@ dimensions:
   - name: quantitative
     weight: 0.15
     focus: >-
-      Mental math speed and accuracy, algebraic formula articulation, dimensional unit tracking,
-      commercial sanity checking, and strategic 'so-what' interpretation.
+      Consulting math, which is not arithmetic precision. In priority order: whether the
+      candidate derives the approach, inputs and formula before computing; whether stated
+      assumptions are explicit and defensible; whether the answer is right to the correct
+      order of magnitude; whether the candidate sanity-checks plausibility unprompted; and
+      whether the number is converted into a commercial 'so what'. Rounding aggressively to
+      keep the arithmetic tractable is correct professional behaviour, not a shortcut.
     violation_classes:
       - naked_calculation: reporting a raw number without commercial interpretation.
       - unit_slip: dropping units, confusing thousands/millions/billions, or mixing margin and markup.
       - missing_formula: diving into arithmetic without stating the underlying formula.
+      - unstated_assumption: using an estimated input without naming it as an assumption.
+      - magnitude_error: an answer wrong by an order of magnitude, which is materially worse than a small slip.
+      - no_sanity_check: never testing whether the result is plausible against the business context.
     calibration:
-      - Mark unassessed (low confidence) when the attempt contains no quantitative work.
+      - >-
+        Mark the dimension unassessed, with assessed=false and an unassessed_reason, when the
+        case presented no quantitative surface. This is a property of the case, not a weakness
+        of the candidate, and its weight redistributes across the assessed dimensions. Do not
+        manufacture a citation to justify scoring it.
+      - >-
+        Setup beats arithmetic. A correct approach with a small computational slip that the
+        candidate catches on a sanity check and corrects calmly scores ABOVE a mechanically
+        flawless number produced with no stated formula and no interpretation.
+      - >-
+        Order of magnitude is the accuracy bar. Judge against a generous band around the
+        expected value rather than exact equality, and penalise magnitude errors heavily.
       - Arithmetic speed is secondary to formula discipline and commercial sanity checking.
     bands:
       Below Bar: >-
@@ -120,23 +138,53 @@ dimensions:
 
   - name: communication
     weight: 0.15
+    # Scope note. This dimension is deliberately limited to what a transcript can
+    # actually evidence: the craft of the message. Delivery, meaning tone, pace,
+    # confidence and hesitation, is not observable from text and is therefore NOT
+    # part of this score today. It becomes a separate assessable signal when voice
+    # scoring exists, which is why it is named here rather than silently folded in.
+    assessable_from_transcript:
+      - top_down_structure
+      - signposting
+      - information_density
+      - concision
+      - directness_in_answering_the_question_asked
+      - holding_a_position_under_pushback
+    not_assessable_from_transcript:
+      - vocal_confidence
+      - pace_and_pausing
+      - filler_and_verbal_crutches
+      - executive_presence
     focus: >-
-      Information density per turn, top-down structure, signposting, concise delivery,
-      and boardroom-grade executive presence.
+      Craft of the message as evidenced by the transcript: information density per turn,
+      top-down delivery with the takeaway first, explicit signposting between branches,
+      concision, answering the exact question asked, and holding a defensible position when
+      the interviewer pushes back. Do not score vocal delivery, confidence, pace or presence;
+      a transcript cannot evidence them and inferring them produces an unfalsifiable score.
     violation_classes:
       - rambling: excessive turn length relative to substance (>300 words without structure).
       - buried_point: delivering evidence first and takeaway at the end.
-      - filler: excessive verbal crutches and repetition.
+      - evasion: answering a question adjacent to the one asked.
+      - capitulation: abandoning a correct position as soon as the interviewer pushes back.
+      - defensiveness: restating a position under pushback without engaging the challenge.
     calibration:
       - Every turn should have high information density.
       - Transitions between branches must be explicitly signposted.
+      - >-
+        Pushback is an instrument, not a verdict. Interviewers challenge correct answers as
+        often as incorrect ones, so reward a candidate who holds a well-evidenced position and
+        penalise both instant capitulation and defensive restatement.
+      - >-
+        Judge only what the transcript shows. If a behaviour would require hearing the
+        candidate, it is out of scope for this dimension.
     bands:
       Below Bar: >-
-        Rambling, long turns relative to content; buried conclusions; verbal crutches; low
-        executive presence; hard-to-follow delivery.
+        Rambling, long turns relative to content; buried conclusions; answers drift from the
+        question asked; abandons or defends positions without engaging the challenge.
       Meets Bar: >-
-        Professional and clear; answers questions directly with followable structure; minimal
-        filler and good pacing.
+        Professional and clear; answers questions directly with followable structure;
+        signposts most transitions; engages pushback with reasoning.
       Top 1% MBB: >-
-        Boardroom-grade executive presence: high information density, crisp top-down delivery,
-        explicit roadmaps and signposts, effortless synthesis checkpoints.
+        High information density, crisp top-down delivery, explicit roadmaps and signposts,
+        effortless synthesis checkpoints, and pushback met by either a specific update or a
+        calm restatement of the evidence.

@@ -28,6 +28,7 @@ from app.evaluator import (
     LangChainCaseEvaluator,
     SuggestedReading,
     WhatTheCaseWantedToTest,
+    EVALUATOR_VERSION,
     MAX_TOOL_CALLS,
     RECURSION_LIMIT,
     build_attempt_context,
@@ -328,7 +329,11 @@ def test_a_clean_report_passes_through_with_version_stamped(monkeypatch) -> None
 
     report = evaluator.evaluate(make_session())
 
-    assert report.evaluator_version.startswith("evaluator-v2|rubric=rubric-v2|checklist=checklist-v2|model=")
+    # Assert against the constant rather than a literal, so a deliberate version
+    # bump does not read as a regression in the version-stamping behaviour itself.
+    assert report.evaluator_version.startswith(
+        f"{EVALUATOR_VERSION}|rubric=rubric-v2|checklist=checklist-v2|model="
+    )
     assert report.dimensions[0].score == 4.0
     assert report.headline_strengths == ["Restated the objective before structuring."]
     assert report.mbb_rating_badge == "Strong Pass"

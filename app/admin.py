@@ -15,9 +15,10 @@ import sqlite3
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from pydantic import BaseModel, Field
 
 from app.accounts import require_admin
 
@@ -381,3 +382,150 @@ def _daily_activity(attempts: list[dict[str, Any]], now: datetime, days: int) ->
             counts[moment.date().isoformat()] += 1
     span = [(now - timedelta(days=offset)).date().isoformat() for offset in reversed(range(days))]
     return [{"date": day, "count": counts.get(day, 0)} for day in span]
+
+
+# --- Contributed case review ------------------------------------------------
+#
+# Every contributed case is private until it passes through here. There is no
+# auto-publish path: a broken or unsafe case costs a candidate thirty minutes and
+# costs Leo their trust, and the deterministic gate can prove consistency but not
+# judgement.
+
+
+def _cases(request: Request):
+    return request.app.state.cases
+
+
+@router.get("/contributions")
+def list_contributions(request: Request) -> dict[str, Any]:
+    """The review queue, plus the full history of every contributed case."""
+    store = _cases(request)
+    return {
+        "queue": store.list_for_review(),
+        "all": store.list_all_versions(),
+    }
+
+
+@router.get("/contributions/{case_id}/{version}")
+def read_contribution(request: Request, case_id: str, version: int) -> dict[str, Any]:
+    """The full package, its validation findings, and any solvability probe.
+
+    The admin sees everything including the hidden diagnosis. That is the point of
+    review: you cannot judge whether a case is worth publishing without seeing the
+    answer it is built around.
+    """
+    package = _cases(request).get_package(case_id, version)
+    if package is None:
+        raise HTTPException(status_code=404, detail="Case version not found")
+    return {
+        "case_id": case_id,
+        "version": version,
+        "package": package,
+        "validation": package.get("validation"),
+        "solvability": package.get("solvability"),
+    }
+
+
+@router.post("/contributions/{case_id}/{version}/solve")
+def run_solvability_probe(request: Request, case_id: str, version: int) -> dict[str, Any]:
+    """Play the case headlessly and check it reaches its own stated diagnosis.
+
+    Run on demand rather than at submission: it is the most expensive check by a
+    wide margin, and it is only worth spending once a human has decided the case
+    is otherwise worth considering.
+    """
+    import app.main as main
+
+    if main.CASE_SOLVER is None:
+        raise HTTPException(status_code=503, detail="The solvability probe is not configured.")
+    store = _cases(request)
+    package = store.get_package(case_id, version)
+    if package is None:
+        raise HTTPException(status_code=404, detail="Case version not found")
+
+    from app.case_runtime import CaseWorld
+    from app.case_solver import SolverUnavailable
+
+    try:
+        world = CaseWorld.from_mapping(
+            package["case"], package["facts"], package["conversation_policy"], version=version
+        )
+    except Exception as error:
+        raise HTTPException(status_code=422, detail=f"This package does not compile: {error}")
+
+    essence = package["case"].get("case_essence") or {}
+    try:
+        report = main.CASE_SOLVER.solve(
+            world,
+            main.INTERVIEWER,
+            mechanism=str(essence.get("core_mechanism") or ""),
+            insight=str(essence.get("pivotal_insight") or ""),
+        )
+    except SolverUnavailable:
+        raise HTTPException(status_code=502, detail="The probe could not complete. Try again.")
+
+    package["solvability"] = report.as_dict()
+    store.save_package(
+        case_id,
+        package,
+        status=_status_of(store, case_id, version),
+        contributor_id=None,
+        version=version,
+    )
+    return report.as_dict()
+
+
+class ReviewDecision(BaseModel):
+    decision: Literal["publish", "return", "withdraw"]
+    note: str = Field(default="", max_length=2_000)
+
+
+@router.post("/contributions/{case_id}/{version}/decide")
+def decide_contribution(
+    request: Request, case_id: str, version: int, decision: ReviewDecision
+) -> dict[str, Any]:
+    """Publish, return for changes, or withdraw a contributed case."""
+    import app.main as main
+
+    store = _cases(request)
+    package = store.get_package(case_id, version)
+    if package is None:
+        raise HTTPException(status_code=404, detail="Case version not found")
+
+    if decision.decision == "publish":
+        # Refuse to publish over an unresolved error. The reviewer can still
+        # return it, but there is no route to a candidate for a package whose own
+        # numbers do not close or that carries personal data.
+        findings = (package.get("validation") or {}).get("findings") or []
+        blocking = [f for f in findings if f.get("severity") == "error"]
+        if blocking:
+            raise HTTPException(
+                status_code=409,
+                detail=f"This case still has {len(blocking)} blocking validation errors.",
+            )
+        status = "published"
+    elif decision.decision == "return":
+        status = "needs_changes"
+    else:
+        status = "unpublished"
+
+    if decision.note.strip():
+        package.setdefault("review_notes", []).append(decision.note.strip())
+        store.save_package(
+            case_id, package, status=status, contributor_id=None, version=version
+        )
+    else:
+        store.set_status(case_id, version, status)
+
+    # Reconcile immediately so a decision takes effect without a deploy, in both
+    # directions: publishing adds the case and withdrawing removes it.
+    registered = main.reload_contributed_cases()
+    return {"case_id": case_id, "version": version, "status": status, "live_cases": registered}
+
+
+def _status_of(store, case_id: str, version: int) -> str:
+    """Preserve a case's review status when rewriting its package."""
+    for record in store.list_all_versions():
+        if record["case_id"] == case_id and record["version"] == version:
+            return str(record["status"])
+    return "submitted"

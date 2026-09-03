@@ -4,7 +4,7 @@
    The library is a practice pathway, not an inventory. A card carries only
    what picks a case: name, type, difficulty, the real decision question, and
    progress. Search and the Recommended / All switch are tier one; type and
-   difficulty sit behind Filters; school and source sit behind that.
+   difficulty sit behind Filters; source sits behind that.
    ========================================================================== */
 
 const els = {
@@ -19,7 +19,8 @@ const els = {
   filtersDone: document.querySelector("#filters-done"),
   typeChips: document.querySelector("#type-chips"),
   levelChips: document.querySelector("#level-chips"),
-  schoolSelect: document.querySelector("#school-select"),
+  sourceSelect: document.querySelector("#source-select"),
+  personaSelect: document.querySelector("#persona-select"),
   sortSelect: document.querySelector("#sort-select"),
   viewSwitch: document.querySelector("#view-switch"),
   results: document.querySelector("#results-count"),
@@ -35,13 +36,49 @@ const els = {
 const LEVELS = ["foundation", "intermediate", "advanced"];
 const LEVEL_INDEX = { foundation: 0, intermediate: 1, advanced: 2 };
 
-const SCHOOL_NAMES = {
-  "MBB Core": "MBB Core",
-  "IIM-A": "IIM Ahmedabad",
-  "IIM-B": "IIM Bangalore",
-  "IIM-C": "IIM Calcutta",
-  ISB: "ISB Hyderabad",
+/* The interviewer persona is chosen here and applied when a case starts, because
+ * an attempt's persona is fixed for its lifetime. The room reads this key, and it
+ * is also stamped onto every start link so a shared or bookmarked URL keeps the
+ * choice rather than silently reverting to the default. */
+const PERSONA_IDS = ["coached", "realistic", "pressure"];
+const STORAGE_PERSONA = "leo.persona";
+
+function readPersona() {
+  try {
+    const stored = localStorage.getItem(STORAGE_PERSONA);
+    if (PERSONA_IDS.includes(stored)) return stored;
+  } catch {
+    /* Blocked site data is not an error worth surfacing; fall back. */
+  }
+  return "realistic";
+}
+
+function writePersona(value) {
+  if (!PERSONA_IDS.includes(value)) return;
+  try {
+    localStorage.setItem(STORAGE_PERSONA, value);
+  } catch {
+    /* The link stamping below still carries the choice for this page. */
+  }
+}
+
+function withPersona(href) {
+  if (!href || !href.startsWith("/practice")) return href;
+  const separator = href.includes("?") ? "&" : "?";
+  return `${href}${separator}persona=${encodeURIComponent(readPersona())}`;
+}
+
+/* The library used to surface which B-school each case came from. It no longer
+ * does: the corpus is mixed-provenance, naming any one institution is inaccurate,
+ * and it is not a claim the product should make publicly. The axis that actually
+ * matters to a candidate is whether a case shipped with the product or came from
+ * another candidate. */
+const SOURCE_NAMES = {
+  curated: "Curated",
+  community: "Community",
 };
+
+const sourceOf = (item) => (item.source === "community" ? "community" : "curated");
 
 let allCases = [];
 let progressByCase = {};
@@ -53,7 +90,7 @@ const state = {
   query: "",
   types: new Set(),
   levels: new Set(),
-  school: "all",
+  source: "all",
 };
 
 /* --- Label casing -------------------------------------------------------- */
@@ -142,7 +179,7 @@ function plural(count, word) {
 }
 
 function activeFilterCount() {
-  return state.types.size + state.levels.size + (state.school === "all" ? 0 : 1);
+  return state.types.size + state.levels.size + (state.source === "all" ? 0 : 1);
 }
 
 function isNarrowed() {
@@ -180,7 +217,7 @@ function recommendScore(item, ctx) {
   else if (status === "solved") score -= 500;
   score += 60 - 22 * Math.abs(levelIndex(item) - ctx.target);
   score += 8 * (ctx.maxLoad - (ctx.load[item.category] || 0));
-  if ((item.school || "MBB Core") === "MBB Core") score += 6;
+  if (sourceOf(item) === "curated") score += 6;
   return score;
 }
 
@@ -213,8 +250,8 @@ function matchesQuery(item, query) {
     humanLabel(item.industry),
     item.category,
     item.industry,
-    item.school || "MBB Core",
-    SCHOOL_NAMES[item.school || "MBB Core"] || "",
+    sourceOf(item),
+    SOURCE_NAMES[sourceOf(item)] || "",
     item.difficulty,
     (item.skills_tested || []).join(" "),
   ]
@@ -231,7 +268,7 @@ function visibleCases() {
     if (state.view === "solved" && status !== "solved") return false;
     if (state.types.size && !state.types.has(item.category)) return false;
     if (state.levels.size && !state.levels.has(levelOf(item))) return false;
-    if (state.school !== "all" && (item.school || "MBB Core") !== state.school) return false;
+    if (state.source !== "all" && sourceOf(item) !== state.source) return false;
     return matchesQuery(item, query);
   });
 }
@@ -297,7 +334,7 @@ function caseCard(item, options = {}) {
   const wide = Boolean(options.wide);
   const origin = [
     esc(humanLabel(item.industry) || "General strategy"),
-    esc(item.school || "MBB Core"),
+    esc(SOURCE_NAMES[sourceOf(item)]),
   ];
 
   const skills = wide
@@ -320,7 +357,7 @@ function caseCard(item, options = {}) {
       : "";
 
   const primaryAction = action
-    ? `<a class="btn-start-case" href="${esc(action.href)}" aria-label="${esc(
+    ? `<a class="btn-start-case" href="${esc(withPersona(action.href))}" aria-label="${esc(
         `${action.label}: ${item.title}`
       )}">
         <span>${esc(action.label)}</span>
@@ -557,8 +594,8 @@ function clearSearch({ focus = true } = {}) {
 function clearFilters() {
   state.types.clear();
   state.levels.clear();
-  state.school = "all";
-  els.schoolSelect.value = "all";
+  state.source = "all";
+  if (els.sourceSelect) els.sourceSelect.value = "all";
   els.filtersPanel
     .querySelectorAll(".filter-chip")
     .forEach((chip) => chip.setAttribute("aria-pressed", "false"));
@@ -582,12 +619,12 @@ function chipMarkup(value, label, count) {
 function buildFilterControls() {
   const typeCounts = {};
   const levelCounts = {};
-  const schoolCounts = {};
+  const sourceCounts = {};
   allCases.forEach((item) => {
     typeCounts[item.category] = (typeCounts[item.category] || 0) + 1;
     levelCounts[levelOf(item)] = (levelCounts[levelOf(item)] || 0) + 1;
-    const school = item.school || "MBB Core";
-    schoolCounts[school] = (schoolCounts[school] || 0) + 1;
+    const source = sourceOf(item);
+    sourceCounts[source] = (sourceCounts[source] || 0) + 1;
   });
 
   els.typeChips.innerHTML = Object.entries(typeCounts)
@@ -599,18 +636,18 @@ function buildFilterControls() {
     .map((level) => chipMarkup(level, humanLabel(level), levelCounts[level]))
     .join("");
 
-  const schools = Object.keys(schoolCounts).sort((a, b) =>
-    a === "MBB Core" ? -1 : b === "MBB Core" ? 1 : a.localeCompare(b)
-  );
-  els.schoolSelect.innerHTML = [
-    `<option value="all">Any school or source (${allCases.length})</option>`,
-    ...schools.map(
-      (school) =>
-        `<option value="${esc(school)}">${esc(SCHOOL_NAMES[school] || school)} (${
-          schoolCounts[school]
-        })</option>`
-    ),
-  ].join("");
+  // Curated first, and a source with no cases yet is simply not offered rather
+  // than shown as an empty filter.
+  const sources = ["curated", "community"].filter((key) => sourceCounts[key]);
+  if (els.sourceSelect) {
+    els.sourceSelect.innerHTML = [
+      `<option value="all">Any source (${allCases.length})</option>`,
+      ...sources.map(
+        (key) =>
+          `<option value="${esc(key)}">${esc(SOURCE_NAMES[key])} (${sourceCounts[key]})</option>`
+      ),
+    ].join("");
+  }
 
   els.typeChips.querySelectorAll(".filter-chip").forEach((chip) => {
     chip.addEventListener("click", () => toggleChip(chip, state.types));
@@ -629,20 +666,14 @@ function toggleChip(chip, bucket) {
   render();
 }
 
-/* The one content rule for library size: 69 scenarios, 12 of them MBB Core. */
+/* Counts only. The previous version named the contributing institutions here,
+ * which is exactly the claim the product no longer makes. */
 function renderScale() {
   const total = allCases.length;
-  const core = allCases.filter((item) => (item.school || "MBB Core") === "MBB Core").length;
-  const schools = joinList(
-    [...new Set(allCases.map((item) => item.school || "MBB Core"))]
-      .filter((school) => school !== "MBB Core")
-      .sort()
-  );
-  els.scale.textContent = schools
-    ? `${plural(total, "case scenario")}: ${core} MBB Core cases plus ${
-        total - core
-      } school exemplars from ${schools}.`
-    : `${plural(total, "case scenario")}.`;
+  const community = allCases.filter((item) => sourceOf(item) === "community").length;
+  els.scale.textContent = community
+    ? `${plural(total, "case scenario")}, all free: ${total - community} curated, ${community} contributed by the community.`
+    : `${plural(total, "case scenario")}, all curated and all free.`;
 }
 
 /* --- Wiring -------------------------------------------------------------- */
@@ -656,8 +687,15 @@ els.sortSelect?.addEventListener("change", (event) => {
   render();
 });
 
-els.schoolSelect?.addEventListener("change", (event) => {
-  state.school = event.target.value;
+els.personaSelect?.addEventListener("change", (event) => {
+  writePersona(event.target.value);
+  // Re-render rather than mutate hrefs in place: the persona is stamped during
+  // card construction, so a stale card would keep the previous choice.
+  render();
+});
+
+els.sourceSelect?.addEventListener("change", (event) => {
+  state.source = event.target.value;
   render();
 });
 
@@ -730,6 +768,10 @@ Promise.all([
     document
       .querySelectorAll("[data-signed-in]")
       .forEach((el) => el.classList.toggle("hidden", !isSignedIn));
+
+    // Reflect the stored choice before the first render, so the control and the
+    // links it stamps cannot disagree on load.
+    if (els.personaSelect) els.personaSelect.value = readPersona();
 
     renderScale();
     buildFilterControls();

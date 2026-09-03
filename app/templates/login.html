@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% set hide_global_header = true %}
 {% block title %}Sign in · Leo MBB Case Prep{% endblock %}
-{% block description %}Sign in to your Leo account to save case transcripts and track your MBB prep progress.{% endblock %}
+{% block description %}Sign in to your free Leo account to save case transcripts and track your MBB prep progress.{% endblock %}
 {% block body_class %}auth-body{% endblock %}
 {% block stylesheets %}
 <link rel="stylesheet" href="{{ asset_url('auth.css') }}" />
@@ -43,6 +43,7 @@
     <p id="domain-note" class="auth-note hidden"></p>
 
     <ul class="auth-points">
+      <li><span class="auth-tick" aria-hidden="true"></span> Free to use. No card, and no paid tier later</li>
       <li><span class="auth-tick" aria-hidden="true"></span> Transcripts securely saved to your account</li>
       <li><span class="auth-tick" aria-hidden="true"></span> Rubric-based MBB scorecard after every attempt</li>
       <li><span class="auth-tick" aria-hidden="true"></span> Seamless resume for in-progress sessions</li>

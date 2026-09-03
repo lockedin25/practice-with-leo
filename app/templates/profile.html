@@ -60,7 +60,10 @@
           <p class="card-subtitle">Themes that repeat across your evaluated attempts.</p>
         </div>
       </header>
-      <div class="profile-overview-body" id="profile-overview">
+      <!-- Scrollable, so it needs to be reachable by keyboard: without tabindex
+           the themes below the fold cannot be read without a mouse. -->
+      <div class="profile-overview-body" id="profile-overview"
+           tabindex="0" role="group" aria-label="Strengths and focus areas">
         <section class="profile-pillar">
           <div class="pillar-head">
             <p class="pillar-label pillar-label-strong">Strengths</p>

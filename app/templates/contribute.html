@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% set nav_active = "contribute" %}
+{% block title %}Contribute a case · Leo{% endblock %}
+{% block description %}Just interviewed? Talk it through and Leo will turn it into a free case other candidates can practise.{% endblock %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset_url('contribute.css') }}" />
+{% endblock %}
+{% block content %}
+<main class="page-main shell contribute-page">
+
+  <header class="contribute-head">
+    <p class="eyebrow"><span class="eyebrow-mark"></span>Contribute</p>
+    <h1 class="contribute-title">Just interviewed? Talk me through it.</h1>
+    <p class="contribute-lede">
+      Tell the story of the case you were given, in your own words and in your own time.
+      Leo asks follow-up questions and turns it into a case other candidates can practise.
+      The published version is re-skinned with an invented client, so nothing identifying
+      about you or the firm goes into it. Whatever you give stays free for every candidate
+      who practises it after you.
+    </p>
+  </header>
+
+  <!-- Progress. A long conversation with no visible end is what makes people
+       abandon one, so what is still needed is always on screen. -->
+  <section class="contribute-progress" id="progress" hidden aria-label="Progress">
+    <ol class="phase-track" id="phase-track">
+      <li class="phase-step" data-phase="narration"><span>Your story</span></li>
+      <li class="phase-step" data-phase="structure"><span>The setup</span></li>
+      <li class="phase-step" data-phase="quantification"><span>The numbers</span></li>
+      <li class="phase-step" data-phase="teeth"><span>What made it hard</span></li>
+      <li class="phase-step" data-phase="playback"><span>Check it over</span></li>
+    </ol>
+    <p class="phase-missing" id="phase-missing"></p>
+    <details class="completion-tracker" id="completion-tracker">
+      <summary>
+        <span>Completion criteria <small>(temporary tracker)</small></span>
+        <span class="tracker-summary" id="tracker-summary">Not ready</span>
+      </summary>
+      <div class="tracker-explainer">
+        <p><strong>Ready to submit:</strong> all three mandatory anchors plus a 70% evidence score.</p>
+        <p><strong>Fully reconstructed:</strong> <span id="completion-rule"></span></p>
+      </div>
+      <ul class="tracker-list" id="tracker-list"></ul>
+    </details>
+  </section>
+
+  <section class="contribute-thread" id="thread" aria-live="polite" aria-label="Conversation">
+    <div class="contribute-start" id="start-panel">
+      <p>This usually takes twenty to forty minutes. You can stop and come back to it.</p>
+      <button type="button" class="btn btn-primary" id="start-button">Start</button>
+    </div>
+  </section>
+
+  <form class="contribute-composer" id="composer" hidden>
+    <label class="sr-only" for="composer-input">Your reply</label>
+    <textarea
+      id="composer-input"
+      class="composer-input"
+      rows="3"
+      placeholder="Type your reply. Take as much space as you need."
+      maxlength="8000"
+    ></textarea>
+    <div class="composer-actions">
+      <div class="composer-session-actions">
+        <button type="button" class="btn btn-ghost" id="reset-button">Start again</button>
+        <button type="button" class="btn btn-secondary" id="pause-button">Save &amp; resume later</button>
+      </div>
+      <div class="composer-primary-actions">
+        <button type="submit" class="btn btn-primary" id="send-button">Send</button>
+        <button type="button" class="btn btn-secondary" id="submit-button" hidden>
+          Submit this case
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <section class="contribute-done" id="done-panel" hidden aria-live="polite"></section>
+</main>
+
+{% include "_footer.html" %}
+{% endblock %}
+{% block scripts %}<script src="{{ asset_url('contribute.js') }}"></script>{% endblock %}

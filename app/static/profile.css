@@ -217,17 +217,53 @@
 /* align-items: start keeps an empty card the height of its own content
    instead of stretching it into a tall blank box beside a full one. */
 
+/* Two cards side by side, so they end on the same line. align-items was start,
+   which let the shorter card stop wherever its content did and left a ragged
+   step between the pair. */
 .profile-grid {
+  /* The competency card is a fixed five dimensions and settles around 425px, so
+     the open-ended themes card is capped just above it. The row lands here, both
+     cards fill it exactly, and the themes scroll rather than dragging their
+     neighbour down. Retune this if a dimension is added. */
+  --profile-pair-height: 440px;
+
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-  align-items: start;
   gap: 12px;
   margin-bottom: 16px;
 }
 
+/* Stated locally because the shared reset in tokens.css only reaches ::after,
+   so everything else is still content-box. Without it the cap below would mean
+   the content box and the card would render 42px taller than asked. */
 .profile-performance,
 .profile-overview-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   padding: 20px;
+}
+
+/* Lifted below 900px, where the two cards stack and there is nothing to match. */
+.profile-overview-card {
+  position: relative;
+  max-height: var(--profile-pair-height);
+}
+
+/* Without this the themes stop mid-sentence at a hard edge, which reads as a
+   clipping bug rather than as a box you can scroll. Over a body that does not
+   overflow it fades card background into card background and is invisible. */
+.profile-overview-card::after {
+  content: "";
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  left: 1px;
+  height: 40px;
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+  background: linear-gradient(to top, var(--surface), transparent);
+  pointer-events: none;
 }
 
 .profile-grid .card-head {
@@ -237,8 +273,16 @@
 .skill-bars {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
   gap: 10px;
   margin-top: 18px;
+}
+
+/* Five dimensions into two columns leaves the last one beside a hole. Spanning
+   it is conditioned on the count being odd, so a sixth dimension would simply
+   pair up instead of stretching across. */
+.skill-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 
 .skill-bars:empty {
@@ -304,10 +348,18 @@
 
 /* --- Strengths and focus areas ------------------------------------------- */
 
+/* The themes are the variable half of the pair. Scrolling here means a long
+   run of feedback tops out rather than dragging the competency card down with
+   it; min-height 0 is what lets a flex child actually shrink to its box. */
 .profile-overview-body {
   display: grid;
+  align-content: start;
+  flex: 1;
+  min-height: 0;
   gap: 14px;
   margin-top: 18px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .profile-pillar {
@@ -891,6 +943,19 @@
 
   .profile-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Stacked, so there is no neighbour to match and nothing to scroll inside. */
+  .profile-overview-card {
+    max-height: none;
+  }
+
+  .profile-overview-card::after {
+    content: none;
+  }
+
+  .profile-overview-body {
+    overflow-y: visible;
   }
 
   .profile-next-step {

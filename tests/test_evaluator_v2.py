@@ -436,3 +436,104 @@ def test_t4_real_world_deterministic_fallback_evaluation() -> None:
     assert report.overall_score == 3.0
     assert len(report.dimension_scores) == 5
     assert report.evaluator_version == "fallback-v2"
+
+
+# --- Dimension assessability and weight redistribution (evaluator-v3) --------
+
+
+def _dimension(name: str, score: float, *, evidence: bool = True, **kwargs: Any) -> DimensionScore:
+    return DimensionScore(
+        name=name,
+        score=score,
+        band="Meets Bar",
+        evidence=[Citation(message_index=0, quote="q")] if evidence else [],
+        **kwargs,
+    )
+
+
+def _report_with(dimensions: list[DimensionScore]) -> EvaluationReport:
+    return EvaluationReport(attempt_id="assessability-fixture", dimensions=dimensions)
+
+
+def test_unassessed_dimension_is_excluded_and_its_weight_redistributes() -> None:
+    """A case with no quantitative surface must not charge the candidate for it."""
+    rubric = load_rubric()
+    dimensions = [
+        _dimension("structuring", 4.0),
+        _dimension("problem_solving", 4.0),
+        _dimension(
+            "quantitative",
+            2.5,
+            evidence=False,
+            assessed=False,
+            unassessed_reason="This case presented no quantitative surface.",
+        ),
+        _dimension("synthesis", 4.0),
+        _dimension("communication", 4.0),
+    ]
+
+    result = weighted_overall(_report_with(dimensions), rubric)
+
+    assert result["overall"] == 4.0, "four dimensions all at 4.0 must average to 4.0, not be dragged by quant"
+    assert "quantitative" in result["excluded_dimensions"]
+    assert "quantitative" not in result["assessed_dimensions"]
+    assert round(sum(result["weights_used"].values()), 6) == 1.0
+
+
+def test_scoring_a_dimension_with_no_opportunity_would_have_depressed_the_score() -> None:
+    """Guards the defect this change fixes, by pinning the arithmetic difference."""
+    rubric = load_rubric()
+    weights = {entry["name"]: entry["weight"] for entry in rubric["dimensions"]}
+    unredistributed = sum(
+        4.0 * weights[name] for name in ("structuring", "problem_solving", "synthesis", "communication")
+    ) + 2.5 * weights["quantitative"]
+
+    assert unredistributed == pytest.approx(3.775)
+    assert unredistributed < 4.0, "the old fixed-weight path scored below the candidate's actual performance"
+
+
+def test_legacy_reports_without_the_assessed_flag_keep_their_historical_score() -> None:
+    """evaluator-v2 payloads default assessed to True, so exclusion must still hinge on evidence."""
+    rubric = load_rubric()
+    legacy_payload = {
+        "attempt_id": "legacy-v2",
+        "dimensions": [
+            {"name": "structuring", "score": 4.0, "band": "Meets Bar",
+             "evidence": [{"message_index": 0, "quote": "q"}]},
+            {"name": "quantitative", "score": 2.5, "band": "Meets Bar", "evidence": []},
+        ],
+    }
+    report = EvaluationReport.model_validate(legacy_payload)
+
+    assert report.dimensions[1].assessed is True, "the flag defaults True on legacy data"
+    result = weighted_overall(report, rubric)
+    assert result["overall"] == 4.0, "a legacy no-evidence dimension stays excluded as it was before"
+    assert result["excluded_dimensions"] == ["quantitative"]
+
+
+def test_unassessed_dimension_must_explain_itself() -> None:
+    """An unassessed dimension needs a reason instead of a manufactured citation."""
+    checklist_ids = [item["id"] for item in load_checklist()["items"]]
+    silent = _report_with([_dimension("quantitative", 2.5, evidence=False, assessed=False)])
+    explained = _report_with(
+        [
+            _dimension(
+                "quantitative",
+                2.5,
+                evidence=False,
+                assessed=False,
+                unassessed_reason="No quantitative surface in this case.",
+            )
+        ]
+    )
+
+    from app.evaluator import completeness_violations
+
+    silent_violations = completeness_violations(silent, checklist_ids)
+    explained_violations = completeness_violations(explained, checklist_ids)
+
+    assert any("unassessed_reason" in violation for violation in silent_violations)
+    assert not any("unassessed_reason" in violation for violation in explained_violations)
+    assert not any(
+        "needs evidence" in violation for violation in explained_violations
+    ), "an unassessed dimension must not be pushed to invent a citation"

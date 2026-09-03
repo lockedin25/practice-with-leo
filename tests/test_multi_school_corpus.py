@@ -50,16 +50,24 @@ def test_reservoir_catalog_loads_all_12_full_packages() -> None:
         assert hidden_facts[0].release_level == "interviewer_only"
 
 
-def test_multi_school_exemplars_count_and_distribution() -> None:
-    """Verify that corpus/exemplars/ contains exactly 57 packages across 4 schools."""
-    exemplars = load_corpus_exemplars(ROOT)
-    assert len(exemplars) == 57
+def test_every_exemplar_package_still_loads() -> None:
+    """The corpus directory grouping is internal; the count is what must not drift.
 
-    schools = [pkg.manifest.school for pkg in exemplars.values()]
-    assert schools.count("IIM-A") == 25
-    assert schools.count("IIM-B") == 10
-    assert schools.count("IIM-C") == 10
-    assert schools.count("ISB") == 12
+    This previously asserted a per-institution breakdown. That axis was removed
+    from the product, but the packages themselves are unchanged, so the check that
+    survives is that all 57 still parse into valid manifests.
+    """
+    exemplars = load_corpus_exemplars(ROOT)
+
+    assert len(exemplars) == 57
+    assert all(pkg.manifest.case_id for pkg in exemplars.values())
+
+
+def test_no_exemplar_declares_itself_a_community_case() -> None:
+    """Everything shipped in the repository is curated by definition."""
+    exemplars = load_corpus_exemplars(ROOT)
+
+    assert {pkg.manifest.source for pkg in exemplars.values()} == {"curated"}
 
 
 def test_all_57_exemplars_validate_cleanly() -> None:
