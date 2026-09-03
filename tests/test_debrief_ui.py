@@ -324,7 +324,9 @@ def test_t5_case_insight_card_serves_the_authored_essence(stub_interviewer) -> N
         },
     )
     assert turn.status_code == 200
-    ended = client.post(f"/api/attempts/{attempt_id}/end")
+    # I5 semantics: a single-turn attempt would default to disposition
+    # "abandoned" (no evaluation); this card needs a scored end explicitly.
+    ended = client.post(f"/api/attempts/{attempt_id}/end", json={"disposition": "scored"})
     assert ended.status_code == 200
 
     card = ended.json()["evaluation"]["what_the_case_wanted_to_test"]
