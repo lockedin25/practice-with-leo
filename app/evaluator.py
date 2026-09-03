@@ -768,6 +768,71 @@ def _strip_em_dashes(report: EvaluationReport) -> EvaluationReport:
     return report
 
 
+# The card is a post-attempt masterclass reveal, so its insight fields are
+# sourced from the authors' essence. A question-shaped string (the prompt's
+# decision question, or an essence phrased as one) must never be spliced into
+# sentence templates such as "isolates {mechanism} via ...".
+_QUESTION_STARTERS = frozenset(
+    {"why", "how", "what", "should", "which", "where", "when", "who", "will", "can", "could", "is", "are", "do", "does", "did"}
+)
+
+
+def is_question_shaped(text: str) -> bool:
+    """True when the text reads as a question rather than a mechanism statement."""
+    stripped = text.strip()
+    if not stripped:
+        return False
+    if stripped.endswith("?"):
+        return True
+    first_word = stripped.split(" ", 1)[0].strip(",.:;!\u2019'\"").lower()
+    return first_word in _QUESTION_STARTERS
+
+
+def optimal_path_gap(core_mechanism: str) -> str:
+    """The candidate-vs-optimal gap line, grammatical for any objective shape."""
+    mechanism = core_mechanism.strip().rstrip(".")
+    if not mechanism:
+        return (
+            "The optimal MBB path states a testable hypothesis up front, isolates the "
+            "driving mechanism with ex-ante evidence, and closes with a 4-part quantified synthesis."
+        )
+    if is_question_shaped(mechanism):
+        return (
+            f"The optimal MBB path answers the case question ({mechanism}) by isolating the "
+            "driving mechanism through ex-ante hypothesis testing and closing with a 4-part quantified close."
+        )
+    return (
+        f"The optimal MBB path isolates {mechanism} via ex-ante hypothesis testing and "
+        "concludes with a 4-part quantified close."
+    )
+
+
+def apply_authored_essence(
+    report: EvaluationReport, reservoir_root: Path | None, case_id: str
+) -> EvaluationReport:
+    """Pin the debrief's case-insight card to the authored case essence.
+
+    The card must carry the authors' ``core_mechanism`` and ``pivotal_insight``,
+    never the prompt's decision question and never a paraphrase that drifts from
+    the authored insight. The decision question stays where it belongs: context.
+    When the package has no essence, whatever the evaluator authored itself is
+    kept rather than fabricating generic filler.
+    """
+    essence = load_case_essence(reservoir_root, case_id) if reservoir_root else None
+    authored_mechanism = str((essence or {}).get("core_mechanism") or "").strip()
+    authored_insight = str((essence or {}).get("pivotal_insight") or "").strip()
+    if not authored_mechanism and not authored_insight:
+        return report
+    if report.what_the_case_wanted_to_test is None:
+        report.what_the_case_wanted_to_test = WhatTheCaseWantedToTest()
+    card = report.what_the_case_wanted_to_test
+    if authored_mechanism:
+        card.core_mechanism = _sanitize(authored_mechanism)
+    if authored_insight:
+        card.pivotal_insight = _sanitize(authored_insight)
+    return report
+
+
 def _report_texts(report: EvaluationReport) -> list[str]:
     texts = [
         report.executive_summary,
@@ -979,9 +1044,12 @@ def generate_fallback_evaluation(
     except Exception:
         pass
 
-    core_mechanism = essence_data.get("core_mechanism") or session.case.objective
+    # The card reveals the authors' mechanism and pivotal insight. When the
+    # package carries no essence, leave the slots empty rather than dressing the
+    # prompt's decision question up as an authored mechanism (P1-5).
+    core_mechanism = str(essence_data.get("core_mechanism") or "").strip()
     commercial_concept = essence_data.get("what_the_case_wanted_to_test") or "Commercial hypothesis testing"
-    pivotal_insight = essence_data.get("pivotal_insight") or "Isolating root-cause unit economics"
+    pivotal_insight = str(essence_data.get("pivotal_insight") or "").strip()
     common_traps = essence_data.get("common_traps") or []
     takeaway_lesson = essence_data.get("takeaway_lesson") or "Always anchor problem-solving on value chain economics"
     readings = essence_data.get("suggested_readings") or [
@@ -1325,9 +1393,7 @@ def generate_fallback_evaluation(
             f"Candidate completed {len(cand_turns)} turns and uncovered {disclosed_facts}/{total_facts} case facts. "
             f"{'Successfully surfaced the core economic drivers.' if fact_ratio >= 0.4 else 'Explored broad areas but could go deeper on unit economics.'}"
         ),
-        candidate_vs_optimal_gap=(
-            f"The optimal MBB path isolates {core_mechanism} via ex-ante hypothesis testing and concludes with a 4-part quantified close."
-        ),
+        candidate_vs_optimal_gap=optimal_path_gap(core_mechanism),
     )
 
     # Golden Rewrites
@@ -1340,8 +1406,12 @@ def generate_fallback_evaluation(
     )
     partner_closing = (
         f"We recommend that the client immediately execute a focused turnaround strategy to achieve the target objective. "
-        f"First, address the core economic mechanism of {core_mechanism}. "
-        "Second, optimize variable operating cost per unit across high-volume routes. "
+        + (
+            f"First, address the core economic mechanism of {core_mechanism}. "
+            if core_mechanism
+            else ""
+        )
+        + "Second, optimize variable operating cost per unit across high-volume routes. "
         "Third, implement dynamic pricing indexed to input costs. "
         "Key implementation risks include client pushback during contract renegotiations (mitigated via value-tiered SLAs). "
         "Our 100-day plan will audit contract contribution in Month 1 and roll out new pricing in Months 2-3."
@@ -1632,6 +1702,7 @@ class LangChainCaseEvaluator:
         history = self._run_planner(agent, context)
         report = self._write_report(context, history)
         report = self._enforce_boundaries(report, context, history)
+        report = apply_authored_essence(report, self._reservoir_root, session.case.id)
         report.evaluator_version = self.version
         if self._boundary_violations(report, context, private_strings(
             context.issue_tree,
