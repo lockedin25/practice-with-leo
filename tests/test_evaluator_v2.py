@@ -25,20 +25,27 @@ from app.evaluator import (
     DimensionScore,
     EvaluationReport,
     LangChainCaseEvaluator,
+    WhatTheCaseWantedToTest,
+    apply_authored_essence,
     build_attempt_context,
     build_tools,
     citation_violations,
     find_leakage,
+    generate_fallback_evaluation,
+    is_question_shaped,
+    load_case_essence,
     load_checklist,
     load_issue_tree,
     load_rubric,
     normalize_text,
+    optimal_path_gap,
     private_fact_contents,
     private_strings,
     quote_is_verbatim,
     read_messages_window,
     weighted_overall,
 )
+from test_evaluator import FakeWriter, _offline_evaluator, valid_report
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -537,3 +544,131 @@ def test_unassessed_dimension_must_explain_itself() -> None:
     assert not any(
         "needs evidence" in violation for violation in explained_violations
     ), "an unassessed dimension must not be pushed to invent a citation"
+
+
+# --- ROADMAP item 6: the case-insight card shows the authored essence ---------
+
+# The authored meridian essence is deliberately different from the prompt's
+# decision question ("Why has EBITDA margin fallen, and what should the CEO do?"),
+# which is exactly the shape of the P1-5 failure.
+_DECISION_QUESTION = "Why has EBITDA margin fallen, and what should the CEO do?"
+
+
+def test_case_insight_card_carries_the_authored_essence_not_the_prompt_question() -> None:
+    """ROADMAP item 6 acceptance: a fixture whose decision question differs from
+    its case_essence surfaces the authored mechanism and pivotal insight."""
+    session = make_test_session()
+    report = generate_fallback_evaluation(session, RESERVOIR_DIR)
+    essence = load_case_essence(RESERVOIR_DIR, session.case.id)
+    assert essence and essence["core_mechanism"] != session.case.objective, "fixture precondition"
+
+    card = report.what_the_case_wanted_to_test
+    assert card is not None
+    assert normalize_text(card.core_mechanism) == normalize_text(essence["core_mechanism"])
+    assert normalize_text(card.pivotal_insight) == normalize_text(essence["pivotal_insight"])
+    assert _DECISION_QUESTION not in card.core_mechanism, "the prompt question must not pose as the mechanism"
+
+    gap = card.candidate_vs_optimal_gap
+    assert gap.startswith("The optimal MBB path")
+    assert "isolates Why" not in gap and "isolates What" not in gap
+    assert gap.endswith("."), "the template fill must not leave a dangling splice"
+
+
+def test_candidate_gap_template_stays_grammatical_for_a_question_shaped_insight(monkeypatch) -> None:
+    """A package may phrase its essence as a question; the gap template must
+    answer it, not splice it into 'isolates Why...'."""
+    question_essence = {
+        "core_mechanism": "Why has diagnostic center profitability fallen despite volume growth?",
+        "pivotal_insight": "Referral commissions rose from 20 to 38 percent of revenue per patient.",
+    }
+    import app.evaluator as evaluator_module
+
+    monkeypatch.setattr(evaluator_module, "load_case_essence", lambda root, case_id: question_essence)
+
+    report = generate_fallback_evaluation(make_test_session(), RESERVOIR_DIR)
+
+    card = report.what_the_case_wanted_to_test
+    assert card.core_mechanism == question_essence["core_mechanism"]
+    assert card.pivotal_insight == question_essence["pivotal_insight"]
+    gap = card.candidate_vs_optimal_gap
+    assert gap.startswith("The optimal MBB path answers the case question")
+    assert "isolates Why" not in gap
+    assert gap.endswith(".")
+
+
+def test_optimal_path_gap_handles_mechanism_and_empty_shapes() -> None:
+    """Unit coverage for the template's three grammatical shapes."""
+    assert optimal_path_gap("") == (
+        "The optimal MBB path states a testable hypothesis up front, isolates the "
+        "driving mechanism with ex-ante evidence, and closes with a 4-part quantified synthesis."
+    )
+
+    statement = optimal_path_gap("Route density drove contribution per vehicle.")
+    assert statement == (
+        "The optimal MBB path isolates Route density drove contribution per vehicle "
+        "via ex-ante hypothesis testing and concludes with a 4-part quantified close."
+    )
+
+    question = optimal_path_gap("Should the client exit pharma logistics?")
+    assert question == (
+        "The optimal MBB path answers the case question (Should the client exit pharma logistics?) "
+        "by isolating the driving mechanism through ex-ante hypothesis testing and closing with a 4-part quantified close."
+    )
+
+
+def test_is_question_shaped_covers_interrogatives_and_punctuation() -> None:
+    assert is_question_shaped("Why has margin fallen?")
+    assert is_question_shaped("Should the client exit pharma logistics?")  # trailing question mark
+    assert is_question_shaped("How can route density be raised")
+    assert is_question_shaped("What drives contribution per vehicle")
+    assert not is_question_shaped("Mix shift into low-utilisation pharma routes.")
+    assert not is_question_shaped("Route density drove the margin decline")
+    assert not is_question_shaped("")
+
+
+def test_llm_report_card_is_overridden_with_the_authored_essence(monkeypatch) -> None:
+    """BUG-6 (P1-5): the writer filled the card with the prompt's decision
+    question; the authored essence must win deterministically."""
+    session = make_test_session()
+    canned = valid_report(attempt_id=session.id)
+    canned.what_the_case_wanted_to_test = WhatTheCaseWantedToTest(
+        core_mechanism=_DECISION_QUESTION,  # exactly the reported failure
+        commercial_concept="Commercial hypothesis testing",
+        pivotal_insight="Some generic filler insight.",
+        candidate_performance_summary="Candidate structured well and identified mix shift.",
+        candidate_vs_optimal_gap="Could have computed contract contribution faster.",
+    )
+    evaluator = _offline_evaluator(monkeypatch)
+    evaluator._writer_chain = FakeWriter(canned)
+
+    report = evaluator.evaluate(session)
+
+    essence = load_case_essence(RESERVOIR_DIR, session.case.id)
+    card = report.what_the_case_wanted_to_test
+    assert card is not None
+    assert normalize_text(card.core_mechanism) == normalize_text(essence["core_mechanism"])
+    assert normalize_text(card.pivotal_insight) == normalize_text(essence["pivotal_insight"])
+    assert _DECISION_QUESTION not in card.core_mechanism
+
+
+def test_apply_authored_essence_creates_the_card_when_the_writer_omitted_it() -> None:
+    """An absent card must not hide the authored reveal when essence exists."""
+    report = apply_authored_essence(EvaluationReport(attempt_id="no-card"), RESERVOIR_DIR, "meridian-cold-chain-v1")
+    card = report.what_the_case_wanted_to_test
+    assert card is not None
+    assert "load factor" in card.core_mechanism
+    assert "route density" in card.pivotal_insight
+
+
+def test_apply_authored_essence_without_a_package_keeps_the_evaluator_text() -> None:
+    """With no essence on disk there is nothing authored to reveal; fabricated
+    filler must not replace what the evaluator wrote."""
+    missing = EvaluationReport(
+        attempt_id="no-essence",
+        what_the_case_wanted_to_test=WhatTheCaseWantedToTest(
+            core_mechanism="An evaluator-authored mechanism statement.",
+            pivotal_insight="An evaluator-authored insight.",
+        ),
+    )
+    kept = apply_authored_essence(missing, RESERVOIR_DIR, "case-that-does-not-exist")
+    assert kept.what_the_case_wanted_to_test.core_mechanism == "An evaluator-authored mechanism statement."

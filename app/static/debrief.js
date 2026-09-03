@@ -236,10 +236,18 @@ function renderCaseWantedToTest(report) {
   const data = report.what_the_case_wanted_to_test;
   if (!data || (!data.core_mechanism && !data.pivotal_insight)) return;
   el.caseWantedCard?.classList.remove("hidden");
-  if (el.caseCoreMechanism) el.caseCoreMechanism.textContent = data.core_mechanism || "";
-  if (el.casePivotalInsight) el.casePivotalInsight.textContent = data.pivotal_insight || "";
-  if (el.caseCandidatePerformance) el.caseCandidatePerformance.textContent = data.candidate_performance_summary || "";
-  if (el.caseOptimalGap) el.caseOptimalGap.textContent = data.candidate_vs_optimal_gap || "";
+  fillInsightSlot(el.caseCoreMechanism, data.core_mechanism);
+  fillInsightSlot(el.casePivotalInsight, data.pivotal_insight);
+  fillInsightSlot(el.caseCandidatePerformance, data.candidate_performance_summary);
+  fillInsightSlot(el.caseOptimalGap, data.candidate_vs_optimal_gap);
+}
+
+/* A slot with no authored content would render an orphaned micro-label, so
+ * empty items collapse instead of showing a blank line. */
+function fillInsightSlot(slot, text) {
+  if (!slot) return;
+  slot.textContent = text || "";
+  slot.closest(".masterclass-item")?.classList.toggle("hidden", !text);
 }
 
 function renderDimension(dimension) {
