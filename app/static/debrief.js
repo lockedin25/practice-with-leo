@@ -27,7 +27,10 @@ const el = {
   caseTitle: document.querySelector("#case-title"),
   subtitle: document.querySelector("#report-subtitle"),
   overallScore: document.querySelector("#overall-score"),
+  overallValue: document.querySelector("#overall-value"),
+  overallOutOf: document.querySelector("#overall-out-of"),
   overallNote: document.querySelector("#overall-note"),
+  reliabilityState: document.querySelector("#reliability-state"),
   strengths: document.querySelector("#strength-list"),
   priorities: document.querySelector("#priority-list"),
   drill: document.querySelector("#drill-text"),
@@ -181,6 +184,25 @@ function renderHeader(attempt) {
 
 /* The five dimension names are listed in full immediately below, so the
  * footnote reports the count and any exclusion, not the whole roster. */
+function renderReliability(report) {
+  const complete = report.reliability === "complete";
+  if (complete) {
+    el.overallValue?.classList.remove("hidden");
+    el.reliabilityState?.classList.add("hidden");
+    return true;
+  }
+
+  el.overallValue?.classList.add("hidden");
+  el.reliabilityState?.classList.remove("hidden");
+  if (el.reliabilityState) el.reliabilityState.textContent = "Provisional evaluation";
+  if (el.mbbBadge) {
+    el.mbbBadge.textContent = "";
+    el.mbbBadge.classList.add("hidden");
+  }
+  el.overallNote.textContent = report.retry_message || "Your transcript is saved. Please try the evaluation again later for a validated score.";
+  return false;
+}
+
 function renderOverall(overall) {
   if (overall?.overall === null || overall?.overall === undefined) {
     el.overallScore.textContent = "\u2013";
@@ -199,11 +221,11 @@ function renderOverall(overall) {
 
 /* The rating badge sits in the outcome panel beside the score; this card
  * carries the summary prose only. */
-function renderExecutiveSummary(report) {
+function renderExecutiveSummary(report, showBadge) {
   if (el.mbbBadge) {
-    el.mbbBadge.textContent = report.mbb_rating_badge || "";
+    el.mbbBadge.textContent = showBadge ? (report.mbb_rating_badge || "") : "";
     el.mbbBadge.className = `mbb-badge badge-${slug(report.mbb_rating_badge)}`;
-    el.mbbBadge.classList.toggle("hidden", !report.mbb_rating_badge);
+    el.mbbBadge.classList.toggle("hidden", !showBadge || !report.mbb_rating_badge);
   }
   if (!report.executive_summary) return;
   el.executiveSummaryCard?.classList.remove("hidden");
@@ -469,8 +491,9 @@ function renderReport(attempt, payload) {
   }
   showReport();
   renderHeader(attempt);
-  renderOverall(payload.overall);
-  renderExecutiveSummary(report);
+  const showHeadline = renderReliability(report);
+  if (showHeadline) renderOverall(payload.overall);
+  renderExecutiveSummary(report, showHeadline);
 
   /* The takeaway lists prefer the evaluator's own short summaries and fall
    * back to the claim/gap text of the detailed items. */

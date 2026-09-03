@@ -53,6 +53,18 @@ def test_t1_debrief_html_executive_header_card() -> None:
     assert 'class="overall-card"' in content
     assert 'id="overall-score"' in content
     assert 'id="overall-note"' in content
+    assert 'id="reliability-state"' in content
+    assert "Provisional evaluation" in content
+
+
+def test_t1_provisional_reports_gate_the_score_and_mbb_badge() -> None:
+    """Fallback/incomplete reports display an explicit state, never a fake headline."""
+    js_content = JS_PATH.read_text(encoding="utf-8")
+    assert 'report.reliability === "complete"' in js_content
+    assert 'el.overallValue?.classList.add("hidden")' in js_content
+    assert 'el.mbbBadge.classList.add("hidden")' in js_content
+    assert 'el.reliabilityState.textContent = "Provisional evaluation"' in js_content
+    assert "if (showHeadline) renderOverall(payload.overall);" in js_content
 
 
 def test_t1_debrief_template_has_a_clear_return_to_practice_room() -> None:
