@@ -49,7 +49,7 @@ def test_end_persists_an_elaborate_fallback_report_when_llm_grading_fails(monkey
     )
     assert turn.status_code == 200
 
-    ended = client.post(f"/api/attempts/{attempt_id}/end")
+    ended = client.post(f"/api/attempts/{attempt_id}/end", json={"disposition": "scored"})
     assert ended.status_code == 200
     assert "fallback=true" in ended.json()["evaluation"]["evaluator_version"]
 
@@ -90,7 +90,7 @@ def test_empty_evaluator_response_persists_a_readable_incomplete_report(monkeypa
     )
     assert turn.status_code == 200
 
-    ended = client.post(f"/api/attempts/{attempt_id}/end")
+    ended = client.post(f"/api/attempts/{attempt_id}/end", json={"disposition": "scored"})
     assert ended.status_code == 200
     report = ended.json()["evaluation"]
     assert report["reliability"] == "incomplete"

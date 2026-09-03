@@ -302,7 +302,7 @@ def test_t4_real_world_attempt_auto_trigger_and_persistence_workflow(candidate_c
     attempt_id = start_resp.json()["id"]
     
     # 2. End attempt
-    end_resp = client.post(f"/api/attempts/{attempt_id}/end")
+    end_resp = client.post(f"/api/attempts/{attempt_id}/end", json={"disposition": "scored"})
     assert end_resp.status_code == 200
     end_data = end_resp.json()
     assert end_data["attempt"]["ended"] is True
@@ -467,4 +467,3 @@ def test_t4_attempt_lifecycle_service(isolated_db) -> None:
     assert prog is not None
     assert prog["status"] == "solved"
     assert prog["best_score"] == 4.4
-

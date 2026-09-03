@@ -77,7 +77,7 @@ def test_the_overview_counts_attempts_and_completion(admin_client) -> None:
     owner = sign_in(candidate, "metrics@casecall.test", name="Metrics Candidate")
     first = _start(candidate)
     _start(candidate, "clearcart-v1")
-    assert candidate.post(f"/api/attempts/{first}/end").status_code == 200
+    assert candidate.post(f"/api/attempts/{first}/end", json={"disposition": "scored"}).status_code == 200
 
     totals = admin.get("/api/admin/overview").json()["totals"]
     assert totals["attempts"] >= 2
