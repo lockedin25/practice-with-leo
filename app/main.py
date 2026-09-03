@@ -280,6 +280,12 @@ class CandidateTurnRequest(BaseModel):
     turn_id: str = Field(min_length=1, max_length=128)
 
 
+class EndAttemptRequest(BaseModel):
+    """Candidate's explicit choice when saving an ended practice."""
+
+    disposition: Literal["abandoned", "scored"] | None = None
+
+
 class VoiceLifecycleRequest(BaseModel):
     """Present for an explicit, versionable lifecycle contract."""
 
@@ -578,10 +584,25 @@ def _evaluate_and_store(session: InterviewSession, user_id: str | None = None) -
 
 
 @app.post("/api/attempts/{attempt_id}/end")
-def end_attempt(attempt_id: str, user: User = Depends(require_user)) -> dict[str, object]:
+def end_attempt(
+    attempt_id: str,
+    request: EndAttemptRequest | None = None,
+    user: User = Depends(require_user),
+) -> dict[str, object]:
     session = _session(attempt_id, user)
+    disposition = request.disposition if request and request.disposition else session.default_end_disposition
     session.ended = True
+    session.disposition = disposition
     STORE.save(session, user_id=user.id)
+    if disposition == "abandoned":
+        STORE.mark_case_abandoned(user.id, session.case.id, session.id)
+        return {
+            "attempt": session.candidate_view(),
+            "evaluation": None,
+            "scorecard": session.scorecard(),
+            "next_url": "/profile",
+            "message": "This early exit was saved to your history without affecting your performance record.",
+        }
     # _evaluate_and_store is deliberately resilient and persists either the
     # LLM report or a full deterministic report before this response returns.
     # Do not silently complete an attempt without a debrief.
@@ -650,6 +671,8 @@ def get_evaluation(attempt_id: str, user: User = Depends(require_user)) -> dict[
     session = _session(attempt_id, user)
     if not session.ended:
         raise HTTPException(status_code=409, detail="The attempt has not ended yet")
+    if session.disposition == "abandoned":
+        raise HTTPException(status_code=409, detail="This attempt was saved without a performance review")
     stored = EVALUATIONS.latest(attempt_id)
     if stored is None:
         # Historical completed attempts from before report persistence are
@@ -863,8 +886,15 @@ def practice_history(
     Full transcripts remain available through the detail endpoint below.
     """
     records = STORE.list_user_practice(user.id, limit=limit)
-    completed = [record for record in records if record["ended"]]
-    reviewed = [record for record in records if record["feedback"] is not None]
+    abandoned = [record for record in records if record["disposition"] == "abandoned"]
+    completed = [
+        record for record in records
+        if record["ended"] and record["disposition"] != "abandoned"
+    ]
+    reviewed = [
+        record for record in records
+        if record["disposition"] != "abandoned" and record["feedback"] is not None
+    ]
     scores = [
         _feedback_score(record["feedback"])
         for record in reviewed
@@ -874,7 +904,8 @@ def practice_history(
         "summary": {
             "attempts": len(records),
             "completed": len(completed),
-            "in_progress": len(records) - len(completed),
+            "abandoned": len(abandoned),
+            "in_progress": len(records) - len(completed) - len(abandoned),
             "feedback_available": len(reviewed),
             "average_feedback_score": round(sum(scores) / len(scores), 2) if scores else None,
         },
@@ -906,8 +937,15 @@ def practice_history_detail(attempt_id: str, user: User = Depends(require_user))
 def profile(user: User = Depends(require_user)) -> dict[str, object]:
     """Derived, candidate-safe progress view over one person's own history."""
     records = STORE.list_user_practice(user.id, limit=250)
-    completed = [record for record in records if record["ended"]]
-    assessed = [record for record in records if isinstance(record["feedback"], dict)]
+    abandoned = [record for record in records if record["disposition"] == "abandoned"]
+    completed = [
+        record for record in records
+        if record["ended"] and record["disposition"] != "abandoned"
+    ]
+    assessed = [
+        record for record in records
+        if record["disposition"] != "abandoned" and isinstance(record["feedback"], dict)
+    ]
 
     dimensions: dict[str, list[float]] = {}
     improvements: dict[str, int] = {}
@@ -962,7 +1000,8 @@ def profile(user: User = Depends(require_user)) -> dict[str, object]:
         "summary": {
             "attempts": len(records),
             "completed": len(completed),
-            "in_progress": len(records) - len(completed),
+            "abandoned": len(abandoned),
+            "in_progress": len(records) - len(completed) - len(abandoned),
             "candidate_turns": sum(int(record["candidate_turns"]) for record in records),
             "feedback_available": len(assessed),
             "average_feedback_score": _mean_feedback_score(assessed),
@@ -1036,12 +1075,14 @@ def _practice_summary(record: dict[str, object]) -> dict[str, object]:
         "mode": record["mode"],
         "stage": record["stage"],
         "candidate_turns": record["candidate_turns"],
+        "substantive_turns": record["substantive_turns"],
         "facts_released": record["facts_released"],
         "ended": record["ended"],
+        "disposition": record["disposition"],
         "started_at": record["started_at"],
         "updated_at": record["updated_at"],
-        "debrief_url": f"/attempts/{attempt_id}/debrief",
-        "evaluation_url": f"/api/attempts/{attempt_id}/evaluation",
+        "debrief_url": f"/attempts/{attempt_id}/debrief" if record["disposition"] != "abandoned" else None,
+        "evaluation_url": f"/api/attempts/{attempt_id}/evaluation" if record["disposition"] != "abandoned" else None,
         "feedback": (
             {
                 "evaluator_version": feedback["evaluator_version"],
@@ -1085,7 +1126,7 @@ def _submit_pre_case_turn(
     if not reply:
         raise VoiceOnboardingUnavailable("Leo did not produce an onboarding response")
 
-    session.record_candidate_turn(content)
+    session.record_candidate_turn(content, substantive=False)
     if onboarding.ready_to_begin:
         session.case_started = True
         # The LLM supplies the conversational transition. The authored opening
@@ -1485,7 +1526,7 @@ def record_native_voice_transcript(
     turn_id = f"voice-native:{voice_session.id}:{request.role}:{event_key}"
     if turn_id not in session.turn_results:
         if request.role == "candidate":
-            session.record_candidate_turn(content)
+            session.record_candidate_turn(content, substantive=session.case_started)
         elif not (
             content == _voice_intro_transcript(session)
             and session.messages
