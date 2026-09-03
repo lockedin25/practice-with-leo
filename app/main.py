@@ -35,7 +35,13 @@ from app.case_validator import validate_package
 from app.case_solver import SolverUnavailable, create_case_solver
 from app import personas
 from app import db
-from app.evaluator import FallbackCaseEvaluator, EvaluatorUnavailable, create_evaluator, load_rubric
+from app.evaluator import (
+    FallbackCaseEvaluator,
+    EvaluatorUnavailable,
+    create_evaluator,
+    load_rubric,
+    mark_report_reliability,
+)
 from app.interviewer import InterviewerUnavailable, create_interviewer
 from app.store import (
     ActiveVoiceSessionExists,
@@ -453,11 +459,11 @@ def get_attempt(attempt_id: str, user: User = Depends(require_user)) -> dict[str
     view = session.candidate_view()
     latest_eval = EVALUATIONS.latest(attempt_id)
     if latest_eval:
-        view["evaluation"] = latest_eval
+        view["evaluation"] = _candidate_evaluation(latest_eval)
         view["debrief_url"] = f"/attempts/{attempt_id}/debrief"
         view["evaluation_url"] = f"/api/attempts/{attempt_id}/evaluation"
         view["score"] = _report_score(latest_eval)
-        rep = latest_eval.get("report") if isinstance(latest_eval.get("report"), dict) else latest_eval
+        rep = view["evaluation"].get("report") if isinstance(view["evaluation"], dict) else None
         if isinstance(rep, dict):
             view["mbb_rating_badge"] = rep.get("mbb_rating_badge")
     elif session.ended:
@@ -499,6 +505,30 @@ def _overall_for(report_payload: dict[str, object]) -> dict[str, object]:
     return weighted_overall(EvaluationReport.model_validate(report_payload), load_rubric())
 
 
+def _candidate_report(report: dict[str, object]) -> dict[str, object]:
+    """Project persisted evaluation metadata onto candidate-safe API fields."""
+    candidate_report = dict(report)
+    # Reports stored before the reliability field existed remain conservative:
+    # historic fallback output never acquires a credible headline by omission.
+    if "reliability" not in candidate_report:
+        version = str(candidate_report.get("evaluator_version", "")).lower()
+        candidate_report["reliability"] = "provisional" if "fallback" in version else "complete"
+        if candidate_report["reliability"] != "complete":
+            candidate_report["retry_message"] = (
+                "Your transcript is saved. Please try the evaluation again later for a validated score."
+            )
+    candidate_report.pop("internal_log_reason", None)
+    return candidate_report
+
+
+def _candidate_evaluation(record: dict[str, object]) -> dict[str, object]:
+    candidate_record = dict(record)
+    report = candidate_record.get("report")
+    if isinstance(report, dict):
+        candidate_record["report"] = _candidate_report(report)
+    return candidate_record
+
+
 def _evaluate_and_store(session: InterviewSession, user_id: str | None = None) -> dict[str, object]:
     """Generate and persist one complete report for an ended attempt.
 
@@ -512,16 +542,24 @@ def _evaluate_and_store(session: InterviewSession, user_id: str | None = None) -
     if stored and isinstance(stored.get("report"), dict):
         return stored["report"]
 
+    def fallback(reliability: Literal["provisional", "incomplete"], reason: str):
+        report = FallbackCaseEvaluator(RESERVOIR_DIR).evaluate(session)
+        return mark_report_reliability(report, reliability, reason)
+
     evaluator = EVALUATOR
     if evaluator is None:
         logging.getLogger(__name__).warning(
             "LLM evaluator is unavailable for attempt %s; using deterministic debrief",
             session.id,
         )
-        report = FallbackCaseEvaluator(RESERVOIR_DIR).evaluate(session)
+        report = fallback("provisional", "evaluator_unavailable")
     else:
         try:
             report = evaluator.evaluate(session)
+            if not report.dimensions:
+                # A typed but empty response is still invalid. Save useful
+                # fallback coaching, but keep its headline explicitly gated.
+                report = fallback("incomplete", "evaluator_response_incomplete")
         except Exception:
             # Preserve the full post-case learning loop even when the provider
             # fails. The fallback works entirely from the stored transcript,
@@ -530,7 +568,7 @@ def _evaluate_and_store(session: InterviewSession, user_id: str | None = None) -
                 "LLM evaluation failed for attempt %s; using deterministic debrief",
                 session.id,
             )
-            report = FallbackCaseEvaluator(RESERVOIR_DIR).evaluate(session)
+            report = fallback("provisional", "primary_evaluator_failure")
     payload = report.model_dump()
     # Weighting is deterministic and shared by both report engines. Do not
     # call a failed primary evaluator again merely to calculate this field.
@@ -558,7 +596,7 @@ def end_attempt(attempt_id: str, user: User = Depends(require_user)) -> dict[str
     CASES.record_attempt_completed(session.case.id)
     return {
         "attempt": session.candidate_view(),
-        "evaluation": evaluation,
+        "evaluation": _candidate_report(evaluation),
         "scorecard": session.scorecard(),
         "debrief_url": f"/attempts/{session.id}/debrief",
         "evaluation_url": f"/api/attempts/{session.id}/evaluation",
@@ -623,7 +661,7 @@ def get_evaluation(attempt_id: str, user: User = Depends(require_user)) -> dict[
     report_dict = stored["report"]
     overall = _overall_for(report_dict) if isinstance(report_dict, dict) else {}
     return {
-        **stored,
+        **_candidate_evaluation(stored),
         "overall": stored.get("overall") or overall,
         "debrief_url": f"/attempts/{attempt_id}/debrief",
     }

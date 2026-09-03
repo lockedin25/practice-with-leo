@@ -154,6 +154,17 @@
   font-variant-numeric: tabular-nums;
 }
 
+.reliability-state {
+  margin: 4px 0;
+  padding: 7px 10px;
+  border: 1px solid var(--leo-gold, #b7791f);
+  border-radius: var(--r-pill);
+  background: var(--leo-gold-soft);
+  color: var(--leo-gold-deep);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
 .overall-out-of {
   margin-left: 2px;
   font-size: 0.42em;

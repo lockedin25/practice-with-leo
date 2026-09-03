@@ -233,6 +233,16 @@ ObservedBehaviorItem = ChecklistItem
 class EvaluationReport(BaseModel):
     attempt_id: str
     evaluator_version: str = ""
+    # A report can still contain useful, candidate-safe coaching when the
+    # evaluator had to fall back or could not validate its output. Keep that
+    # distinction explicit so downstream surfaces never present it as a
+    # comparable MBB headline score.
+    reliability: Literal["complete", "provisional", "incomplete"] = "complete"
+    retry_message: str = ""
+    # This is a stable reason code, not a provider exception. It is persisted
+    # with the report for operations and avoids leaking implementation details
+    # to a candidate-facing retry message.
+    internal_log_reason: str = ""
     overall_score: float = 0.0
     mbb_rating_badge: str = "Meets Bar"
     overall_band: str = "Meets Bar"
@@ -837,6 +847,24 @@ def _degrade_report(
     return report
 
 
+RELIABILITY_RETRY_MESSAGE = (
+    "Your transcript is saved. Please try the evaluation again later for a validated score."
+)
+
+
+def mark_report_reliability(
+    report: EvaluationReport,
+    reliability: Literal["complete", "provisional", "incomplete"],
+    internal_log_reason: str = "",
+) -> EvaluationReport:
+    """Attach candidate-safe reliability metadata to a persisted report."""
+    report.reliability = reliability
+    if reliability != "complete":
+        report.retry_message = RELIABILITY_RETRY_MESSAGE
+        report.internal_log_reason = internal_log_reason
+    return report
+
+
 def _placeholder_report(context: AttemptContext) -> EvaluationReport:
     """Honest empty report when structured output never validates."""
     dimensions = [
@@ -853,7 +881,7 @@ def _placeholder_report(context: AttemptContext) -> EvaluationReport:
         ChecklistItem(id=item["id"], title=item["title"], status="not_applicable", note="")
         for item in context.checklist_items
     ]
-    return EvaluationReport(
+    return mark_report_reliability(EvaluationReport(
         attempt_id=context.session.id,
         overall_score=1.0,
         mbb_rating_badge="Needs Substantial Practice",
@@ -864,7 +892,7 @@ def _placeholder_report(context: AttemptContext) -> EvaluationReport:
         headline_strengths=[],
         priority_improvements=[],
         next_drill="Re-run the evaluation once the evaluator service is available.",
-    )
+    ), "incomplete", "validated_report_unavailable")
 
 
 def _tree_conclusions(tree: dict[str, Any]) -> list[dict[str, str]]:
@@ -1464,6 +1492,7 @@ class FallbackCaseEvaluator:
             rubric=self._rubric,
         )
         report.evaluator_version = self.version
+        mark_report_reliability(report, "provisional", "deterministic_fallback")
         # Normalise against the rubric file rather than the heuristic's own
         # duplicated weight table, so both evaluators answer to one source.
         return stamp_overall(report, self._rubric)
@@ -1556,6 +1585,11 @@ class LangChainCaseEvaluator:
         report = self._write_report(context, history)
         report = self._enforce_boundaries(report, context, history)
         report.evaluator_version = self.version
+        if self._boundary_violations(report, context, private_strings(
+            context.issue_tree,
+            context.undisclosed_fact_contents() + private_fact_contents(self._reservoir_root, context.session),
+        )):
+            mark_report_reliability(report, "incomplete", "report_completeness_violation")
         return stamp_overall(report, self._rubric)
 
     # -- Planner ----------------------------------------------------------
@@ -1654,12 +1688,13 @@ class LangChainCaseEvaluator:
                 errors.append(str(error)[:500])
         # If writer fails, fallback to genuine deterministic heuristic evaluation
         try:
-            return generate_fallback_evaluation(
+            report = generate_fallback_evaluation(
                 session=context.session,
                 reservoir_root=self._reservoir_root,
                 checklist_items=context.checklist_items,
                 rubric=self._rubric,
             )
+            return mark_report_reliability(report, "provisional", "writer_failure_fallback")
         except Exception:
             return _placeholder_report(context)
 
