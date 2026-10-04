@@ -443,3 +443,8 @@
     flex: 1;
   }
 }
+
+/* Keep the full evidence ledger accessible without pushing the conversation
+   below a long list of optional metadata. */
+.tracker-list { max-height: 22rem; overflow-y: auto; }
+.tracker-progress { overflow-wrap: anywhere; }

@@ -1,7 +1,6 @@
 """The crowdsourced contribution engine.
 
-The properties under test are the ones that cannot be left to a prompt: the phase
-floor, the hard gate on the fields that give a case teeth, the privacy handling of
+The properties under test include the mandatory submission gate, the privacy handling of
 provenance, and the rule that nothing reaches a candidate without admin approval.
 """
 
@@ -12,12 +11,8 @@ from fastapi.testclient import TestClient
 
 import app.main as main
 from app.case_author import (
-    MINIMUM_NARRATION_TURNS,
-    PHASES,
     ExtractedCase,
     ExtractionState,
-    advance_phase,
-    enforce_conversation_state,
 )
 from app.case_synthesis import SynthesisedCase, SynthesisedFact, build_package, slugify
 from app.case_validator import validate_package
@@ -28,6 +23,7 @@ from conftest import sign_in
 def _complete_extraction() -> ExtractedCase:
     return ExtractedCase(
         client_and_industry="A cold chain logistics operator.",
+        situation="Revenue grew while margins fell.",
         decision_question="Why has margin fallen and what should the CEO do?",
         core_mechanism="Mix shift into low-utilisation pharma routes priced off the food cost base.",
         pivotal_insight="Volume grew while contribution per kilo collapsed to nothing.",
@@ -48,58 +44,9 @@ def _threshold_extraction() -> ExtractedCase:
     )
 
 
-# --- Phase progression -------------------------------------------------------
-
-
-def test_the_narration_phase_cannot_be_cut_short() -> None:
-    """The listening phase is what produces texture a form would destroy."""
-    state = ExtractionState(phase="narration", phase_turns=1)
-
-    assert advance_phase(state, "structure") == "narration"
-
-    state.phase_turns = MINIMUM_NARRATION_TURNS
-    assert advance_phase(state, "structure") == "structure"
-
-
-def test_phases_cannot_be_skipped() -> None:
-    state = ExtractionState(phase="narration", phase_turns=MINIMUM_NARRATION_TURNS)
-
-    assert advance_phase(state, "playback") == "structure"
-
-
-def test_phases_cannot_run_backwards() -> None:
-    state = ExtractionState(phase="teeth", extracted=_complete_extraction())
-
-    assert advance_phase(state, "narration") == "teeth"
-
-
-def test_the_teeth_phase_holds_until_the_case_has_teeth() -> None:
-    """The hard gate, enforced in code because a prompt can be talked past."""
-    state = ExtractionState(phase="teeth", extracted=ExtractedCase(client_and_industry="A retailer."))
-
-    assert advance_phase(state, "playback") == "teeth"
-
-    state.extracted = _complete_extraction()
-    assert advance_phase(state, "playback") == "playback"
-
-
-def test_an_unknown_phase_is_ignored_rather_than_accepted() -> None:
-    state = ExtractionState(phase="structure")
-
-    assert advance_phase(state, "freestyle") == "structure"
-
-
-def test_every_declared_phase_is_reachable_in_order() -> None:
-    state = ExtractionState(phase=PHASES[0], phase_turns=MINIMUM_NARRATION_TURNS)
-    state.extracted = _complete_extraction()
-
-    visited = [state.phase]
-    for target in PHASES[1:]:
-        state.phase = advance_phase(state, target)
-        visited.append(state.phase)
-
-    assert visited == list(PHASES)
-
+# Question routing, partial evidence and turn replay are covered in
+# test_contribution_loop.py. The former three-turn phase-floor tests were removed
+# with the obsolete phase engine; the new flow intentionally has no phase floor.
 
 # --- Accumulating what the contributor said ----------------------------------
 
@@ -169,8 +116,8 @@ def test_completion_tracker_explains_every_field_behind_the_gate() -> None:
     tracker = _threshold_extraction().completion_tracker()
 
     assert len(tracker) == 8
-    assert sum(item["mandatory_for_submit"] for item in tracker) == 3
-    assert sum(item["required_for_complete"] for item in tracker) == 5
+    assert sum(item["mandatory_for_submit"] for item in tracker) == 4
+    assert sum(item["required_for_complete"] for item in tracker) == 6
     assert sum(item["credit"] for item in tracker) == pytest.approx(0.70)
     assert {item["status"] for item in tracker} == {"captured", "missing"}
 
@@ -188,7 +135,7 @@ def test_state_survives_a_round_trip_through_storage() -> None:
 
     restored = ExtractionState.from_dict(state.as_dict())
 
-    assert restored.phase == "teeth"
+    assert restored.mode == "collecting"
     assert restored.turns == 9
     assert restored.extracted.core_mechanism == state.extracted.core_mechanism
     assert restored.messages == state.messages
@@ -404,7 +351,7 @@ def test_submitting_without_the_teeth_is_refused() -> None:
     assert "who the client was" in response.json()["detail"]
 
 
-def test_threshold_case_can_submit_without_exhaustive_playback(monkeypatch) -> None:
+def test_reviewed_case_can_submit_without_formal_playback(monkeypatch) -> None:
     class StubSynthesiser:
         @staticmethod
         def synthesise(extracted, *, contributor_id):
@@ -414,6 +361,7 @@ def test_threshold_case_can_submit_without_exhaustive_playback(monkeypatch) -> N
     with TestClient(main.app) as client:
         user = sign_in(client, "unconfirmed@example.com")
         state = ExtractionState(phase="structure", extracted=_threshold_extraction())
+        state.closed_fields = {key: {"quote": "Nothing more", "turn": 1} for key in ExtractedCase.model_fields}
         main.CONTRIBUTIONS.create("unconfirmed-session", user.id, state.as_dict())
 
         response = client.post("/api/contributions/unconfirmed-session/submit")
@@ -516,8 +464,9 @@ def test_a_signed_in_contributor_gets_the_page(candidate_client) -> None:
     assert "Talk me through it" in response.text
     assert "Start again" in response.text
     assert "Save &amp; resume later" in response.text
-    assert "Completion criteria" in response.text
-    assert "temporary tracker" in response.text
+    assert "Case details and review progress" in response.text
+    assert "revisit every section" in response.text
+    assert "Improve fidelity" not in response.text
 
 
 def test_pause_saves_an_unsent_draft_for_the_next_visit() -> None:
@@ -570,103 +519,6 @@ def test_contribute_appears_in_the_site_navigation(candidate_client) -> None:
 # The reported failure: the agent summarised what it had, declared itself done,
 # and offered a Submit that was then refused for fields the contributor had never
 # been asked about and could not name.
-
-
-def test_gaps_are_chased_one_at_a_time_in_conversational_order() -> None:
-    """Handing the agent five gaps at once produces a turn that lands none of them."""
-    from app.case_author import REQUIRED_FIELDS
-
-    state = ExtractionState()
-
-    assert state.next_gap() == REQUIRED_FIELDS[0]
-
-    state.extracted = state.extracted.merge({"client_and_industry": "A retailer."})
-    assert state.next_gap() == "decision_question"
-
-
-def test_no_gap_remains_once_everything_is_captured() -> None:
-    state = ExtractionState(extracted=_complete_extraction())
-
-    assert state.next_gap() is None
-
-
-def test_a_closing_reply_is_replaced_with_the_next_required_question() -> None:
-    state = ExtractionState()
-
-    reply = enforce_conversation_state(
-        state,
-        "Thank you so much for reconstructing this case. This will be invaluable.",
-    )
-
-    assert reply.endswith("?")
-    assert "who was the client" in reply
-
-
-def test_a_vague_anything_else_does_not_count_as_gap_chasing() -> None:
-    state = ExtractionState(extracted=_complete_extraction())
-    state.extracted.core_mechanism = ""
-
-    reply = enforce_conversation_state(state, "Thanks. Anything else?")
-
-    assert "actually causing the problem" in reply
-
-
-def test_the_only_non_question_state_is_ready_to_submit() -> None:
-    state = ExtractionState(
-        phase="playback", ready_to_submit=True, extracted=_complete_extraction()
-    )
-
-    reply = enforce_conversation_state(state, "Thanks.")
-
-    assert "enough here to build a strong case" in reply.lower()
-    assert "?" not in reply
-
-
-def test_the_agent_is_told_exactly_which_gap_to_close() -> None:
-    from app.case_author import gap_instruction
-
-    state = ExtractionState(extracted=_complete_extraction())
-    state.extracted.core_mechanism = ""
-    state.gap_focus = "core_mechanism"
-
-    instruction = gap_instruction(state)
-
-    assert "core_mechanism" in instruction
-    assert "MUST record" in instruction
-
-
-def test_the_instruction_escalates_after_repeated_unanswered_asks() -> None:
-    """Asking the same gentle question forever is how a conversation dead-ends."""
-    from app.case_author import ESCALATE_AFTER_ATTEMPTS, gap_instruction
-
-    state = ExtractionState(extracted=_complete_extraction())
-    state.extracted.pivotal_insight = ""
-
-    polite = gap_instruction(state)
-    state.field_attempts["pivotal_insight"] = ESCALATE_AFTER_ATTEMPTS
-    firm = gap_instruction(state)
-
-    assert "Stop being indirect" not in polite
-    assert "Stop being indirect" in firm
-    assert "cannot be published without this" in firm
-
-
-def test_a_completed_case_is_told_to_read_back_rather_than_chase() -> None:
-    from app.case_author import gap_instruction
-
-    instruction = gap_instruction(ExtractionState(extracted=_complete_extraction()))
-
-    assert "Everything required has been captured" in instruction
-
-
-def test_escalation_survives_a_reload() -> None:
-    """Otherwise a contributor who refreshes gets asked gently forever."""
-    state = ExtractionState(gap_focus="core_mechanism", field_attempts={"core_mechanism": 3})
-
-    restored = ExtractionState.from_dict(state.as_dict())
-
-    assert restored.gap_focus == "core_mechanism"
-    assert restored.field_attempts["core_mechanism"] == 3
 
 
 # --- Human-readable gaps -----------------------------------------------------
@@ -766,7 +618,7 @@ def test_readiness_is_derived_from_sufficiency_not_read_back_from_storage() -> N
     assert view["missing"]
 
 
-def test_threshold_readiness_allows_recoverable_gaps() -> None:
+def test_evidence_threshold_does_not_skip_followups() -> None:
     with TestClient(main.app) as client:
         user = sign_in(client, "threshold-ready@example.com")
         state = ExtractionState(extracted=_threshold_extraction())
@@ -774,11 +626,11 @@ def test_threshold_readiness_allows_recoverable_gaps() -> None:
 
         view = client.get("/api/contributions/threshold-ready-session").json()
 
-    assert view["can_submit"] is True
-    assert view["ready_to_submit"] is True
+    assert view["can_submit"] is False
+    assert view["ready_to_submit"] is False
     assert view["sufficiency_score"] == 0.70
     assert view["fully_complete"] is False
-    assert len(view["completion_tracker"]) == 8
+    assert len(view["completion_tracker"]) == len(ExtractedCase.model_fields)
     assert "pivotal_insight" in view["missing"]
     assert "common_traps" in view["missing"]
 
@@ -789,6 +641,7 @@ def test_readiness_is_reported_once_the_gaps_really_are_closed() -> None:
         done = ExtractionState(
             phase="playback", ready_to_submit=True, extracted=_complete_extraction()
         )
+        done.closed_fields = {key: {"quote": "Nothing more", "turn": 1} for key in ExtractedCase.model_fields}
         main.CONTRIBUTIONS.create("genuine-session", user.id, done.as_dict())
 
         view = client.get("/api/contributions/genuine-session").json()

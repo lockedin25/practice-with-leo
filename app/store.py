@@ -10,6 +10,7 @@ from app import db
 
 import json
 import sqlite3
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -505,8 +506,8 @@ class SessionStore:
             )
         return cursor.rowcount == 1
 
-    def _connect(self) -> sqlite3.Connection:
-        return db.connect(self._database_path)
+    def _connect(self) -> AbstractContextManager[sqlite3.Connection]:
+        return db.transaction(self._database_path)
 
 
 class EvaluationStore:
@@ -649,8 +650,8 @@ class EvaluationStore:
             for attempt_id, version, payload, created, uid in rows
         ]
 
-    def _connect(self) -> sqlite3.Connection:
-        return db.connect(self._database_path)
+    def _connect(self) -> AbstractContextManager[sqlite3.Connection]:
+        return db.transaction(self._database_path)
 
 
 class CaseStore:
@@ -724,8 +725,11 @@ class CaseStore:
         """Write one case version and return the version number used."""
         if status not in self.STATUSES:
             raise ValueError(f"Unknown case status: {status}")
-        resolved = version if version is not None else self.next_version(case_id)
         with self._connect() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            resolved = version if version is not None else int(connection.execute(
+                "SELECT COALESCE(MAX(version), 0) + 1 FROM cases WHERE case_id = ?", (case_id,)
+            ).fetchone()[0])
             connection.execute(
                 """
                 INSERT INTO cases (case_id, version, source, status, package_json, contributor_id)
@@ -880,8 +884,8 @@ class CaseStore:
             for case_id, attempted, completed in rows
         }
 
-    def _connect(self) -> sqlite3.Connection:
-        return db.connect(self._database_path)
+    def _connect(self) -> AbstractContextManager[sqlite3.Connection]:
+        return db.transaction(self._database_path)
 
 
 class ContributionStore:
@@ -1009,5 +1013,5 @@ class ContributionStore:
                 (status, case_id, session_id),
             )
 
-    def _connect(self) -> sqlite3.Connection:
-        return db.connect(self._database_path)
+    def _connect(self) -> AbstractContextManager[sqlite3.Connection]:
+        return db.transaction(self._database_path)

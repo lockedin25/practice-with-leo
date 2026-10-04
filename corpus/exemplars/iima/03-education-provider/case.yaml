@@ -67,3 +67,13 @@ reservoir_files:
 - issue-tree.yaml
 - conversation-policy.yaml
 - validation.md
+
+provenance:
+  source_type: authored
+  firm: null
+  firm_tags: []
+  contributor_id: null
+  contributor_name: null
+  attribution_mode: anonymous
+  contributed_at: null
+  metadata_source: not_recorded

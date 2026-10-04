@@ -1,0 +1,273 @@
+[
+  {
+    "turn": 1,
+    "message": "The interviewer said revenue had grown but margins were falling. We discussed the business and I struggled to explain what was happening.",
+    "progress": 0.1,
+    "active_question": "setting",
+    "can_submit": false,
+    "reply": "Who was the client, and what industry or business were they in?",
+    "fields": {
+      "situation": "Revenue had grown but margins were falling",
+      "decision_question": "Explain why margins were falling despite revenue growth",
+      "given_upfront": [
+        "Revenue had grown but margins were falling"
+      ]
+    },
+    "field_statuses": {
+      "situation": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "decision_question": {
+        "status": "partial",
+        "missing_detail": "Specific recommendation, target, or decision required beyond explaining the issue"
+      },
+      "given_upfront": {
+        "status": "partial",
+        "missing_detail": "Additional background or upfront prompt details provided at the start"
+      }
+    }
+  },
+  {
+    "turn": 2,
+    "message": "Answer the question.",
+    "progress": 0.1,
+    "active_question": "setting",
+    "can_submit": false,
+    "reply": "I'm here to document your specific interview case rather than solve it, so I need your recollection\u2014could you share what type of business or industry the client was in, even in generic terms?",
+    "fields": {
+      "situation": "Revenue had grown but margins were falling",
+      "decision_question": "Explain why margins were falling despite revenue growth",
+      "given_upfront": [
+        "Revenue had grown but margins were falling"
+      ]
+    },
+    "field_statuses": {
+      "situation": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "decision_question": {
+        "status": "partial",
+        "missing_detail": "Specific recommendation, target, or decision required beyond explaining the issue"
+      },
+      "given_upfront": {
+        "status": "partial",
+        "missing_detail": "Additional background or upfront prompt details provided at the start"
+      }
+    }
+  },
+  {
+    "turn": 3,
+    "message": "The client was a cold-chain logistics operator transporting food and pharmaceutical products. Competitors were small local carriers undercutting our prices on dense routes.",
+    "progress": 0.25,
+    "active_question": "decision",
+    "can_submit": false,
+    "reply": "Beyond diagnosing the margin drop, what specific recommendation, action plan, or target was the client asking you to deliver?",
+    "fields": {
+      "client_and_industry": "Cold-chain logistics operator transporting food and pharmaceutical products",
+      "competitors": [
+        "Small local carriers undercutting prices on dense routes"
+      ],
+      "situation": "Revenue had grown but margins were falling",
+      "decision_question": "Explain why margins were falling despite revenue growth",
+      "given_upfront": [
+        "Revenue had grown but margins were falling"
+      ]
+    },
+    "field_statuses": {
+      "situation": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "decision_question": {
+        "status": "partial",
+        "missing_detail": "Specific recommendation, target, or decision required beyond explaining the issue"
+      },
+      "given_upfront": {
+        "status": "partial",
+        "missing_detail": "Additional background or upfront prompt details provided at the start"
+      },
+      "client_and_industry": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "competitors": {
+        "status": "complete",
+        "missing_detail": ""
+      }
+    }
+  },
+  {
+    "turn": 4,
+    "message": "Two ways to get this case wrong: blame fuel inflation without checking route density, or exit pharma entirely instead of repricing the sparse routes.",
+    "progress": 0.35,
+    "active_question": "decision",
+    "can_submit": false,
+    "reply": "Beyond identifying the root cause of the margin drop, what specific recommendation, strategic decision, or target was the client asking for?",
+    "fields": {
+      "client_and_industry": "Cold-chain logistics operator transporting food and pharmaceutical products",
+      "competitors": [
+        "Small local carriers undercutting prices on dense routes"
+      ],
+      "situation": "Revenue had grown but margins were falling",
+      "decision_question": "Explain why margins were falling despite revenue growth",
+      "given_upfront": [
+        "Revenue had grown but margins were falling"
+      ],
+      "common_traps": [
+        "Blaming fuel inflation without checking route density",
+        "Exiting pharma entirely instead of repricing the sparse routes"
+      ]
+    },
+    "field_statuses": {
+      "situation": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "decision_question": {
+        "status": "partial",
+        "missing_detail": "Specific recommendation, target, or decision required beyond explaining the issue"
+      },
+      "given_upfront": {
+        "status": "partial",
+        "missing_detail": "Additional background or upfront prompt details provided at the start"
+      },
+      "client_and_industry": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "competitors": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "common_traps": {
+        "status": "complete",
+        "missing_detail": ""
+      }
+    }
+  },
+  {
+    "turn": 5,
+    "message": "The interviewer wanted me to explain why margins were falling despite growth and recommend how to restore profitability over the next year.",
+    "progress": 0.55,
+    "active_question": "mechanism",
+    "can_submit": false,
+    "reply": "What was the core underlying mechanism or root cause that was driving the margin decline despite the revenue growth?",
+    "fields": {
+      "client_and_industry": "Cold-chain logistics operator transporting food and pharmaceutical products",
+      "competitors": [
+        "Small local carriers undercutting prices on dense routes"
+      ],
+      "situation": "Revenue had grown but margins were falling",
+      "decision_question": "Explain why margins were falling despite revenue growth and recommend how to restore profitability",
+      "time_horizon": "1 year / next year",
+      "primary_metric": "Profitability / profit margins",
+      "given_upfront": [
+        "Revenue had grown but margins were falling"
+      ],
+      "common_traps": [
+        "Blaming fuel inflation without checking route density",
+        "Exiting pharma entirely instead of repricing the sparse routes"
+      ]
+    },
+    "field_statuses": {
+      "situation": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "decision_question": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "given_upfront": {
+        "status": "partial",
+        "missing_detail": "Additional background or upfront prompt details provided at the start"
+      },
+      "client_and_industry": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "competitors": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "common_traps": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "time_horizon": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "primary_metric": {
+        "status": "complete",
+        "missing_detail": ""
+      }
+    }
+  },
+  {
+    "turn": 6,
+    "message": "The cause was a mix shift towards pharma routes with fewer deliveries per trip. This raised cost per kilo, but we still charged pharma customers based on the old dense food-route cost base. That is why revenue growth reduced margins.",
+    "progress": 0.8,
+    "active_question": "",
+    "can_submit": true,
+    "reply": "There is enough here to build a strong case. Submit this case now, or choose Improve fidelity to add more detail.",
+    "fields": {
+      "client_and_industry": "Cold-chain logistics operator transporting food and pharmaceutical products",
+      "competitors": [
+        "Small local carriers undercutting prices on dense routes"
+      ],
+      "situation": "Revenue had grown but margins were falling",
+      "decision_question": "Explain why margins were falling despite revenue growth and recommend how to restore profitability",
+      "time_horizon": "1 year / next year",
+      "primary_metric": "Profitability / profit margins",
+      "given_upfront": [
+        "Revenue had grown but margins were falling"
+      ],
+      "core_mechanism": "Mix shift towards pharma routes with fewer deliveries per trip raised cost per kilo, while pricing was still based on the old dense food-route cost base, reducing margins as revenue grew",
+      "common_traps": [
+        "Blaming fuel inflation without checking route density",
+        "Exiting pharma entirely instead of repricing the sparse routes"
+      ]
+    },
+    "field_statuses": {
+      "situation": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "decision_question": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "given_upfront": {
+        "status": "partial",
+        "missing_detail": "Additional background or upfront prompt details provided at the start"
+      },
+      "client_and_industry": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "competitors": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "common_traps": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "time_horizon": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "primary_metric": {
+        "status": "complete",
+        "missing_detail": ""
+      },
+      "core_mechanism": {
+        "status": "complete",
+        "missing_detail": ""
+      }
+    }
+  }
+]

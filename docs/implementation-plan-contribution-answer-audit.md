@@ -1,6 +1,38 @@
 # Question-Led Case Contribution Architecture
 
-Status: proposed for approval on 2026-08-31. This supersedes the earlier phase-based plan. No application code has been changed.
+Status: superseded by version 3 on 2026-09-09. See [the current implementation and verification record](contribution-review-v3.md). The text below preserves the historical design; its 70% submission shortcut and Improve fidelity action are no longer current behavior.
+
+## Historical first implementation and verification record (2026-09-09)
+
+The question-led engine is in `app/contribution.py`; `app/case_author.py` retains the public draft/state names used by persistence and synthesis. This consolidates the proposed catalogue/models/agent/engine package into two modules to preserve existing import boundaries. The old narration floor, phase-transition engine and untyped `ExtractionTurn.fields_filled` contract have been removed.
+
+Verified causes:
+
+- The old model tool schema exposed `fields_filled` as an arbitrary object, without the accepted case-field names or their meanings. Simulating the plausible keys `industry` and `competitors` caused the merge to discard all evidence and return a 0% score.
+- Competitors had no field in the target model or tracker.
+- A minimum of three narration turns kept the visible stage behind the questions being asked.
+- The first live evaluation of the replacement exposed an overly strict interpretation of “situation”: the model wanted extra background despite an explicit performance problem. Field-specific minimum criteria and examples now separate situation, client, decision and cause.
+
+Implemented behavior:
+
+- A typed `CasePatch` exposes all 19 named fields and their descriptions. Unknown keys fail validation instead of disappearing silently.
+- One Answer Assessor extracts every supported field from the latest answer, including useful tangents, with complete/partial/unavailable/conflict status. Quotes must occur in the latest contributor message. Partial answers and supporting evidence are retained.
+- The engine merges evidence, records source turn/question, recomputes score, keeps unresolved mandatory questions active, and selects the next ranked question. A separate Question Framer receives that post-merge selection and saved facts. Invalid or failed framing uses the deterministic selected-question fallback.
+- Setting (client + situation), decision and cause are mandatory and total 70%. Optional facts cannot compensate for a missing mandatory criterion. At the threshold the forced loop stops; optional questions begin through **Improve fidelity**.
+- The API returns saved facts, question tracker, active question, evidence tracker and readiness together. The browser shows values for all 19 fields, including competitors. The full ledger is scrollable and initially expanded.
+- Version 2 state retains transcript, unsent draft, attempts, field assessments and fact provenance. Legacy values are marked as legacy evidence; phase no longer determines routing. Question states and score are derived on load rather than persisted as another independent authority.
+- Explicit corrections supersede earlier evidence. Unresolved contradictions and retractions are excluded from the synthesis snapshot. An assessor failure leaves both saved and in-memory state unchanged; a framer failure preserves the accepted answer and uses fallback wording.
+
+Verification:
+
+- `tests/test_contribution_loop.py` replays the reported overview → “answer the question” → client/competitor → two wrong paths → decision → cause sequence through the real engine, authenticated API, persistence and reload. Only provider I/O is scripted. It also covers partial answers, corrections, conflicts, ownership, failure rollback, typed schema, optional unknowns and migration.
+- The opt-in `scripts/eval_contribution.py` runs six synthetic conversational turns against the configured live model. Its final successful trace is `docs/evals/contribution-live-replay.json`: **10% → 10% → 25% → 35% → 55% → 80%**, then submission ready. It asserts immediate situation capture, no fabricated progress for meta requests, captured competitors/two traps, skipping an answered case setting, and stable reload after every turn.
+- Browser QA against an isolated test database: visible score/field changes, Submit and Improve fidelity, refresh/resume, optional cannot-recall, unsent draft restoration, and 375 px layout without horizontal overflow or console errors.
+- Full regression suite: 444 passed, 1 expected failure. Contribution suites: 66 passed. JavaScript syntax check and `git diff --check` passed.
+
+Limits: evidence-quote validation verifies provenance, not semantic entailment. Field mapping and completeness still require model judgment; the live replay is a repeatable evaluation, not a claim of perfect extraction for every wording. No new dependency, database migration, push or deployment is required by this patch. Practice-case orchestration is unchanged.
+
+The remaining sections preserve the original design requirements for reference; these historical requirements are superseded by the version 3 record linked above.
 
 ## 1. Architectural decision
 
@@ -462,6 +494,6 @@ Implementation should be sequential. Catalogue and state contracts determine the
 - Model-selected topic changes outside the ranked catalogue.
 - Optimizing back to one LLM call before assessor and framer quality is measured.
 
-## 15. Approval gate
+## 15. Authorization
 
-No application implementation should begin until this replacement architecture is approved or revised.
+The 2026-09-09 instruction to make this architecture work and reproduce the stalled tracker authorized implementation. The implementation and verification record above supersedes the earlier proposal-only status.

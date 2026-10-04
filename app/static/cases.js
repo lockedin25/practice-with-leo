@@ -254,6 +254,8 @@ function matchesQuery(item, query) {
     SOURCE_NAMES[sourceOf(item)] || "",
     item.difficulty,
     (item.skills_tested || []).join(" "),
+    (item.firm_tags || []).join(" "),
+    item.contributor_label || "",
   ]
     .join(" ")
     .toLowerCase();
@@ -381,6 +383,7 @@ function caseCard(item, options = {}) {
       ${skills ? `<div class="case-skills">${skills}</div>` : ""}
 
       <p class="case-origin">${origin.join(" · ")}</p>
+      <p class="case-origin">${esc(item.contributor_label || "Contributor not recorded")} · ${(item.firm_tags || []).map(esc).join(" · ") || "Firm not recorded"} · ${item.contributed_at ? esc(new Date(item.contributed_at).toLocaleDateString()) : "Contribution date not recorded"}</p>
       <div class="case-foot">
         ${primaryAction}
         ${debrief}

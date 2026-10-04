@@ -26,11 +26,13 @@ from app.auth import router as auth_router
 from app.case_runtime import CaseCatalogue, CaseWorld, InterviewSession
 from app.case_author import (
     ExtractionState,
+    ExtractedCase,
     ExtractionUnavailable,
     SYNTHESIS_THRESHOLD,
     create_case_author,
     describe_missing,
 )
+from app.contribution import MAX_CONTRIBUTOR_TURNS
 from app.case_synthesis import SynthesisUnavailable, create_case_synthesiser
 from app.case_validator import validate_package
 from app.case_solver import SolverUnavailable, create_case_solver
@@ -137,6 +139,8 @@ EVALUATIONS = EvaluationStore(DATABASE_PATH)
 # and in git, where the corpus rights discipline can review them.
 CASES = CaseStore(DATABASE_PATH)
 CONTRIBUTIONS = ContributionStore(DATABASE_PATH)
+from app.case_provenance import backfill as backfill_case_provenance
+backfill_case_provenance(DATABASE_PATH)
 # All three degrade to None without a provider key, matching how voice and the
 # evaluator behave: contribution becomes unavailable rather than breaking boot.
 CASE_AUTHOR = create_case_author()
@@ -387,6 +391,16 @@ def login_page(request: Request) -> Response:
     return TEMPLATES.TemplateResponse(request, "login.html", _shell_context(request))
 
 
+@app.get("/admin/contributions")
+def admin_contributions_page(request: Request) -> Response:
+    user = current_user(request)
+    if user is None:
+        return RedirectResponse("/login?next=/admin/contributions", status_code=303)
+    if not user.is_admin:
+        return RedirectResponse("/practice", status_code=303)
+    return TEMPLATES.TemplateResponse(request, "admin_contributions.html", _shell_context(request))
+
+
 @app.get("/admin")
 def admin_console(request: Request) -> Response:
     user = current_user(request)
@@ -448,7 +462,17 @@ def start_attempt(request: StartAttemptRequest, user: User = Depends(require_use
             detail = "This case already has an open attempt. Resume it or reset the test before starting again."
         else:
             detail = "You have already completed this case. Reset the test before attempting it again."
-        raise HTTPException(status_code=409, detail=detail)
+        # ``attempt_id`` lets a caller that lands here via a stale/reloaded
+        # catalogue link (rather than an intentional new attempt) resume the
+        # open session instead of dead-ending on the conflict.
+        return JSONResponse(
+            status_code=409,
+            content={
+                "detail": detail,
+                "error": "attempt_conflict",
+                "attempt_id": progress["latest_attempt_id"] if progress["status"] == "in_progress" else None,
+            },
+        )
 
     session = InterviewSession(id=str(uuid4()), case=case, mode=request.mode)
     session.add_interviewer_turn(_voice_intro_transcript(session))
@@ -728,15 +752,18 @@ class ContributionPauseRequest(BaseModel):
 def _contribution_view(record: dict[str, object]) -> dict[str, object]:
     """Contributor-facing projection of an extraction conversation.
 
-    Deliberately excludes nothing sensitive, because there is nothing sensitive
-    here: it is the contributor's own account of their own interview. What it does
-    do is surface progress, since a long conversation with no visible end is what
-    makes people abandon one.
+    Ownership is checked before this projection is returned. Progress, question
+    focus and transcript all come from the same saved contribution state.
     """
     state = ExtractionState.from_dict(dict(record["state"]))  # type: ignore[arg-type]
-    missing = state.extracted.missing_required()
-    missing_anchors = state.extracted.missing_synthesis_anchors()
+    tracker = state.completion_tracker()
+    missing = [row["key"] for row in tracker if row["required_for_complete"] and row["status"] != "captured"]
+    missing_anchors = [row["key"] for row in tracker if row["mandatory_for_submit"] and row["status"] != "captured"]
     can_submit = state.can_submit()
+    # The cap is what stops a conversation running long, so it is shown counting
+    # down rather than only stated once: a contributor deciding how much detail
+    # to give needs to know how many replies are actually left.
+    turns_remaining = max(MAX_CONTRIBUTOR_TURNS - state.turns, 0)
     return {
         "id": record["id"],
         "status": record["status"],
@@ -750,11 +777,22 @@ def _contribution_view(record: dict[str, object]) -> dict[str, object]:
         "missing_label": describe_missing(missing),
         "missing_anchors": missing_anchors,
         "missing_anchors_label": describe_missing(missing_anchors),
-        "completion_tracker": state.extracted.completion_tracker(),
+        "mode": state.mode,
+        "active_question": state.active_question(),
+        "question_tracker": state.question_tracker(),
+        "progress_score": state.discussion_progress(),
+        "discussions_remaining": len(ExtractedCase.model_fields) - len(state.closed_fields),
+        "completion_tracker": tracker,
+        "extracted": state.extracted.model_dump(),
         "fully_complete": not missing,
+        "turns_remaining": turns_remaining,
+        "turn_limit": MAX_CONTRIBUTOR_TURNS,
         "completion_rule": (
-            "Client and industry context, the decision question, the underlying mechanism, "
-            "the turning-point insight, and two plausible wrong answers."
+            "Facts are captured immediately. Leo asks each remaining section once and moves on "
+            f"after your answer. {turns_remaining} of {MAX_CONTRIBUTOR_TURNS} replies left."
+            if turns_remaining
+            else f"Facts are captured immediately. You have used all {MAX_CONTRIBUTOR_TURNS} replies, "
+            "so the conversation is closed."
         ),
         # Compatibility alias for the first contribution client. Readiness is now
         # a weighted runtime decision, never the model's stored opinion.
@@ -846,12 +884,27 @@ def contribution_turn(
     except ExtractionUnavailable:
         raise HTTPException(status_code=502, detail="That did not go through. Try sending it again.")
 
-    CONTRIBUTIONS.save_state(session_id, state.as_dict())
-    return _contribution_view(CONTRIBUTIONS.get(session_id))
+    saved_state = state.as_dict()
+    try:
+        CONTRIBUTIONS.save_state(session_id, saved_state)
+    except sqlite3.OperationalError as error:
+        if db.is_busy_error(error):
+            raise db.DatabaseBusy("the contribution save waited out the database busy timeout") from error
+        raise HTTPException(
+            status_code=503,
+            detail="Your answer could not be saved. It is still in the composer; please try again.",
+        ) from error
+    # The write has already succeeded. Project the committed state directly so
+    # an unnecessary second SQLite connection cannot turn success into a 500.
+    return _contribution_view({**record, "state": saved_state})
+
+
+class ContributionSubmitRequest(BaseModel):
+    public_credit: bool = False
 
 
 @app.post("/api/contributions/{session_id}/submit")
-def submit_contribution(session_id: str, user: User = Depends(require_user)) -> dict[str, object]:
+def submit_contribution(session_id: str, submission: ContributionSubmitRequest = ContributionSubmitRequest(), user: User = Depends(require_user)) -> dict[str, object]:
     """Synthesise, validate, and queue for review. Never publishes."""
     if CASE_SYNTHESISER is None:
         raise HTTPException(status_code=503, detail="Contribution is not available right now.")
@@ -861,11 +914,11 @@ def submit_contribution(session_id: str, user: User = Depends(require_user)) -> 
 
     state = ExtractionState.from_dict(dict(record["state"]))  # type: ignore[arg-type]
     if not state.can_submit():
-        missing_anchors = state.extracted.missing_synthesis_anchors()
+        missing_anchors = [row["key"] for row in state.completion_tracker() if row["mandatory_for_submit"] and row["status"] != "captured"]
         if missing_anchors:
             needed = describe_missing(missing_anchors)
         else:
-            needed = "one more concrete detail about the situation, turning point, traps, or numbers"
+            needed = "a follow-up on every section, until you explicitly confirm there is nothing more to add"
         raise HTTPException(
             status_code=422,
             detail=(
@@ -875,10 +928,12 @@ def submit_contribution(session_id: str, user: User = Depends(require_user)) -> 
         )
 
     try:
-        package = CASE_SYNTHESISER.synthesise(state.extracted, contributor_id=user.id)
+        package = CASE_SYNTHESISER.synthesise(state.synthesis_draft(), contributor_id=user.id)
     except SynthesisUnavailable:
         raise HTTPException(status_code=502, detail="The case could not be assembled. Try again.")
 
+    from app.case_provenance import stamp_submission
+    stamp_submission(package, user=user, state=state, public_credit=submission.public_credit)
     verdict = validate_package(package)
     package["validation"] = verdict.as_dict()
     case_id = str(package["case"]["case_id"])

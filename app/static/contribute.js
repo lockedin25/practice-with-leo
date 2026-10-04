@@ -25,7 +25,7 @@ const els = {
   done: document.querySelector("#done-panel"),
 };
 
-const PHASES = ["narration", "structure", "quantification", "teeth", "playback"];
+
 
 let sessionId = null;
 let busy = false;
@@ -66,13 +66,11 @@ function renderThread(messages) {
 }
 
 function renderCompletionTracker(view) {
-  if (view.fully_complete) {
-    els.trackerSummary.textContent = "Fully reconstructed";
-  } else if (view.can_submit) {
-    els.trackerSummary.textContent = "Ready to submit";
+  if (view.can_submit) {
+    els.trackerSummary.textContent = "Ready for admin review";
   } else {
-    const captured = Math.round((view.sufficiency_score || 0) * 100);
-    els.trackerSummary.textContent = `${captured}% of 70%`;
+    const captured = Math.round((view.progress_score || 0) * 100);
+    els.trackerSummary.textContent = `${captured}% of sections reviewed`;
   }
   els.completionRule.textContent = view.completion_rule || "";
   els.trackerList.replaceChildren(
@@ -81,17 +79,14 @@ function renderCompletionTracker(view) {
       const copy = node("div", "tracker-copy");
       copy.append(
         node("span", "tracker-label", criterion.label),
-        node("span", "tracker-progress", criterion.progress)
+        node("span", "tracker-progress", criterion.progress),
+        node("span", "tracker-progress", Array.isArray(criterion.value) ? criterion.value.join(" · ") : criterion.value || "")
       );
-      const role = criterion.mandatory_for_submit
-        ? "Mandatory anchor"
-        : criterion.required_for_complete
-          ? "Required for complete"
-          : "Supporting evidence";
+      const role = criterion.discussion_complete ? "Discussion complete" : "Follow-up required";
       item.append(
         node("span", "tracker-mark", criterion.status === "captured" ? "✓" : criterion.status === "partial" ? "◐" : "○"),
         copy,
-        node("span", "tracker-role", `${role} · ${Math.round(criterion.weight * 100)}%`)
+        node("span", "tracker-role", role)
       );
       return item;
     })
@@ -100,27 +95,23 @@ function renderCompletionTracker(view) {
 
 function renderProgress(view) {
   els.progress.hidden = false;
-  const reached = PHASES.indexOf(view.phase);
-  [...els.track.querySelectorAll(".phase-step")].forEach((step, index) => {
-    step.classList.toggle("is-done", index < reached);
-    step.classList.toggle("is-current", index === reached);
-  });
+  els.track.replaceChildren(...(view.question_tracker || []).map((question) => {
+    const current = view.active_question?.id === question.id;
+    const resolved = ["complete", "unavailable"].includes(question.status);
+    const item = node("li", `phase-step${resolved ? " is-done" : ""}${current ? " is-current" : ""}`);
+    item.append(node("span", "", `${question.label} · ${question.status === "complete" ? "Reviewed" : question.status === "unavailable" ? "Not recalled" : current ? "Current focus" : question.status === "partial" ? "In progress" : "Pending"}`));
+    return item;
+  }));
   renderCompletionTracker(view);
 
-  if (view.can_submit) {
-    const captured = Math.round((view.sufficiency_score || 0) * 100);
-    els.missing.textContent = (view.missing || []).length
-      ? `Enough to submit (${captured}% captured). Leo can synthesize the remaining details, or you can keep answering to improve fidelity.`
-      : "Everything essential is captured. Submit whenever you are ready.";
-    return;
+  const captured = Math.round((view.progress_score || 0) * 100);
+  const facts = (view.completion_tracker || []).filter(row => Array.isArray(row.value) ? row.value.length : row.value).length;
+  if (view.active_question) {
+    const focus = view.active_question;
+    els.missing.textContent = `${facts} fields captured · ${captured}% reviewed${view.can_submit ? " · Ready to submit" : ""}. Current focus: ${focus.label}. ${focus.missing_facets.length ? `Still needed: ${focus.missing_facets.join("; ")}.` : "Tell the story once; Leo will record every useful detail."}`;
+  } else {
+    els.missing.textContent = view.can_submit ? `${facts} fields captured · All sections reviewed. Submit when you are ready.` : "Every section has been discussed, but the core case details are still incomplete. Save your draft or add those details when you recall them.";
   }
-  if ((view.missing_anchors || []).length) {
-    els.missing.textContent = `Still needed before Leo can build the case: ${view.missing_anchors_label}.`;
-    return;
-  }
-  const captured = Math.round((view.sufficiency_score || 0) * 100);
-  const threshold = Math.round((view.sufficiency_threshold || 0.7) * 100);
-  els.missing.textContent = `Almost ready (${captured}% captured; ${threshold}% needed). One more concrete detail about the situation, turning point, traps, or numbers will unlock submission.`;
 }
 
 function render(view) {
@@ -190,6 +181,8 @@ async function send(event) {
   } catch (error) {
     /* Put their words back in the box. Losing a long answer to a failed request
      * is the fastest way to lose the contributor as well. */
+    pending.remove();
+    els.thread.querySelector(".turn-thinking")?.remove();
     els.input.value = content;
     showError(error.message);
   } finally {
@@ -204,6 +197,7 @@ async function submit() {
   try {
     const result = await request(`/api/contributions/${encodeURIComponent(sessionId)}/submit`, {
       method: "POST",
+      body: JSON.stringify({public_credit: document.querySelector("#public-credit").checked}),
     });
     els.composer.hidden = true;
     els.progress.hidden = true;

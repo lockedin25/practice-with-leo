@@ -108,9 +108,10 @@ const el = {
 /* --- API ---------------------------------------------------------------- */
 
 class ApiError extends Error {
-  constructor(message, status) {
+  constructor(message, status, body) {
     super(message);
     this.status = status;
+    this.body = body || {};
   }
 }
 
@@ -126,7 +127,7 @@ async function request(url, options = {}) {
   }
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    throw new ApiError(body.detail || "Something went wrong. Please try again.", response.status);
+    throw new ApiError(body.detail || "Something went wrong. Please try again.", response.status, body);
   }
   return response.json();
 }
@@ -1185,6 +1186,26 @@ async function boot() {  showTranscriptState("Connecting you to Leo…");
     renderAttempt(attempt);
     el.input.focus();
   } catch (error) {
+    // A conflict here means this exact case is already open under an attempt
+    // id we didn't have locally (another tab, a cleared/other-device session).
+    // Resume that attempt instead of dead-ending the candidate on the 409.
+    const openAttemptId = error.status === 409 ? error.body?.attempt_id : null;
+    if (openAttemptId) {
+      try {
+        const attempt = await request(`/api/attempts/${openAttemptId}`);
+        persistSession(attempt.id, Date.now(), attempt.case.id);
+        renderAttempt(attempt);
+        if (attempt.ended) {
+          window.location.href = `/attempts/${attempt.id}/debrief`;
+          return;
+        }
+        toast("Picked up where you left off.");
+        el.input.focus();
+        return;
+      } catch {
+        /* Fall through to the conflict error below. */
+      }
+    }
     el.title.textContent = "Case unavailable";
     showTranscriptState(error.message || "The case could not be loaded.", { spinner: false, retry: true });
   }

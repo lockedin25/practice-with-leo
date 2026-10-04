@@ -20,6 +20,7 @@ import os
 import secrets
 import sqlite3
 import time
+from contextlib import AbstractContextManager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -246,8 +247,8 @@ class AccountStore:
             ).fetchone()
         return row[0] if row else None
 
-    def _connect(self) -> sqlite3.Connection:
-        return db.connect(self._database_path)
+    def _connect(self) -> AbstractContextManager[sqlite3.Connection]:
+        return db.transaction(self._database_path)
 
 
 def _user_from_row(row: tuple[Any, ...]) -> User:

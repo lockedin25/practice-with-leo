@@ -445,7 +445,12 @@ def _check_safety(package: dict[str, Any], result: ValidationResult) -> None:
     published verbatim. That is the defensible position on recalled interview
     content, and it only holds if it is enforced rather than assumed.
     """
-    texts = _all_text(package)
+    # Private recall evidence and reviewer notes are never released to candidates.
+    # Firm/author attribution is explicitly displayed as provenance, not a real
+    # company impersonated by the fictional case world.
+    authored = {key: value for key, value in package.items() if key not in {"contribution", "review_history", "review_notes", "validation", "solvability"}}
+    authored["case"] = {key: value for key, value in (package.get("case") or {}).items() if key != "provenance"}
+    texts = _all_text(authored)
     joined = "\n".join(texts)
     lowered = joined.lower()
 

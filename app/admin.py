@@ -72,7 +72,7 @@ def _attempt_rows(database_path: Path) -> list[dict[str, Any]]:
         LIMIT ?
     """
     try:
-        with db.connect(database_path) as connection:
+        with db.transaction(database_path) as connection:
             raw = connection.execute(query, (ROW_LIMIT,)).fetchall()
     except sqlite3.OperationalError:
         # Fallback if evaluations or user columns are structured differently
@@ -86,7 +86,7 @@ def _attempt_rows(database_path: Path) -> list[dict[str, Any]]:
             LIMIT ?
         """
         try:
-            with db.connect(database_path) as connection:
+            with db.transaction(database_path) as connection:
                 legacy_raw = connection.execute(fallback_query, (ROW_LIMIT,)).fetchall()
                 raw = [
                     (r[0], r[1], r[2], r[5], r[3], r[4], r[5], r[6], r[7], r[8], None, None, None)
@@ -171,7 +171,7 @@ def _user_rows(database_path: Path) -> list[dict[str, Any]]:
         LIMIT ?
     """
     try:
-        with db.connect(database_path) as connection:
+        with db.transaction(database_path) as connection:
             raw = connection.execute(query, (ROW_LIMIT,)).fetchall()
     except sqlite3.OperationalError:
         return []
@@ -400,10 +400,13 @@ def _cases(request: Request):
 def list_contributions(request: Request) -> dict[str, Any]:
     """The review queue, plus the full history of every contributed case."""
     store = _cases(request)
-    return {
-        "queue": store.list_for_review(),
-        "all": store.list_all_versions(),
-    }
+    from app.contribution_review import summary
+    records = [summary(request, r) for r in store.list_all_versions()]
+    latest = {}
+    for record in records:
+        if record["case_id"] not in latest or record["version"] > latest[record["case_id"]]["version"]:
+            latest[record["case_id"]] = record
+    return {"queue": [r for r in latest.values() if r["status"] in ("submitted", "validated", "needs_changes", "draft")], "all": records}
 
 
 @router.get("/contributions/{case_id}/{version}")
@@ -414,16 +417,8 @@ def read_contribution(request: Request, case_id: str, version: int) -> dict[str,
     review: you cannot judge whether a case is worth publishing without seeing the
     answer it is built around.
     """
-    package = _cases(request).get_package(case_id, version)
-    if package is None:
-        raise HTTPException(status_code=404, detail="Case version not found")
-    return {
-        "case_id": case_id,
-        "version": version,
-        "package": package,
-        "validation": package.get("validation"),
-        "solvability": package.get("solvability"),
-    }
+    from app.contribution_review import details
+    return details(request, case_id, version)
 
 
 @router.post("/contributions/{case_id}/{version}/solve")
@@ -478,6 +473,7 @@ def run_solvability_probe(request: Request, case_id: str, version: int) -> dict[
 class ReviewDecision(BaseModel):
     decision: Literal["publish", "return", "withdraw"]
     note: str = Field(default="", max_length=2_000)
+    expected_revision: str | None = None
 
 
 @router.post("/contributions/{case_id}/{version}/decide")
@@ -492,7 +488,16 @@ def decide_contribution(
     if package is None:
         raise HTTPException(status_code=404, detail="Case version not found")
 
+    from app.contribution_review import check_revision
+    check_revision(package, decision.expected_revision)
     if decision.decision == "publish":
+        from app.case_validator import validate_package
+        from app.case_runtime import CaseWorld
+        package["validation"] = validate_package(package).as_dict()
+        try:
+            CaseWorld.from_mapping(package["case"], package["facts"], package["conversation_policy"], version=version)
+        except Exception as error:
+            raise HTTPException(status_code=409, detail=f"This case cannot run: {error}")
         # Refuse to publish over an unresolved error. The reviewer can still
         # return it, but there is no route to a candidate for a package whose own
         # numbers do not close or that carries personal data.
@@ -509,13 +514,15 @@ def decide_contribution(
     else:
         status = "unpublished"
 
+    from app.accounts import current_user
+    package.setdefault("review_history", []).append({"action":decision.decision, "reviewer_id":current_user(request).id, "at":datetime.now(timezone.utc).isoformat()})
     if decision.note.strip():
         package.setdefault("review_notes", []).append(decision.note.strip())
         store.save_package(
             case_id, package, status=status, contributor_id=None, version=version
         )
     else:
-        store.set_status(case_id, version, status)
+        store.save_package(case_id, package, status=status, contributor_id=None, version=version)
 
     # Reconcile immediately so a decision takes effect without a deploy, in both
     # directions: publishing adds the case and withdrawing removes it.
@@ -529,3 +536,41 @@ def _status_of(store, case_id: str, version: int) -> str:
         if record["case_id"] == case_id and record["version"] == version:
             return str(record["status"])
     return "submitted"
+
+
+class ReviewDraftEdit(BaseModel):
+    expected_revision: str
+    case: dict[str, Any]
+    facts: dict[str, Any]
+    conversation_policy: dict[str, Any]
+
+
+@router.post("/contributions/{case_id}/{version}/draft")
+def edit_contribution_draft(request: Request, case_id: str, version: int, edit: ReviewDraftEdit):
+    from app.contribution_review import save_draft
+    return save_draft(request, case_id, version, edit.model_dump(exclude={"expected_revision"}), edit.expected_revision, "edited")
+
+
+class AugmentRequest(BaseModel):
+    expected_revision: str
+
+
+@router.post("/contributions/{case_id}/{version}/augment")
+def augment_contribution(request: Request, case_id: str, version: int, body: AugmentRequest):
+    import app.main as main
+    from app.contribution_review import details, check_revision, original_state, save_draft
+    from app.case_author import ExtractionState
+    from app.case_synthesis import SynthesisUnavailable
+    view = details(request, case_id, version)
+    check_revision(view["package"], body.expected_revision)
+    original = original_state(request, view["package"], case_id)
+    if original is None:
+        raise HTTPException(status_code=422, detail="The original contribution was not retained. Edit the case sections manually.")
+    if main.CASE_SYNTHESISER is None:
+        raise HTTPException(status_code=503, detail="AI augmentation is not configured.")
+    state = ExtractionState.from_dict(original)
+    try:
+        proposal = main.CASE_SYNTHESISER.synthesise(state.synthesis_draft(), contributor_id=view["contributor_id"] or "unknown")
+    except SynthesisUnavailable:
+        raise HTTPException(status_code=502, detail="AI augmentation failed. Your current draft has been preserved.")
+    return save_draft(request, case_id, version, proposal, body.expected_revision, "ai_augmented")

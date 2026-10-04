@@ -192,6 +192,10 @@ class ProvenanceModel(BaseModel):
         default=None, description="Month precision only, as YYYY-MM. Never a full date."
     )
     contributor_id: str | None = Field(default=None)
+    contributor_name: str | None = None
+    contributed_at: str | None = None
+    firm_tags: list[str] = Field(default_factory=list)
+    metadata_source: str = "not_recorded"
     attribution_mode: Literal["anonymous", "pseudonymous", "public"] = Field(
         default="pseudonymous",
         description="Only 'public' contributors may ever be named on a public surface.",

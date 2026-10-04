@@ -72,6 +72,10 @@ class CaseWorld:
     # mid-interview. Packages on disk are always version 1; only contributed cases
     # in the database ever go higher.
     version: int = 1
+    contributor_label: str = "Curated collection"
+    contributor_name: str | None = None
+    contributed_at: str | None = None
+    firm_tags: tuple[str, ...] = ()
 
     @classmethod
     def from_reservoir(cls, root: Path, case_id: str | None = None) -> "CaseWorld":
@@ -108,6 +112,8 @@ class CaseWorld:
         case is compiled by exactly the same code, and therefore obeys exactly the
         same disclosure rules, as one shipped in the repository.
         """
+        from app.case_provenance import public_metadata
+        metadata = public_metadata(case_data)
         opening = case_data["candidate_opening"]
         phases = tuple(
             Phase(
@@ -144,6 +150,10 @@ class CaseWorld:
             phases=phases,
             facts=facts,
             source=_source_of(case_data),
+            contributor_label=metadata["contributor_label"],
+            contributor_name=metadata["contributor_name"],
+            contributed_at=metadata["contributed_at"],
+            firm_tags=tuple(metadata["firm_tags"]),
             version=int(case_data.get("version", version) or version),
         )
 
@@ -161,6 +171,10 @@ class CaseWorld:
             "industry": self.industry,
             "difficulty": self.difficulty,
             "source": self.source,
+            "contributor_label": self.contributor_label,
+            "contributor_name": self.contributor_name,
+            "contributed_at": self.contributed_at,
+            "firm_tags": list(self.firm_tags),
             "version": self.version,
             "supported_durations": self.supported_durations,
             "skills_tested": self.skills_tested,

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Review contributed cases · Leo{% endblock %}
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ asset_url('admin.css') }}" />
+<link rel="stylesheet" href="{{ asset_url('admin_contributions.css') }}" />
+{% endblock %}
+{% block content %}
+<main class="console shell" aria-label="Contribution review">
+  <header class="console-head">
+    <div><p class="eyebrow">Admin review</p><h1>Contributed cases</h1><p class="muted">Compare the original recollection with the AI draft, refine it, and approve it for the library.</p></div>
+    <div class="console-head-actions"><a class="btn btn-secondary" href="/admin">Admin overview</a><button class="btn btn-secondary" id="review-refresh">Refresh</button></div>
+  </header>
+  <p id="review-status" role="status" aria-live="polite"></p>
+  <section class="card review-queue" aria-label="Submitted cases">
+    <label for="review-filter">Show</label>
+    <select id="review-filter"><option value="queue">Awaiting review</option><option value="all">All case versions</option></select>
+    <div class="table-scroll"><table class="data-table"><thead><tr><th>Case</th><th>Contributor</th><th>Firm</th><th>Contributed</th><th>Status</th><th></th></tr></thead><tbody id="review-rows"></tbody></table></div>
+  </section>
+  <section id="review-detail" hidden>
+    <header class="console-head review-detail-head"><div><h2 id="review-title"></h2><p id="review-meta"></p></div></header>
+    <div class="review-actions">
+      <button class="btn btn-secondary" id="review-augment">Regenerate AI draft</button>
+      <button class="btn btn-secondary" id="review-save">Save edited draft</button>
+      <button class="btn btn-primary" id="review-approve">Approve for library</button>
+      <button class="btn btn-secondary" id="review-return">Return for changes</button>
+      <button class="btn btn-secondary" id="review-withdraw">Withdraw from library</button>
+    </div>
+    <label class="review-note">Review note<textarea id="review-note" rows="2" maxlength="2000" placeholder="Explain your decision or what still needs work."></textarea></label>
+    <div id="review-validation" class="card" aria-label="Validation results"></div>
+    <div class="review-columns">
+      <section><h2>Contributor’s original account</h2><p class="muted">These answers and evidence stay unchanged when you edit or regenerate the AI draft.</p><div id="review-original"></div><details class="card"><summary>Full contribution conversation</summary><div id="review-transcript"></div></details></section>
+      <section><h2>AI-augmented case draft</h2><p class="muted">Review each section below. Saving or regenerating creates a new version; publication requires your approval.</p><div id="review-editors"></div></section>
+    </div>
+  </section>
+</main>
+{% endblock %}
+{% block scripts %}<script src="{{ asset_url('admin_contributions.js') }}"></script>{% endblock %}

@@ -1,0 +1,178 @@
+[
+  {
+    "message": "The client was a cold-chain logistics operator delivering food and pharmaceuticals. Revenue grew but margins fell. The interviewer wanted us to explain the falling margins and recommend how to restore profitability over the next year. The cause was a mix shift into sparse pharma routes. Fewer deliveries per trip raised cost per kilo but prices were still based on dense food routes, so the growth reduced margins. Local competitors undercut prices on dense routes. Two wrong paths were blaming fuel inflation without checking route density, and exiting pharma rather than repricing sparse routes. The insight was that route density, not revenue, determines unit economics. This was a Bain interview in August 2026.",
+    "active_field": "client_and_industry",
+    "review_progress": 0.0,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "Beyond being a cold-chain logistics operator delivering food and pharmaceuticals, what else do you recall about the client's size, geographic market, or fleet (or you can say 'nothing more' if that covers it)?"
+  },
+  {
+    "message": "It also served regional hospitals through dedicated delivery contracts.",
+    "active_field": "client_and_industry",
+    "review_progress": 0.0,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "Is there anything else you recall about the client or industry context, such as their geographic footprint, fleet size, or market position, or does that cover everything?"
+  },
+  {
+    "message": "Answer the question.",
+    "active_field": "client_and_industry",
+    "review_progress": 0.0,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "Because I am documenting your specific interview experience, I rely on your recollection: do you remember any further details about the client's geography, fleet, or market context, or is there nothing more to add?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "situation",
+    "review_progress": 0.0526,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "You noted that revenue grew while margins fell; do you recall any specific figures, percentages, or additional details about how this performance problem unfolded, or is there nothing more to add?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "decision_question",
+    "review_progress": 0.1053,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "Beyond explaining the falling margins and recommending how to restore profitability, did the interviewer ask for specific target figures or any secondary questions, or is there nothing more to add?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "core_mechanism",
+    "review_progress": 0.1579,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "Regarding the mix shift into sparse pharma routes raising costs per kilo while prices stayed fixed, do you recall any additional specifics on the cost structure or how the mechanism worked, or is there nothing more to add?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "competitors",
+    "review_progress": 0.2105,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "You mentioned local competitors were undercutting prices on dense routes; do you recall any other details about these competitors or the competitive landscape, or is there nothing more to add?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "time_horizon",
+    "review_progress": 0.2632,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "You noted the turnaround was targeted over the next year; were there any specific interim milestones or timelines mentioned, or is there nothing more to add on the time horizon?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "primary_metric",
+    "review_progress": 0.3158,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "What primary metric or specific measure of profitability (such as EBITDA margin, operating profit margin, or profit per route) did the interviewer focus on to evaluate success, or do you not recall?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "given_upfront",
+    "review_progress": 0.3684,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "At the start of the case, what specific background data, baseline metrics, or exhibits did the interviewer share upfront, or do you not recall?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "had_to_ask_for",
+    "review_progress": 0.4211,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "What specific data, metrics, or exhibits (such as route density, cost per kilo, or pricing differences between food and pharma) did you have to proactively ask the interviewer for, or do you not recall?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "quantities",
+    "review_progress": 0.4737,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "What specific numbers or directional magnitudes do you recall from the case, such as the revenue growth rate, the extent of the margin decline, or differences in cost per kilo and stops per route between food and pharma?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "pivotal_insight",
+    "review_progress": 0.5263,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "Beyond the insight that route density rather than revenue drives unit economics, what else can you recall about the pivotal realization or data point that unlocked the case, or is there nothing more to add?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "common_traps",
+    "review_progress": 0.5789,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "Beyond blaming fuel inflation or recommending an outright exit from pharma, what other plausible wrong turns or traps could a candidate fall into in this case, or is there nothing more to add?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "interviewer_pushback",
+    "review_progress": 0.6316,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "During the case, what specific assumptions, calculations, or recommendations did the interviewer challenge, correct, or push you to reconsider, or do you not recall?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "what_it_tested",
+    "review_progress": 0.6842,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "What core skills or analytical capabilities do you think this case was primarily testing (such as decomposing unit economics, analyzing mix shift, or cost-to-serve pricing), or is there nothing specific you recall?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "takeaway_lesson",
+    "review_progress": 0.7368,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "Looking back at this case, what was your main personal takeaway or lesson about approaching profitability problems, or what would you do differently if you encountered it again (or feel free to say you cannot recall)?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "firm",
+    "review_progress": 0.7895,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "You noted that this interview was with Bain; is there any specific practice area, division, or additional detail about the firm to add, or is there nothing more on this?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "interview_round",
+    "review_progress": 0.8421,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "Which interview round was this case used in (for example, first round, second/final round, or a screener), or do you not recall/prefer not to share?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "geography",
+    "review_progress": 0.8947,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "Which office location, country, or region was this interview for, or do you prefer not to share/cannot recall?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "interview_month",
+    "review_progress": 0.9474,
+    "evidence_score": 0.9,
+    "can_submit": false,
+    "reply": "You noted August 2026 for the interview month; is there anything else you remember about the timing or date of the interview, or is there nothing more to add?"
+  },
+  {
+    "message": "Nothing more.",
+    "active_field": "",
+    "review_progress": 1.0,
+    "evidence_score": 0.9,
+    "can_submit": true,
+    "reply": "We have reviewed every section and recorded where you have nothing more to add. You can now submit this case for admin review."
+  }
+]
