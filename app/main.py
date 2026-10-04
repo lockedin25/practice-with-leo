@@ -1,3 +1,5 @@
+"""HTTP surface: page routes, the attempt, voice and contribution APIs, and catalogue startup."""
+
 from __future__ import annotations
 
 import hmac

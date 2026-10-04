@@ -1,5 +1,7 @@
 # E2E Test Infra: MBB Case Prep V2
 
+> **Historical.** Written for the August 2026 build harness. The suite has since grown to ~470 tests; run `make test`. Current coverage is summarised in [docs/codebase-guide.md](docs/codebase-guide.md#tests).
+
 ## Test Philosophy
 - Opaque-box, requirement-driven. Derives test assertions directly from `ORIGINAL_REQUEST.md`.
 - Methodology: Category-Partition + Boundary Value Analysis (BVA) + Pairwise Combinatorial + Real-World Workload Testing.

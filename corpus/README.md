@@ -9,8 +9,10 @@ for cases that the product has a right to use, transform and present to candidat
 |---|---|---|
 | `sources/` | Rights records and source catalogues | No, unless the source licence permits it |
 | `templates/` | Authoring and ingestion templates | Yes, but only original template material |
-| `cases/` | Approved runnable case packages | Yes, only for authored or licensed cases |
+| `cases/` | Case write-ups for authoring reference (not loaded by the runtime) | Yes, only for authored or licensed cases |
 | `restricted-index/` | Minimal metadata for restricted references | No |
+| `exemplars/` | The 57 playable casebook-derived packages (`iima`, `iimb`, `iimc`, `isb`), loaded by the runtime at startup | Yes, rewritten case packages |
+| `playbooks/` | Interviewer-pattern notes distilled from source casebooks | No |
 
 ## Corpus rule
 

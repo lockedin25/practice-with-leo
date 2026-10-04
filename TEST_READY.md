@@ -1,5 +1,7 @@
 # Test Readiness Report: MBB Case Prep V2 — 10x Debrief Report Engine & Multi-School Corpus
 
+> **Historical.** A snapshot from August 2026 (167 tests). The suite has since grown to ~470 tests; run `make test`.
+
 **Generated At**: 2026-08-24T14:24:00+05:30  
 **Test Suite Status**: PASS (167 / 167 tests passed, 0 failures, 0 regressions)  
 **Execution Command**: `.venv/bin/pytest tests/`  

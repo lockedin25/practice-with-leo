@@ -12,7 +12,8 @@ index.
 
 ## V1 rules
 
-- Meridian Cold Chain is the only playable reservoir.
+- The 12 reservoirs here are all playable. The other 57 playable cases live under
+  `corpus/exemplars/`. (Originally Meridian Cold Chain was the only one.)
 - The supplied case diagnosis is immutable.
 - Augmentation fills missing qualitative context only. It does not add live
   facts, new numbers, a competing root cause, or a shortcut to the answer.

@@ -5,7 +5,7 @@
 #   https://<app>.fly.dev/auth/google/callback
 
 app = "leo-case-prep"
-primary_region = "sin"   # Singapore. Fly has no India region; see the plan.
+primary_region = "sin"   # Singapore. Fly has no India region; see docs/deployment-plan.md §3.
 
 [build]
   dockerfile = "Dockerfile"
@@ -21,6 +21,10 @@ primary_region = "sin"   # Singapore. Fly has no India region; see the plan.
 #   VOICE_OPENROUTER_MODEL, ELEVENLABS_API_KEY, ELEVENLABS_VOICE_ID,
 #   ELEVENLABS_VOICE_MODE, VOICE_ENABLED, GOOGLE_CLIENT_ID,
 #   GOOGLE_CLIENT_SECRET, OAUTH_REDIRECT_URI, ADMIN_EMAILS, SESSION_SECRET
+# Optional: ALLOWED_EMAIL_DOMAINS, VOICE_COMPLETION_TOKENS, VOICE_AUDIT_ENABLED,
+#   VOICE_AUDIT_MODEL, and for the agent voice modes only ELEVENLABS_AGENT_ID,
+#   ELEVENLABS_CUSTOM_LLM_SECRET, ELEVENLABS_CASE_TOOL_SECRET,
+#   ELEVENLABS_WEBHOOK_SECRET. .env.example documents each one.
 #
 # VOICE_ENABLED and ELEVENLABS_VOICE_MODE are not secret, but they are set that
 # way, so they are deliberately not repeated in [env] above. One value, one

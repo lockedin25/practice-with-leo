@@ -5,6 +5,10 @@ without a rewrite in between.
 
 ## 1. Critique of the plan that exists
 
+> Status, October 2026: the stale sections called out here are now marked
+> superseded, and README.md has been rewritten. This section is kept as the
+> reasoning behind the plan.
+
 There is no deployment plan. There are three fragments, and one of them is
 actively misleading.
 
@@ -141,9 +145,9 @@ production if skipped.
    `DATABASE_PATH`. The path mattered as much as the pragmas: it was a hardcoded
    constant, so a container would have written to its own ephemeral disk and lost
    everything on each deploy without erroring.
-2. **`Cache-Control` on static assets.** Currently absent, so every asset
-   revalidates on every page load. Hash the filenames or set a long max-age with
-   an explicit revalidation path.
+2. **`Cache-Control` on static assets.** *Done:* `CachedStaticFiles` in
+   `app/main.py` sets an explicit caching contract, busted per deploy by
+   `BUILD_ID` / `FLY_MACHINE_VERSION`.
 3. **Set `SESSION_SECRET` explicitly.** Without it the value is generated into the
    volume; with a volume that survives, but it must not depend on that.
 4. **Production `OAUTH_REDIRECT_URI`** plus the matching authorised redirect URI
@@ -154,8 +158,8 @@ production if skipped.
    an authenticated stranger can spend API credit, which key security does not
    defend against. The reversal is one environment variable and no redeploy of
    code, which is why it is safe to start open.
-6. **Retire the stale design section.** Mark `docs/engineering-design.md` §10
-   superseded and point it here.
+6. **Retire the stale design section.** *Done:* `docs/engineering-design.md` is
+   marked superseded.
 
 ## 5. Phase 1 — Docker
 
@@ -237,7 +241,9 @@ Enough to answer "why was that turn slow" without a debugger.
   post-hoc audit, and synthesis producing no audio.
 - **Back up the volume.** A nightly copy of the SQLite file off-machine, with one
   documented restore that has actually been run once. An untested backup is not a
-  backup, and this file holds every transcript and debrief.
+  backup, and this file holds every transcript and debrief. `scripts/backup_db.sh`
+  copies the database off the machine; scheduling it and rehearsing a restore
+  are still to do.
 
 ## 9. Scaling triggers
 
@@ -271,6 +277,6 @@ Stated plainly so it is not discovered later.
   synthetic-MediaStream harness. The browser pane blocks microphone access, so PCM
   decode, gapless playback and barge-in have not been exercised by a real voice.
   The first production smoke test is the first real test.
-- **`tests/test_case_progress.py` fails** on a `syncTimer` call removed by the
-  in-progress timer work in `app/static/app.js`. Resolve before deploying, either
+- **`tests/test_case_progress.py`** has one test marked `xfail` for a `syncTimer`
+  call removed by the in-progress timer work in `app/static/app.js`. Resolve it
   by finishing that refactor or updating the test.

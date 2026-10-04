@@ -1,137 +1,146 @@
-# Leo
+# Practice with Leo
 
-Leo is a web-based consulting case interviewer. The public landing page explains
-his approach and presents a 12-case library; the practice room remains text-first
-while the case runtime and feedback architecture mature ahead of voice.
+Leo is an AI interviewer for practising consulting case interviews (McKinsey, BCG, Bain).
+You pick a case, talk it through by typing or by voice, and get a written debrief scored
+the way a real interviewer would score you.
 
-## What is implemented
+Leo is not a chatbot that knows the answer and leaks it. Each case is a private world of
+facts, and the server decides which facts you have earned. The model only writes Leo's
+next line from the facts it has been allowed to share.
 
-- Public landing page, catalogue filters, and a responsive browser practice room.
-- Twelve original case worlds across profitability, growth, market entry, pricing,
-  operations, turnaround, M&A, public sector, digital transformation, and sustainability.
-- A server-side case runtime that controls stage progression and fact release.
-- A generic LangChain director that extracts candidate intent and selects fact IDs through structured LLM output.
-- Leo's LangChain interviewer layer converts only runtime-approved facts into the next natural-language turn.
-- A candidate-safe API projection: unreleased facts and the answer key never reach the browser or the LangChain prompt.
-- An end-attempt scorecard with evidence-based starter feedback.
-- SQLite-backed, user-scoped practice records with canonical transcripts, versioned feedback, and idempotent browser turns, so a development reload does not lose an active interview or duplicate a retried answer.
-- Google sign-in, per-candidate attempt ownership, and an admin console over every transcript and the metrics across them.
+## What it does
 
-## Architecture
+- **69 case packages.** 12 original cases plus 57 adapted from IIM Ahmedabad,
+  IIM Bangalore, IIM Calcutta and ISB casebooks. They cover profitability, operations,
+  growth, pricing, market entry, M&A, turnaround, digital and public-sector cases.
+- **Three interviewer personas.** *Coached*, *Realistic* and *Pressure* set how easily
+  Leo gives up information and what tone he takes. A precise question still gets an
+  answer from the toughest persona, and a vague one gets little from any of them.
+- **Typed or spoken practice.** The practice room works as a chat. You can also turn on
+  push-to-talk voice: hold the spacebar, speak, and Leo replies in streamed speech.
+- **Debrief after every case.** You get a 1.0 to 5.0 score on structuring, problem
+  solving, quantitative work, synthesis and communication. Each score quotes what you
+  said, and the debrief adds model rewrites of your opening and close, a focused drill
+  and suggested reading from the knowledge base.
+- **Progress over time.** Your profile tracks scores, recurring weak areas, past
+  transcripts and how far you got on each case.
+- **Community cases.** Signed-in users can contribute a case they were given in a real
+  interview. Leo asks about it field by field, an admin reviews the AI-drafted case, and
+  approved cases join the library with optional credit to the contributor.
+- **Admin console.** Admins can see transcripts and metrics for all users, re-run
+  evaluations and review contributed cases.
+
+## How it works
 
 ```mermaid
 flowchart LR
-    B[Browser chat UI] --> A[FastAPI attempt API]
-    A --> R[Authoritative case runtime]
-    R -->|approved facts and stage only| L[LangChain interviewer]
-    L --> A
-    A --> B
-    R -->|private only| C[Reservoir and answer key]
+    B[Browser: chat or push-to-talk] --> A[FastAPI attempt API]
+    A --> R[Case runtime]
+    R -->|approved facts and stage only| D[LLM director and interviewer]
+    D --> A
+    R -.->|never sent| P[(Private facts, issue tree, answer key)]
+    A --> E[Evaluator: 5-dimension debrief]
+    A --> S[(SQLite: users, attempts, feedback)]
 ```
 
-The runtime, rather than the model, decides which facts can be released. LangChain only turns the approved context into a natural interviewer response. This is the primary answer-leakage control.
+- **The case runtime has final say on what Leo can reveal.** It tracks the interview
+  stage and each fact's release level, so the LLM can propose facts but can't reveal
+  anything the runtime hasn't approved.
+- **The browser never sees private case content.** The public API returns only
+  candidate-safe data: unreleased facts, the issue tree and the answer key never reach
+  the browser or the interviewer prompt.
+- **One interview engine serves text and voice.** In voice mode, ElevenLabs only does
+  speech-to-text and text-to-speech. Spoken turns go through the same runtime as typed
+  ones.
 
-## Run locally
+## Tech stack
+
+Python 3.11+, FastAPI, Jinja2, LangChain via OpenRouter, Pydantic, SQLite, and vanilla
+JS/CSS on the frontend. Voice uses ElevenLabs Scribe and TTS. Sign-in uses Google OAuth.
+The app deploys to Fly.io from the included `Dockerfile` and `fly.toml`.
+
+## Quick start
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e '.[dev]'
-cp .env.example .env
-uvicorn app.main:app --reload --reload-dir app --reload-dir reservoir
+pip install -e '.[dev]'          # or: uv sync
+cp .env.example .env             # then fill in the keys below
+make dev                         # uvicorn with reload on http://127.0.0.1:8000
 ```
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000). The landing page and
-candidate-safe catalogue are public; the practice room requires Google sign-in
-(see [Accounts and access](#accounts-and-access)). `OPENROUTER_API_KEY` is required for interview turns:
-both the director and interviewer are LLM-driven through OpenRouter. The default
-is `anthropic/claude-sonnet-4.6`, with `~openai/gpt-latest` as the model-level fallback.
+| Variable | Needed for |
+|---|---|
+| `OPENROUTER_API_KEY` | Every interview turn and evaluation (required) |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `OAUTH_REDIRECT_URI` | Sign-in, which the practice room requires |
+| `ADMIN_EMAILS` | Access to `/admin` (nobody is an admin until it is set) |
+| `VOICE_ENABLED`, `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID` | Push-to-talk voice (optional) |
+| `SESSION_SECRET`, `DATABASE_PATH` | Production only |
 
-## Test
+[`.env.example`](.env.example) explains each variable and its default.
+
+For Google sign-in, create an OAuth 2.0 **Web application** client in the
+[Google Cloud console](https://console.cloud.google.com/apis/credentials) and register
+`http://127.0.0.1:8000/auth/google/callback` as a redirect URI.
+
+## Tests
 
 ```bash
-pytest
+make test        # or: pytest
 ```
 
-## API
+The suite covers the API boundary, fact release, personas, evaluation, persistence,
+voice transport and the contribution flow.
 
-| Endpoint | Auth | Purpose |
-|---|---|---|
-| `GET /api/cases` | public | Candidate-safe case catalogue |
-| `GET /api/auth/config` | public | Whether Google sign-in is configured, and any domain restriction |
-| `GET /auth/google/start` | public | Begin the Google authorization-code flow |
-| `GET /auth/google/callback` | public | Complete sign-in and set the session cookie |
-| `POST /auth/logout` | public | Clear the session cookie |
-| `GET /api/me` | candidate | The signed-in account |
-| `POST /api/attempts` | candidate | Start a case interview, owned by the caller |
-| `GET /api/attempts/{id}` | owner | Read the current candidate view |
-| `POST /api/attempts/{id}/turn` | owner | Submit a candidate response and get the interviewer reply |
-| `POST /api/attempts/{id}/end` | owner | End the attempt and return a starter scorecard |
-| `GET /api/me/practice-history` | candidate | Owned case history, completion, and latest performance summaries |
-| `GET /api/me/practice-history/{id}` | owner | One owned transcript with latest and versioned feedback |
-| `GET /api/me/profile` | candidate | Personal progress metrics, assessed skills, development areas, and recent cases |
-| `GET /api/admin/overview` | admin | Cohort totals, stage and case mix, 14-day activity |
-| `GET /api/admin/users` | admin | Per-candidate rollup of attempts and completion |
-| `GET /api/admin/attempts` | admin | Every attempt, filterable by candidate |
-| `GET /api/admin/attempts/{id}` | admin | One full transcript with released evidence and scorecard |
+## Repository layout
 
-### Pages
+```
+app/                FastAPI app: routes, case runtime, interviewer, evaluator, voice, accounts
+  templates/        Jinja2 pages (landing, cases, practice, debrief, profile, contribute, admin)
+  static/           Page scripts and styles; tokens.css is the shared design system
+reservoir/          The 12 original case packages, plus the shared conversation policy
+corpus/exemplars/   57 casebook-derived cases (iima, iimb, iimc, isb)
+knowledge_base/     Industry primers, case-type playbooks and methodology used in debriefs
+evaluation/         Scoring rubric, behaviour checklist and evaluator prompts
+scripts/            Corpus builders, metadata backfill, latency benchmark, evals, DB backup
+tests/              pytest suite
+docs/               Design notes, setup guides and plans (see below)
+```
 
-| Page | Auth | Purpose |
-|---|---|---|
-| `/` | public | Landing page and case library |
-| `/login` | public | Google sign-in |
-| `/practice` | candidate | The interview workspace |
-| `/profile` | candidate | Personal progress, feedback themes, and transcript review |
-| `/admin` | admin | Transcripts and metrics across all candidates |
+A case package is a folder with `case.yaml` (the prompt and metadata), `facts.yaml`
+(private facts with release levels) and, optionally, `issue-tree.yaml` and
+`conversation-policy.yaml`.
 
-## Accounts and access
+## Documentation
 
-Sign-in is Google OAuth 2.0 using the authorization-code flow. The browser never
-receives a token: the code is exchanged server side with the client secret, and
-the result is an opaque session cookie signed with HMAC-SHA256, `HttpOnly` and
-`SameSite=Lax`.
+| Topic | Document |
+|---|---|
+| Codebase tour, module by module | [docs/codebase-guide.md](docs/codebase-guide.md) |
+| System design | [docs/engineering-design.md](docs/engineering-design.md) |
+| Product design and brand | [docs/product-design.md](docs/product-design.md), [docs/leo-brand.md](docs/leo-brand.md) |
+| How a case world is modelled | [docs/case-world-model.md](docs/case-world-model.md) |
+| Evaluator design | [docs/evaluator-agent-design.md](docs/evaluator-agent-design.md) |
+| Transcript and feedback data model | [docs/user-practice-data-architecture.md](docs/user-practice-data-architecture.md) |
+| Case contribution and admin review | [docs/contribution-review-v3.md](docs/contribution-review-v3.md) |
+| Voice setup (ElevenLabs) | [docs/elevenlabs-voice-migration-plan.md](docs/elevenlabs-voice-migration-plan.md), [docs/elevenlabs-agent-setup.md](docs/elevenlabs-agent-setup.md), [docs/elevenlabs-native-agent-setup.md](docs/elevenlabs-native-agent-setup.md) |
+| Deploying to Fly.io | [docs/deployment-plan.md](docs/deployment-plan.md) |
+| Roadmap and latest QA campaign | [docs/implementation-roadmap.md](docs/implementation-roadmap.md), [docs/campaign/CAMPAIGN_REPORT.md](docs/campaign/CAMPAIGN_REPORT.md) |
 
-To enable it:
+## Security and deployment notes
 
-1. In the [Google Cloud console](https://console.cloud.google.com/apis/credentials),
-   create an OAuth 2.0 Client ID of type **Web application**.
-2. Add `http://127.0.0.1:8000/auth/google/callback` as an authorised redirect URI
-   (add your deployed URL too, when there is one).
-3. Put the client ID and secret in `.env` as `GOOGLE_CLIENT_ID` and
-   `GOOGLE_CLIENT_SECRET`, and set `OAUTH_REDIRECT_URI` to match exactly.
-4. Set `ADMIN_EMAILS` to the addresses that may open `/admin`.
-5. Restart. Until step 3 is done, `/login` says so rather than failing silently.
+- Sign-in uses Google's authorization-code flow. The server exchanges the code, and the
+  browser only ever holds an opaque, HMAC-signed, `HttpOnly` session cookie.
+- An attempt belongs to the account that created it. Requests for someone else's
+  attempt return `404`.
+- Admin rights come from `ADMIN_EMAILS` on every request. An admin still can't see a
+  case's answer key.
+- Voice API keys stay on the server, and the browser gets single-use tokens that expire
+  after 15 minutes.
+- **SQLite allows only one writer, so run one instance.** Set `SESSION_SECRET` and keep
+  the database on a persistent volume.
+- **Before any public launch, add per-user rate limits.** Without them, open sign-up
+  means anyone can run up OpenRouter and ElevenLabs costs.
 
-Access rules:
+## Status
 
-- An attempt belongs to the account that created it. Another candidate asking for
-  it gets `404`, not `403`, so the API never confirms that it exists.
-- Administrators are derived from `ADMIN_EMAILS` on every request, so granting or
-  revoking access takes effect immediately rather than at the next sign-in. With
-  the variable unset, nobody is an administrator.
-- `ALLOWED_EMAIL_DOMAINS` optionally restricts who may create an account at all.
-- The admin transcript view shows only what the runtime actually released to the
-  candidate. The answer key stays private even from an administrator.
-
-Accounts, sessions and attempt ownership live in `app/accounts.py`, the Google
-flow in `app/auth.py`, and the admin API in `app/admin.py`. None of them import
-the interview API; `app/main.py` shares the store and catalogue through
-`app.state`.
-
-For an architectural tour, see [the codebase guide](docs/codebase-guide.md). The
-future checker-agent, feedback-agent, and voice roadmap is in
-[the implementation roadmap](docs/implementation-roadmap.md). The detailed
-dual-mode ElevenLabs voice migration plan is in
-[the voice migration plan](docs/elevenlabs-voice-migration-plan.md).
-The exact provider-side configuration for the implemented feature-gated voice
-path is in [the ElevenLabs agent setup guide](docs/elevenlabs-agent-setup.md).
-The low-latency hosted-model alternative, including its guarded fact-release
-tool and copy-paste workflow prompts, is in [the native ElevenLabs setup
-guide](docs/elevenlabs-native-agent-setup.md).
-The user-scoped transcript and feedback model is documented in
-[the practice-data architecture](docs/user-practice-data-architecture.md).
-
-## Deployment boundary
-
-The current session store is SQLite-backed and is suitable for local development or one web instance. Before multi-instance deployment, replace it with a shared database or Redis, add rate limits, and move the API key and `SESSION_SECRET` into the host's secret manager. Set `SESSION_SECRET` explicitly in production: the generated `data/.session_secret` is per-host, so without it every instance would reject the others' cookies. In native ElevenLabs mode, the runtime releases facts only through the authenticated `get_case_facts` tool; the agent receives an ID index rather than the private case reservoir.
+Leo is under active development and the repository is private.

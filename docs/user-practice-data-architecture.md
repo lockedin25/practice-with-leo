@@ -11,6 +11,11 @@ users (one person)
         ├── attempt_owners (compatibility ownership link for existing auth)
         ├── evaluations (versioned feedback reports)
         └── voice_sessions (optional provider transport metadata)
+  ├── user_case_progress (one row per person per case)
+  └── contribution_sessions (a case being contributed)
+
+cases (contributed case packages, versioned)
+case_stats (library-wide attempt and completion counts per case)
 ```
 
 ## Tables and responsibility
@@ -22,6 +27,10 @@ users (one person)
 | `attempt_owners` | `attempt_id`, `user_id` | Existing compatibility ownership relation. It remains enforced by authorization while `attempts.user_id` is the query-optimized practice-history link. |
 | `evaluations` | `attempt_id`, `evaluator_version`, `report_json`, `created_at` | Immutable, versioned performance feedback. Re-evaluation adds a row rather than overwriting previous feedback. |
 | `voice_sessions` | `attempt_id`, provider conversation ID, status | Operational voice metadata only. It contains neither audio nor a duplicate provider transcript. |
+| `user_case_progress` | `user_id`, `case_id`, `status`, `attempts_count`, `latest_attempt_id`, `best_score`, `reset_at` | Per-person progress on each case (`not_started`, `in_progress`, `solved`), shown in the library and reset by `POST /api/cases/{case_id}/reset`. |
+| `contribution_sessions` | `id`, `user_id`, `status`, `state_json`, `case_id` | A contributor's case-contribution interview. A partial unique index allows only one in-progress session per person. |
+| `cases` | `case_id`, `version`, `source`, `status`, `package_json`, `contributor_id` | Versioned contributed case packages through review (`draft` to `published`). Published rows are registered into the catalogue at startup. Authored cases stay on disk. |
+| `case_stats` | `case_id`, `times_attempted`, `times_completed` | Aggregate counts per case across all users. |
 
 ## Lifecycle
 

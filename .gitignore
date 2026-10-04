@@ -7,3 +7,4 @@ data/
 .gstack/
 .worktrees/
 _society/
+*.egg-info/

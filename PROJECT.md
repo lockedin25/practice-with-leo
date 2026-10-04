@@ -1,5 +1,7 @@
 # Project: MBB Case Prep V2 — 10x Debrief Report Engine & Multi-School Corpus
 
+> **Historical.** This is the August 2026 plan for the debrief engine and multi-school corpus. Every milestone below has shipped. For the current architecture see [docs/codebase-guide.md](docs/codebase-guide.md).
+
 ## Architecture
 MBB Case Prep V2 is a full-stack, AI-powered consulting interview simulator and debrief platform.
 - **Corpus & Reservoir Layer** (`reservoir/`, `corpus/`, `knowledge_base/`): Authoritative case packages with verified facts, objective functions, private causal issue trees (`issue-tree.yaml`), structured `case_essence` (mechanism, pivotal insight, traps, takeaways, knowledge base links), and multi-school case catalog (IIM Ahmedabad, IIM Bangalore, IIM Calcutta, ISB).

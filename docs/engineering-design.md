@@ -1,5 +1,7 @@
 # CaseCall: Engineering Design, V1 Runtime
 
+> **Superseded.** This is the original design for a TypeScript/Cloudflare build. The shipped app is Python/FastAPI on Fly.io, and the file paths, endpoints and test counts below no longer match. The current architecture is in [codebase-guide.md](codebase-guide.md). The design principles (runtime-controlled fact release, candidate-safe projections) still hold.
+
 **Status:** In build
 **Version:** 0.3
 **Last updated:** 2026-08-22

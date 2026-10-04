@@ -1,5 +1,7 @@
 # Leo Implementation Roadmap
 
+> **Partly historical.** Written when the library had 12 cases. The evaluator (Phase 4), voice (Phases 5-6) and Google sign-in have since shipped, and the library now has 69 cases. Current open work is in [campaign/ROADMAP.md](campaign/ROADMAP.md).
+
 ## Purpose and boundary
 
 This document began as a planning-only roadmap. The landing page, multi-case
