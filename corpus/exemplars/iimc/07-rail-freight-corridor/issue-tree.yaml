@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.dfc-dwell-time
+  label: Reduce MMLP container dwell time from 48 to under 12 hours.
+nodes:
+- id: train-siding-turnaround
+  type: branch
+  label: Rail Siding Operations & Crane Productivity
+  status: valid_branch
+  evidence: []
+  conclusion: Trains sit on siding for 24+ hours waiting for customs clearance before unloading starts.
+- id: customs-icd-regulations
+  type: branch
+  label: Train-Level vs Container-Level Customs Clearance
+  status: valid_branch
+  evidence: []
+  conclusion: Single-container document hold blocks unloading of all 90 double-stack containers.
+- id: road-evacuation-readiness
+  type: branch
+  label: Truck Gate Appointments & First-Mile Drayage
+  status: valid_branch
+  evidence: []
+  conclusion: Trucks arrive uncoordinated, compounding yard congestion post-unloading.
+- id: diagnosis
+  type: diagnosis
+  label: Train-Level Customs Blockage & Siding Lockup
+  status: hidden_target
+  evidence:
+  - train-siding-turnaround
+  - customs-icd-regulations
+  - road-evacuation-readiness
+  conclusion: Dwell time is 48 hours because single container customs holds lock entire double-stack trains on the siding;
+    decoupling train discharge to a bonded buffer yard restores 12-hour turnaround.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Logistics Terminal Debottlenecking
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Establish bonded buffer siding for 3-hour train release, mandate pre-arrival customs filing, and schedule truck
+    appointments.
+edges:
+- from: objective.dfc-dwell-time
+  to: train-siding-turnaround
+  relation: investigate
+- from: objective.dfc-dwell-time
+  to: customs-icd-regulations
+  relation: investigate
+- from: objective.dfc-dwell-time
+  to: road-evacuation-readiness
+  relation: investigate
+- from: train-siding-turnaround
+  to: diagnosis
+  relation: supports
+- from: customs-icd-regulations
+  to: diagnosis
+  relation: supports
+- from: road-evacuation-readiness
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: rail-first
+  sequence:
+  - train-siding-turnaround
+  - customs-icd-regulations
+  - road-evacuation-readiness
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from train dwell time to customs ICD clearance bottlenecks.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what happens if 1 out of 90 containers on a train has a paperwork error.
+  - Clarify that the rail siding must be vacated for the next train.
+  - Redirect toward immediate offloading into a bonded buffer yard.

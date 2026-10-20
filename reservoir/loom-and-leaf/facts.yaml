@@ -1,0 +1,111 @@
+schema_version: reservoir-facts-v1
+facts:
+  - id: company.model
+    domain: company
+    release_level: broad_context
+    content: "Loom & Leaf sells own-brand apparel through 95 stores and an online channel, positioned between value fashion and premium labels."
+    candidate_purpose: "Establish retail footprint and brand positioning."
+    question_examples:
+      - "What is Loom & Leaf's store footprint and sales channel mix?"
+      - "What is the brand positioning and target demographic?"
+
+  - id: financials.scope
+    domain: financials
+    release_level: sharp_question
+    content: "Revenue is flat, but the six-point gross-margin decline is driven by higher markdowns and inventory write-downs rather than a broad rise in fabric cost."
+    candidate_purpose: "Isolate the gross margin drop to promotional markdowns rather than COGS/fabric inflation."
+    question_examples:
+      - "What is driving the six percentage point gross margin drop?"
+      - "Did raw material or supplier production costs increase?"
+
+  - id: inventory.age
+    domain: operations
+    release_level: hypothesis_backed
+    content: "Inventory older than 180 days rose from 12 to 29 percent of stock, concentrated in seasonal womenswear and online-only styles."
+    dependencies: [financials.scope]
+    candidate_purpose: "Demonstrate severe inventory aging concentrated in trend categories."
+    question_examples:
+      - "What is the age profile of current inventory?"
+      - "In which product categories is aged inventory concentrated?"
+
+  - id: assortment
+    domain: commercial
+    release_level: sharp_question
+    content: "The buying team expanded the number of styles by 35 percent to appear more trend-led, while units per style and repeat demand fell."
+    dependencies: [inventory.age]
+    candidate_purpose: "Identify merchandising root cause: 35% SKU proliferation in unvetted trend styles."
+    question_examples:
+      - "How has SKU assortment and style count evolved?"
+      - "What was the strategy behind recent buying decisions?"
+
+  - id: planning
+    domain: operations
+    release_level: hypothesis_backed
+    content: "Initial buys are locked before reliable sell-through data is available, and store replenishment does not distinguish fast sellers from slow sellers early enough."
+    dependencies: [assortment]
+    candidate_purpose: "Expose inflexible long-lead buying and lack of dynamic store replenishment."
+    question_examples:
+      - "What is the procurement lead time and replenishment process?"
+      - "How does the planning team respond to early sell-through signals?"
+
+  - id: channel
+    domain: customers
+    release_level: broad_context
+    content: "Online demand is growing, but online returns are higher for poorly described fit and colour, which further reduces contribution on selected styles."
+    candidate_purpose: "Highlight digital return rate friction on complex trend items."
+    question_examples:
+      - "What are the return rates in the e-commerce channel?"
+      - "Why are online return rates elevated?"
+
+  - id: economics
+    domain: economics
+    release_level: hypothesis_backed
+    content: "Core basics maintain full-price sell-through and higher contribution, while trend capsules account for most markdown cost but only a minority of revenue."
+    dependencies: [assortment]
+    candidate_purpose: "Demonstrate the profitability dichotomy: profitable core basics vs loss-making trend sprawl."
+    question_examples:
+      - "How do sell-through and profitability compare between core basics and trend capsules?"
+      - "What percentage of revenue and markdowns do trend items represent?"
+
+  - id: brand_risk
+    domain: risk
+    release_level: sharp_question
+    content: "Repeated broad discounting trains customers to wait for sales and would weaken the mid-market brand position."
+    candidate_purpose: "Warn against perpetual sitewide sales that dilute brand equity."
+    question_examples:
+      - "What is the customer perception risk of continuous discounting?"
+      - "How does frequent clearance impact brand equity?"
+
+  - id: liquidity
+    domain: financials
+    release_level: sharp_question
+    content: "Working capital is under pressure because suppliers are paid before slow-moving stock is cleared, but the company has enough liquidity for a phased reset."
+    candidate_purpose: "Clarify working capital runway and cash flow constraints."
+    question_examples:
+      - "What is the cash flow and working capital position?"
+      - "How urgent is the inventory liquidation need?"
+
+  - id: diagnosis.hidden
+    domain: diagnosis
+    release_level: interviewer_only
+    provenance: source_derived
+    content: "The 6-point gross margin collapse is driven by a 35% SKU explosion in unvalidated trend capsules with long-lead locked buys, causing aged stock (>180 days) to surge to 29% and triggering massive clearance markdowns; core basics remain profitable, so recovery requires cutting trend SKU count, introducing test-and-react buying, and executing targeted markdown governance."
+    candidate_purpose: "Never disclose directly. Benchmark for evaluator answer-key comparison and interviewer recovery."
+
+  - id: recommendation.assortment
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Reduce low-confidence trend buys, protect core basics, and use smaller test orders before committing to seasonal volume."
+    candidate_purpose: "Pillar 1: Assortment rationalization and test-and-react buying."
+
+  - id: recommendation.inventory
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Create early sell-through triggers for reallocation, replenishment, and targeted markdowns instead of waiting for end-of-season clearance."
+    candidate_purpose: "Pillar 2: Dynamic in-season replenishment and markdown triggers."
+
+  - id: recommendation.digital
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Improve fit information and merchandising for high-return online styles while using controlled clearance channels to release aged inventory."
+    candidate_purpose: "Pillar 3: Digital return reduction and controlled stock clearance."

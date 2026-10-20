@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: plant.capacity
+  domain: company
+  release_level: broad_context
+  content: Plant produces 300,000 MT/year of TMT bars using sponge iron (DRI) and scrap in electric induction furnaces.
+- id: cost.breakdown
+  domain: financials
+  release_level: sharp_question
+  content: Power and raw materials account for 88% of total production cost per ton.
+- id: power.consumption
+  domain: operations
+  release_level: hypothesis_backed
+  content: "Specific power consumption rose from 580 kWh/ton to 765 kWh/ton; grid power tariffs rose from \u20B95.80 to \u20B9\
+    7.60/kWh."
+  dependencies:
+  - cost.breakdown
+- id: sponge_iron.quality
+  domain: operations
+  release_level: hypothesis_backed
+  content: "Purchasing team switched to low-grade sponge iron with 76% metallization (down from 84%) to save \u20B91,500/ton\
+    \ on purchase price."
+  dependencies:
+  - power.consumption
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "EBITDA fell to 3% because buying cheap low-grade sponge iron (76% metallization) increased power consumption by\
+    \ 32% (765 kWh/ton), completely overwhelming the \u20B91,500 raw material discount under rising power tariffs."
+- id: recommendation.quality_sourcing
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Mandate minimum 84% sponge iron metallization standards, as energy savings of \u20B91,400/ton exceed the raw material\
+    \ price delta."
+- id: recommendation.waste_heat
+  domain: recommendation
+  release_level: synthesis_support
+  content: Install a 15 MW waste-heat recovery captive power plant to reduce grid power exposure by 40%.
+- id: recommendation.furnace_automation
+  domain: recommendation
+  release_level: synthesis_support
+  content: Deploy automated oxygen-assisted lancing and scrap pre-heating to reduce batch tap-to-tap time.

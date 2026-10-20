@@ -1,0 +1,75 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.diagnostic-margin
+  label: Restore diagnostic center network EBITDA margin.
+nodes:
+- id: channel-mix
+  type: branch
+  label: Patient Acquisition Channels
+  status: valid_branch
+  evidence: []
+  conclusion: Doctor-referred volume grew from 45% to 70% while direct walk-ins dropped.
+- id: cost-to-serve
+  type: branch
+  label: Commission & Overhead Economics
+  status: valid_branch
+  evidence: []
+  conclusion: Doctor referral payouts jumped from 20% to 38% due to competitor lab poaching.
+- id: test-portfolio
+  type: branch
+  label: Pathology vs Specialized Test Menu
+  status: valid_branch
+  evidence: []
+  conclusion: Routine tests dominate volume but suffer highest commission dilution.
+- id: diagnosis
+  type: diagnosis
+  label: Referral Commission Inflation
+  status: hidden_target
+  evidence:
+  - channel-mix
+  - cost-to-serve
+  conclusion: Margin decline is caused by escalating doctor referral commissions (up to 38%) and customer mix shift away from
+    direct walk-ins.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Margin Recovery Plan
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Scale direct-to-consumer home collection, secure corporate B2B wellness accounts, and expand high-margin specialized
+    test lines.
+edges:
+- from: objective.diagnostic-margin
+  to: channel-mix
+  relation: investigate
+- from: objective.diagnostic-margin
+  to: cost-to-serve
+  relation: investigate
+- from: objective.diagnostic-margin
+  to: test-portfolio
+  relation: investigate
+- from: channel-mix
+  to: diagnosis
+  relation: supports
+- from: cost-to-serve
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: channel-first
+  sequence:
+  - channel-mix
+  - cost-to-serve
+  - test-portfolio
+  - diagnosis
+  - actions
+  interviewer_behaviour: Prompt candidate to analyze acquisition channel unit economics.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to compare profitability across direct walk-in vs doctor-referred patients.
+  - Highlight that lab operating costs are stable.
+  - Redirect toward doctor commission structures and marketing channels.

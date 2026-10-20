@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.qsr-cannibalization
+  label: Fix negative SSSG and optimize QSR store expansion density.
+nodes:
+- id: sales-performance
+  type: branch
+  label: Legacy vs New Store Sales Trajectory
+  status: valid_branch
+  evidence: []
+  conclusion: Legacy stores fell 8% and new stores missed targets by 30%.
+- id: catchment-overlap
+  type: branch
+  label: Geographic Proximity & Customer Cannibalization
+  status: valid_branch
+  evidence: []
+  conclusion: 72% customer overlap across stores located within 1 km radius.
+- id: channel-economics
+  type: branch
+  label: Dine-In Footfall Split vs Delivery Demand
+  status: valid_branch
+  evidence: []
+  conclusion: Dine-in traffic split between stores while fixed occupancy rents doubled.
+- id: diagnosis
+  type: diagnosis
+  label: Trade Area Store Cannibalization
+  status: hidden_target
+  evidence:
+  - sales-performance
+  - catchment-overlap
+  - channel-economics
+  conclusion: Aggressive expansion placed 18 stores inside existing trade catchments, cannibalizing legacy dine-in revenue
+    without adding incremental demand.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Network Rationalization Plan
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Enforce 2.5 km radius zoning, pivot delivery expansion to cloud kitchens, and relocate cannibalized stores.
+edges:
+- from: objective.qsr-cannibalization
+  to: sales-performance
+  relation: investigate
+- from: objective.qsr-cannibalization
+  to: catchment-overlap
+  relation: investigate
+- from: objective.qsr-cannibalization
+  to: channel-economics
+  relation: investigate
+- from: sales-performance
+  to: diagnosis
+  relation: supports
+- from: catchment-overlap
+  to: diagnosis
+  relation: supports
+- from: channel-economics
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: geography-first
+  sequence:
+  - sales-performance
+  - catchment-overlap
+  - channel-economics
+  - diagnosis
+  - actions
+  interviewer_behaviour: Prompt candidate to analyze store catchment radius and footfall overlap.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to check the geographic distance between new stores and existing stores.
+  - Clarify that total market burger consumption is growing.
+  - Redirect inquiry toward trade area cannibalization and rent efficiency.

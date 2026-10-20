@@ -1,0 +1,34 @@
+schema_version: conversation-policy-v1
+mode: realistic
+
+principles:
+  - Speak naturally and respond directly to candidate inquiries on utility operations and public policy.
+  - Follow candidate-led problem decomposition; validate first-principles NRW decomposition.
+  - Challenge recommendations that assume unrestricted municipal borrowing or immediate tariff increases.
+  - "Keep the hidden diagnosis private: do not reveal the exact 50/50 physical/commercial split before the candidate asks about the loss profile."
+  - Ensure candidate balances fiscal recovery with low-income community access and service predictability.
+
+phase_policy:
+  clarification:
+    interviewer_goal: Confirm candidate understands utility network scale, the 42% NRW metric, political tariff freeze, and 18-month timeframe.
+    reveal_levels: [broad_context, sharp_question]
+    expected_candidate_behaviours:
+      - Clarify utility mandate and scale (4M residents).
+      - Inquire about the composition and calculation of non-revenue water.
+      - Understand constraints around tariffs and municipal approvals.
+
+  drill_down:
+    interviewer_goal: Guide candidate through physical leakage vs commercial metering losses and evaluation of DMA pressure management.
+    reveal_levels: [broad_context, sharp_question, hypothesis_backed]
+    expected_candidate_behaviours:
+      - Decompose NRW into physical leaks and apparent/commercial losses.
+      - Inquire about network zoning, pressure dynamics, and meter calibration status.
+      - Evaluate 80/20 interventions (DMA night-flow analysis and bulk commercial audits) over blanket replacement.
+
+  synthesis:
+    interviewer_goal: Assess actionable 18-month roadmap, risk mitigations, and execution sequencing.
+    reveal_levels: [synthesis_support]
+    expected_candidate_behaviours:
+      - Deliver a structured 3-pillar action plan (DMA zoning, commercial recovery, service transparency).
+      - Propose self-funding mechanism where commercial savings finance physical repairs.
+      - Address political and social equity risks in informal settlements.

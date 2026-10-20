@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 02-saas-cross-sell-v1
+title: Enterprise SaaS Net Revenue Retention
+school: ISB
+status: approved
+rights_status: original
+category: growth_strategy
+industry: saas_and_b2b_tech
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a high-growth B2B enterprise SaaS platform with $60M ARR. Net Revenue Retention (NRR) has slipped
+    from 124% to 102%, depressing software valuation multiples.
+  objective: Diagnose expansion revenue stalls and design a multi-product cross-selling and consumption-based packaging model.
+  opening_requirements:
+  - Name Enterprise SaaS Net Revenue Retention and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Net Revenue Retention (NRR %) and Multi-Product Customer Share (%)) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Net Revenue Retention (NRR %) and Multi-Product Customer Share (%)
+  decision_question: Why did SaaS NRR decelerate and how should cross-selling and usage-based pricing be restructured?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Siloed sales compensation and product fragmentation. Account executives were rewarded exclusively on new
+    customer logos rather than account expansion, while the 3 standalone software modules had separate logins, un-integrated
+    data, and conflicting pricing tiers.
+  what_the_case_wanted_to_test: B2B SaaS metrics (CAC, LTV, NRR, GRR), seat-based vs consumption pricing, customer success
+    alignment, and product suite bundling.
+  pivotal_insight: 80% of enterprise customers use only 1 core module; customer success managers have no quota for upsell,
+    while fragmented pricing makes purchasing secondary modules require a full procurement contract cycle.
+  common_traps:
+  - Assuming customer logo churn is the problem (Gross Revenue Retention is healthy at 94%).
+  - Blaming engineering software downtime for lack of expansion.
+  - Cutting software license prices across the board.
+  takeaway_lesson: In enterprise SaaS, high NRR requires unifying fragmented products into a single modular platform and aligning
+    Customer Success compensation with net expansion quotas.
+  suggested_readings:
+  - knowledge_base/industries/08_saas_and_b2b_tech.md
+  - knowledge_base/case_types/growth_strategy.md
+  - knowledge_base/methodology/01_preliminary_questions.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 22-5g-plan-pricing-v1
+title: Telecom 5G Plan Pricing
+school: IIM-A
+status: approved
+rights_status: original
+category: pricing
+industry: telecom_and_media
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is a top Indian telecom operator that invested \u20B940,000 Cr in 5G spectrum and network rollout.\
+    \ 5G users consume 3x more data, but ARPU has risen only 4%."
+  objective: Design a 5G tariff monetization and pricing structure to accelerate ARPU growth without triggering subscriber
+    churn.
+  opening_requirements:
+  - Name Telecom 5G Plan Pricing and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Average Revenue Per User (ARPU) and 5G Subscriber Churn) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Average Revenue Per User (ARPU) and 5G Subscriber Churn
+  decision_question: How should the telecom operator restructure 5G mobile tariffs to monetize network capex?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Unlimited free 5G data promotional bundles cannibalized premium 4G recharge plans, while speed and latency
+    differences are imperceptible to casual smartphone video viewers.
+  what_the_case_wanted_to_test: Telecom tariff design, price elasticity, network slicing monetization, speed tiering vs data
+    capping, and OTT content bundling.
+  pivotal_insight: Offering unmetered free 5G data trained consumers to treat 5G as a free utility; monetization requires
+    shifting from generic data allowances to speed-tiered plans and high-speed 5G Fixed Wireless Access (FWA) home broadband.
+  common_traps:
+  - Raising baseline entry-level prepaid recharge prices causing mass churn to competitors.
+  - Charging extra purely for 5G data volume when consumers already get 2GB/day on 4G.
+  - Ignoring home broadband 5G FWA monetization.
+  takeaway_lesson: When a next-gen technology upgrade provides excess raw capacity, pricing must shift from commodity data
+    metering to differentiated experience tiering (speed, latency, home broadband).
+  suggested_readings:
+  - knowledge_base/industries/07_telecom_and_media.md
+  - knowledge_base/case_types/pricing_strategy.md
+  - knowledge_base/methodology/04_data_gathering_and_notes.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

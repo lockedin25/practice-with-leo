@@ -1,0 +1,74 @@
+schema_version: reservoir-v1
+case_id: 01-steel-mill-cost-absorption-v1
+title: Integrated Steel Mill Cost Absorption
+school: IIM-C
+status: approved
+rights_status: original
+category: profitability
+industry: heavy_manufacturing_and_steel
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a 6M MT integrated blast furnace steel producer in Eastern India. Global steel dumping has compressed
+    hot-rolled coil (HRC) spot prices by 28%, turning company EBITDA negative.
+  objective: Determine whether to throttle blast furnace production or maintain high output to absorb fixed costs, and recommend
+    an operational cost reduction plan.
+  opening_requirements:
+  - Name Integrated Steel Mill Cost Absorption and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Cash breakeven per ton of HRC steel and Net Operating Cash Flow) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Cash breakeven per ton of HRC steel and Net Operating Cash Flow
+  decision_question: Should the steel mill throttle output or operate at 100% capacity during a price slump to optimize fixed
+    cost absorption?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "Operating leverage and blast furnace thermal physics. Shutting down or damping down a blast furnace damages\
+    \ refractory lining and destroys fixed cost absorption (\u20B94,200/ton fixed overhead), causing higher cash burn than\
+    \ continuing to produce at marginal cost."
+  what_the_case_wanted_to_test: Heavy manufacturing operating leverage, blast furnace thermal continuity constraints, variable
+    vs fixed cost decomposition, and value-added product mix optimization.
+  pivotal_insight: "Throttling production by 25% raises fixed cost per ton by \u20B91,400, worsening net cash loss; the mill\
+    \ must run at 100% capacity while shifting hot metal from commodity HRC to high-margin automotive CRCA and galvanised\
+    \ steel."
+  common_traps:
+  - Recommending shutting down 2 of 4 blast furnaces without considering refractory restart costs ($40M).
+  - Assuming cutting blue-collar maintenance labor solves an operating leverage problem.
+  - Selling raw iron ore pellets instead of making steel.
+  takeaway_lesson: In capital-intensive continuous process industries (steel, petrochemicals, glass), high fixed cost structures
+    mean volume curtailment during down-cycles accelerates insolvency; survival requires shifting product mix up the value
+    curve.
+  suggested_readings:
+  - knowledge_base/industries/14_heavy_manufacturing_and_steel.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

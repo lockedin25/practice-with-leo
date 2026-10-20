@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 05-edtech-cac-optimization-v1
+title: EdTech Sales CAC Optimization
+school: ISB
+status: approved
+rights_status: original
+category: growth_strategy
+industry: saas_and_b2b_tech
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is a K-12 live online tutoring platform in India. Customer Acquisition Cost (CAC) reached \u20B922,000\
+    \ on an annual course price of \u20B935,000, eroding business viability."
+  objective: Diagnose outbound tele-calling sales inefficiency and design a teacher-led referral and product-led growth acquisition
+    model.
+  opening_requirements:
+  - Name EdTech Sales CAC Optimization and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Blended Customer Acquisition Cost (CAC) and Lead Conversion Rate (%)) and time horizon (twelve
+    months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Blended Customer Acquisition Cost (CAC) and Lead Conversion Rate (%)
+  decision_question: "How should the EdTech platform reduce customer acquisition cost from \u20B922,000 to under \u20B98,000?"
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: High burn outbound tele-calling sales engine. Buying cold parent phone numbers and employing 2,000 aggressive
+    inside-sales reps led to a 0.8% lead conversion rate, high lead fatigue, and brand reputation damage.
+  what_the_case_wanted_to_test: EdTech unit economics, outbound tele-sales vs organic word-of-mouth, teacher-led student referrals,
+    and freemium diagnostic test funnels.
+  pivotal_insight: "Outbound tele-sales conversion is 0.8% at \u20B924k CAC; students referred by school teachers or participating\
+    \ in free diagnostic olympiad tests convert at 14% with a CAC of \u20B93,500."
+  common_traps:
+  - Increasing cold calling volume with autodialers.
+  - Offering heavy 50% course discounts that degrade perceived academic quality.
+  - Spending more on celebrity Bollywood brand ambassador TV commercials.
+  takeaway_lesson: In consumer education where parental trust is paramount, aggressive outbound cold calling burns capital;
+    sustainable acquisition requires teacher-endorsed organic referral loops and diagnostic academic funnels.
+  suggested_readings:
+  - knowledge_base/industries/08_saas_and_b2b_tech.md
+  - knowledge_base/case_types/growth_strategy.md
+  - knowledge_base/methodology/01_preliminary_questions.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

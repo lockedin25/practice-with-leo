@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.fertilizer-pivot
+  label: Transition fertilizer portfolio to high-margin non-subsidized specialty nutrition.
+nodes:
+- id: subsidy-receivables-drag
+  type: branch
+  label: Government Subsidy Arrears & Interest Cost
+  status: valid_branch
+  evidence: []
+  conclusion: "185-day subsidy delay traps \u20B92,800 Cr and incurs \u20B9240 Cr interest cost."
+- id: bulk-vs-specialty-margins
+  type: branch
+  label: Commodity DAP vs Specialty WSF Economics
+  status: valid_branch
+  evidence: []
+  conclusion: Specialty nutrition has 32% gross margin, zero subsidy reliance, and 30-day terms.
+- id: precision-horticulture-demand
+  type: branch
+  label: Micro-Irrigation Adoption & Horticulture Boom
+  status: valid_branch
+  evidence: []
+  conclusion: Drip irrigation boom drives 16% CAGR in specialty nutrition demand.
+- id: diagnosis
+  type: diagnosis
+  label: Subsidy Arrears Trap & Specialty De-Regulation
+  status: hidden_target
+  evidence:
+  - subsidy-receivables-drag
+  - bulk-vs-specialty-margins
+  - precision-horticulture-demand
+  conclusion: Low EBITDA and working capital strain are caused by heavy reliance on subsidized bulk fertilizers with 185-day
+    payment delays; pivoting to non-subsidized specialty nutrition eliminates subsidy risk and expands margins.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Specialty Nutrition Transformation
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Build 200k MT water-soluble fertilizer capacity, establish agronomist crop-trial sales force, and partner with
+    micro-irrigation leaders.
+edges:
+- from: objective.fertilizer-pivot
+  to: subsidy-receivables-drag
+  relation: investigate
+- from: objective.fertilizer-pivot
+  to: bulk-vs-specialty-margins
+  relation: investigate
+- from: objective.fertilizer-pivot
+  to: precision-horticulture-demand
+  relation: investigate
+- from: subsidy-receivables-drag
+  to: diagnosis
+  relation: supports
+- from: bulk-vs-specialty-margins
+  to: diagnosis
+  relation: supports
+- from: precision-horticulture-demand
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: subsidy-first
+  sequence:
+  - subsidy-receivables-drag
+  - bulk-vs-specialty-margins
+  - precision-horticulture-demand
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from working capital subsidy delay to specialty fertilizer margin analysis.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate who pays for bulk fertilizer (farmer vs government).
+  - Clarify that government subsidies take 6 months to disburse.
+  - Redirect toward de-regulated water-soluble fertilizers and bio-stimulants.

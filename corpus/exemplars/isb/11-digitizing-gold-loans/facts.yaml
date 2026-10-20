@@ -1,0 +1,45 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: gold_loan.scale
+  domain: company
+  release_level: broad_context
+  content: Client operates 1,200 physical branches and launched doorstep gold loans across 12 metros.
+- id: fraud.losses
+  domain: risk
+  release_level: sharp_question
+  content: "Collateral auction audits revealed \u20B914 Cr in fake gold-plated jewelry where stone weight was undervalued\
+    \ and karat purity was overstated."
+- id: tat.bottlenecks
+  domain: operations
+  release_level: hypothesis_backed
+  content: Doorstep turnaround takes 175 minutes because field agents use manual acid testing, take photos, and wait 90 minutes
+    for branch manager approval.
+  dependencies:
+  - fraud.losses
+- id: xrf.technology
+  domain: operations
+  release_level: hypothesis_backed
+  content: Equipping agents with portable battery-powered XRF gold purity spectrometers provides laboratory-grade 99.9% purity
+    verification in 45 seconds.
+  dependencies:
+  - tat.bottlenecks
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Doorstep gold loans failed because manual touchstone acid assays were fooled by fake gold and manual branch approval
+    stretched TAT to 3 hours; equipping agents with portable XRF analyzers and automated digital LTV calculation achieves
+    28-minute disbursals with zero fraud.
+- id: recommendation.xrf_rollout
+  domain: recommendation
+  release_level: synthesis_support
+  content: Equip all mobile loan officers with certified portable XRF gold analyzers connected via Bluetooth to the loan app.
+- id: recommendation.smart_pouch
+  domain: recommendation
+  release_level: synthesis_support
+  content: Deposit verified jewelry into GPS-tracked, tamper-evident smart security pouches with biometric seals.
+- id: recommendation.instant_upi
+  domain: recommendation
+  release_level: synthesis_support
+  content: Automate loan-to-value (LTV) calculation against live MCX gold prices and disburse funds instantly via UPI upon
+    pouch sealing.

@@ -1,0 +1,44 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: export.portfolio
+  domain: company
+  release_level: broad_context
+  content: Client exports 5 high-volume cardiovascular oral solid drugs ($220M revenue) to US and EU markets.
+- id: stockout.impact
+  domain: financials
+  release_level: sharp_question
+  content: "Single-source Chinese API factory shutdown caused a 4-month formulation plant halt, losing \u20B9180 Cr in revenue\
+    \ and customer penalty fines."
+- id: regulatory.barrier
+  domain: regulation
+  release_level: hypothesis_backed
+  content: US FDA requires a 6-month accelerated stability study and a Prior Approval Supplement (PAS) filing to approve any
+    new API vendor.
+  dependencies:
+  - stockout.impact
+- id: dual_sourcing.cost
+  domain: economics
+  release_level: hypothesis_backed
+  content: A 70:30 allocation between Chinese primary and Indian secondary API suppliers increases landed API cost by only
+    3.5% while eliminating single-point failure.
+  dependencies:
+  - regulatory.barrier
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Plant shutdown occurred because client single-sourced API in US FDA dossiers to save 3.5% cost, making emergency
+    vendor switching impossible due to 9-month regulatory approval requirements.
+- id: recommendation.dual_dmf
+  domain: recommendation
+  release_level: synthesis_support
+  content: File proactive US FDA PAS supplements to pre-qualify 2 validated API vendors for every top-10 revenue product.
+- id: recommendation.split_allocation
+  domain: recommendation
+  release_level: synthesis_support
+  content: Contractually split commercial procurement 70% primary (low-cost) and 30% secondary (domestic) to keep both manufacturing
+    lines active.
+- id: recommendation.strategic_reserve
+  domain: recommendation
+  release_level: synthesis_support
+  content: Maintain a rolling 90-day strategic buffer stock of key intermediate KSMs in temperature-controlled warehouses.

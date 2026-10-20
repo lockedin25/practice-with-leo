@@ -1,0 +1,109 @@
+schema_version: reservoir-facts-v1
+facts:
+  - id: company.position
+    domain: company
+    release_level: broad_context
+    content: "Northstar has 8 million retail customers, a trusted urban brand, and strong digital payments adoption among salaried customers."
+    candidate_purpose: "Establish bank baseline customer scale and urban brand strength."
+    question_examples:
+      - "What is Northstar's current customer base and competitive position?"
+      - "What are Northstar's primary customer segments and product strengths?"
+
+  - id: objective.scope
+    domain: objective
+    release_level: sharp_question
+    content: "The board wants profitable retail income growth, not loan-book growth at any cost."
+    candidate_purpose: "Clarify strategic objective: risk-adjusted retail net income rather than reckless asset expansion."
+    question_examples:
+      - "What are the board's constraints on asset growth vs risk-adjusted return?"
+      - "Is the focus on balance sheet expansion or fee/spread income quality?"
+
+  - id: segments.current
+    domain: customers
+    release_level: sharp_question
+    content: "Affluent urban customers generate 55 percent of retail income but are mature; emerging affluent customers in tier-two cities are growing faster but are under-served."
+    candidate_purpose: "Highlight market saturation in metros vs emerging affluent growth opportunity in tier-2."
+    question_examples:
+      - "What is the breakdown of retail income across customer segments?"
+      - "Which customer segments offer the highest growth potential?"
+
+  - id: market.opportunity
+    domain: market
+    release_level: hypothesis_backed
+    content: "In Northstar's target tier-two cities, about 12 million digitally active households have formal savings accounts but limited access to advice, unsecured credit, and investment products."
+    dependencies: [segments.current]
+    candidate_purpose: "Size the tier-2 emerging affluent market opportunity (12M households)."
+    question_examples:
+      - "How large is the tier-2 emerging affluent market?"
+      - "What financial products are currently under-penetrated among these households?"
+
+  - id: economics.segment
+    domain: economics
+    release_level: hypothesis_backed
+    content: "An emerging-affluent household can generate positive lifetime value if it holds a salary account, uses payments, and takes one credit or investment product within two years."
+    dependencies: [market.opportunity]
+    candidate_purpose: "Demonstrate household LTV mechanics anchored on salary/CASA relationship."
+    question_examples:
+      - "What are the unit economics and lifetime value of an emerging affluent customer?"
+      - "What product adoption threshold is required for customer profitability?"
+
+  - id: channel.cost
+    domain: operations
+    release_level: sharp_question
+    content: "A full branch costs roughly four times as much to acquire and serve a customer as a relationship-manager hub supported by digital onboarding."
+    candidate_purpose: "Expose 4x cost differential between physical full branches and digital RM hubs."
+    question_examples:
+      - "What is the cost to acquire and serve across different branch formats?"
+      - "How do unit economics compare between full-service branches and digital hubs?"
+
+  - id: competition
+    domain: market
+    release_level: sharp_question
+    content: "Large private banks lead on branch density, while fintechs lead on simple onboarding but generally do not offer a full advisory relationship."
+    candidate_purpose: "Identify competitive white space between branch-heavy incumbents and transactional fintechs."
+    question_examples:
+      - "How are competitors positioned in tier-2 cities?"
+      - "Where is the competitive white space against legacy private banks and fintechs?"
+
+  - id: capability
+    domain: company
+    release_level: broad_context
+    content: "Northstar already has a digital onboarding stack and a partner network of payroll providers, but its tier-two credit models use sparse local data."
+    candidate_purpose: "Highlight payroll partner asset and underwriting data limitation."
+    question_examples:
+      - "What existing technology and distribution capabilities does Northstar possess?"
+      - "Does Northstar have proprietary data for underwriting in tier-2 cities?"
+
+  - id: risk.credit
+    domain: risk
+    release_level: hypothesis_backed
+    content: "Unsecured credit losses rise sharply when acquisition incentives outpace underwriting quality; the bank cannot use broad pre-approved offers without local risk calibration."
+    candidate_purpose: "Warn against premature unsecured lending before cash-flow seasoning."
+    question_examples:
+      - "What are the credit delinquency risks in tier-2 unsecured lending?"
+      - "Can Northstar deploy pre-approved personal loans immediately?"
+
+  - id: diagnosis.hidden
+    domain: diagnosis
+    release_level: interviewer_only
+    provenance: source_derived
+    content: "Urban affluent growth is saturated (55% share but slowing); the 25% growth mandate is best achieved by targeting the 12M emerging-affluent tier-2 households using an asset-light digital onboarding + RM hub model (4x cheaper than full branches), anchoring relationships on corporate payroll/CASA deposits first and gating unsecured credit on 6-12 months of observed transaction data."
+    candidate_purpose: "Never disclose directly. Benchmark for evaluator answer-key comparison and interviewer recovery."
+
+  - id: recommendation.hub
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Pilot a hub-and-digital model in a limited set of cities, pairing digital acquisition with advisers for high-value life events and product cross-sell."
+    candidate_purpose: "Pillar 1: Asset-light digital onboarding and advisory hub rollout."
+
+  - id: recommendation.sequence
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Start with salary-account and payments acquisition, then offer credit or investments only after observed cash-flow and engagement signals improve risk confidence."
+    candidate_purpose: "Pillar 2: Payroll/CASA relationship anchoring and seasoned credit cross-sell."
+
+  - id: recommendation.measure
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Track activated accounts, product depth, acquisition cost, delinquency, and cohort contribution rather than headline account openings."
+    candidate_purpose: "Pillar 3: Cohort LTV and risk governance metrics."

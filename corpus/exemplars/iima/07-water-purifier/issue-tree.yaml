@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.purifier-cashflow
+  label: Fix cash flow and unit economics of IoT water purifier subscription.
+nodes:
+- id: capex-and-pricing
+  type: branch
+  label: Hardware Capex vs Subscription Pricing
+  status: valid_branch
+  evidence: []
+  conclusion: "\u20B99,000 upfront capex requires 18 months of \u20B9499 fees to break even."
+- id: subscriber-churn
+  type: branch
+  label: Cohort Retention & Lock-in Terms
+  status: valid_branch
+  evidence: []
+  conclusion: "32% churn within 6 months without security deposit, leaving \u20B96,000 unrecovered capex per churning user."
+- id: reverse-logistics
+  type: branch
+  label: Asset Retrieval & Refurbishment Cost
+  status: valid_branch
+  evidence: []
+  conclusion: "De-installation and refurbishing costs \u20B92,500 per unit, making returns value-destructive."
+- id: diagnosis
+  type: diagnosis
+  label: Unamortized Hardware Capex from Early Churn
+  status: hidden_target
+  evidence:
+  - capex-and-pricing
+  - subscriber-churn
+  - reverse-logistics
+  conclusion: "Zero-deposit subscription creates massive cash drain as 32% of subscribers churn before paying off the \u20B9\
+    9k hardware manufacturing capex."
+- id: actions
+  type: recommendation
+  label: 3-Pillar HaaS Turnaround Plan
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: "Mandate 12-month lock-in with \u20B92,500 security deposit, implement IoT filter DRM, and offer rent-to-own\
+    \ conversion."
+edges:
+- from: objective.purifier-cashflow
+  to: capex-and-pricing
+  relation: investigate
+- from: objective.purifier-cashflow
+  to: subscriber-churn
+  relation: investigate
+- from: objective.purifier-cashflow
+  to: reverse-logistics
+  relation: investigate
+- from: capex-and-pricing
+  to: diagnosis
+  relation: supports
+- from: subscriber-churn
+  to: diagnosis
+  relation: supports
+- from: reverse-logistics
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: unit-economics-first
+  sequence:
+  - capex-and-pricing
+  - subscriber-churn
+  - reverse-logistics
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate to calculate customer payback period vs average tenure.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - "Ask candidate to calculate months required to recover the \u20B99,000 manufacturing cost at \u20B9499/month."
+  - Highlight that 32% of users cancel in 6 months.
+  - Redirect toward contract lock-ins and security deposit requirements.

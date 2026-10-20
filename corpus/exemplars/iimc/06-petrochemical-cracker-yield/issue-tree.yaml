@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.cracker-yield
+  label: Maximize and stabilize dual-feed petrochemical cracker margins.
+nodes:
+- id: feedstock-yield-chemistry
+  type: branch
+  label: Ethane vs Naphtha Yield & Co-Product Output
+  status: valid_branch
+  evidence: []
+  conclusion: Ethane yields 80% ethylene; Naphtha yields high-value butadiene, propylene, benzene.
+- id: crack-spread-economics
+  type: branch
+  label: Crude vs Gas Price Ratios & Polymer Spreads
+  status: valid_branch
+  evidence: []
+  conclusion: When butadiene spreads spike, naphtha is more profitable despite lower ethylene yield.
+- id: operational-switching-latency
+  type: branch
+  label: Feed Switching Speed & Procurement Contracts
+  status: valid_branch
+  evidence: []
+  conclusion: 18-day switching lag caused plant to miss short-term market crack spread spikes.
+- id: diagnosis
+  type: diagnosis
+  label: Rigid Feed Procurement & Missed Co-Product Spreads
+  status: hidden_target
+  evidence:
+  - feedstock-yield-chemistry
+  - crack-spread-economics
+  - operational-switching-latency
+  conclusion: Margin instability is driven by an 18-day lag in switching cracker feeds, missing lucrative co-product price
+    spikes when petrochemical spreads shift.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Petrochemical Optimization Plan
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy real-time LP feed dispatch, execute financial crack-spread hedging, and invest in downstream C4 polymer
+    integration.
+edges:
+- from: objective.cracker-yield
+  to: feedstock-yield-chemistry
+  relation: investigate
+- from: objective.cracker-yield
+  to: crack-spread-economics
+  relation: investigate
+- from: objective.cracker-yield
+  to: operational-switching-latency
+  relation: investigate
+- from: feedstock-yield-chemistry
+  to: diagnosis
+  relation: supports
+- from: crack-spread-economics
+  to: diagnosis
+  relation: supports
+- from: operational-switching-latency
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: chemistry-first
+  sequence:
+  - feedstock-yield-chemistry
+  - crack-spread-economics
+  - operational-switching-latency
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from chemical cracking yields to co-product price economics.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what other products come out of cracking naphtha besides ethylene.
+  - Clarify that butadiene and benzene can have very high market value.
+  - Redirect toward dual-feed flexibility and real-time LP dispatch.

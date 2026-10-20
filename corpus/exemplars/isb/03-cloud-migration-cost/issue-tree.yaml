@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.cloud-cost-finops
+  label: "Reduce monthly cloud OpEx from \u20B916 Cr to under \u20B99 Cr."
+nodes:
+- id: cost-category-decomposition
+  type: branch
+  label: Compute vs Storage vs Network Breakdown
+  status: valid_branch
+  evidence: []
+  conclusion: Compute is 68% of spend; compute instances are provisioned on-demand.
+- id: workload-utilization-efficiency
+  type: branch
+  label: CPU/RAM Utilization & Idle Dev Environments
+  status: valid_branch
+  evidence: []
+  conclusion: Average CPU is 14%; 600 dev servers run un-utilized on weekends.
+- id: commercial-pricing-models
+  type: branch
+  label: On-Demand vs Reserved Instances / Savings Plans
+  status: valid_branch
+  evidence: []
+  conclusion: Zero reserved commitments exist, paying 2.5x standard discounted rates.
+- id: diagnosis
+  type: diagnosis
+  label: Oversized On-Demand Instances & Idle Environments
+  status: hidden_target
+  evidence:
+  - cost-category-decomposition
+  - workload-utilization-efficiency
+  - commercial-pricing-models
+  conclusion: Cloud spend exploded due to lift-and-shift provisioning of oversized on-demand instances at 14% utilization
+    without commercial savings plans or idle dev shutdowns.
+- id: actions
+  type: recommendation
+  label: 3-Pillar FinOps Optimization Roadmap
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Lock 3-year Savings Plans, right-size compute with auto-scaling, and enforce automated non-prod environment
+    shutdowns.
+edges:
+- from: objective.cloud-cost-finops
+  to: cost-category-decomposition
+  relation: investigate
+- from: objective.cloud-cost-finops
+  to: workload-utilization-efficiency
+  relation: investigate
+- from: objective.cloud-cost-finops
+  to: commercial-pricing-models
+  relation: investigate
+- from: cost-category-decomposition
+  to: diagnosis
+  relation: supports
+- from: workload-utilization-efficiency
+  to: diagnosis
+  relation: supports
+- from: commercial-pricing-models
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: bill-first
+  sequence:
+  - cost-category-decomposition
+  - workload-utilization-efficiency
+  - commercial-pricing-models
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from monthly bill line items to compute utilization and pricing commitments.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to check the average CPU utilization of the cloud servers.
+  - Clarify that the bank has zero reserved instance contracts.
+  - Redirect toward right-sizing compute instances and 3-year Savings Plans.

@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.bpo-ai-pivot
+  label: Transition BPO from FTE headcount billing to AI outcome pricing.
+nodes:
+- id: fte-revenue-cannibalization
+  type: branch
+  label: Hourly FTE Billing vs AI Call Reduction
+  status: valid_branch
+  evidence: []
+  conclusion: AI automation cuts billable hours by 45%, destroying revenue under hourly contracts.
+- id: ai-voice-agent-capabilities
+  type: branch
+  label: AI Voice Containment & Latency Metrics
+  status: valid_branch
+  evidence: []
+  conclusion: GenAI handles 74% of Tier-1 calls at 600ms latency with high CSAT.
+- id: outcome-pricing-economics
+  type: branch
+  label: Pay-Per-Resolution Margin Multipliers
+  status: valid_branch
+  evidence: []
+  conclusion: Pay-per-resolution at $1.85/call expands BPO gross margin from 28% to 52%.
+- id: diagnosis
+  type: diagnosis
+  label: FTE Model Disruption & Outcome-Based Transition
+  status: hidden_target
+  evidence:
+  - fte-revenue-cannibalization
+  - ai-voice-agent-capabilities
+  - outcome-pricing-economics
+  conclusion: Hourly FTE billing penalizes AI efficiency; transitioning to outcome-based Pay-Per-Resolution captures software
+    margins on 74% automated volume.
+- id: actions
+  type: recommendation
+  label: 3-Pillar AI Services Transformation
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Execute Pay-Per-Resolution contracts, deploy AI voice Tier-1 with human handoff, and equip Tier-2 staff with
+    AI copilots.
+edges:
+- from: objective.bpo-ai-pivot
+  to: fte-revenue-cannibalization
+  relation: investigate
+- from: objective.bpo-ai-pivot
+  to: ai-voice-agent-capabilities
+  relation: investigate
+- from: objective.bpo-ai-pivot
+  to: outcome-pricing-economics
+  relation: investigate
+- from: fte-revenue-cannibalization
+  to: diagnosis
+  relation: supports
+- from: ai-voice-agent-capabilities
+  to: diagnosis
+  relation: supports
+- from: outcome-pricing-economics
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: commercial-first
+  sequence:
+  - fte-revenue-cannibalization
+  - ai-voice-agent-capabilities
+  - outcome-pricing-economics
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from FTE billing conflict to outcome pricing unit economics.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what happens to an hourly billed BPO when AI reduces call handling time by 50%.
+  - Clarify that AI software costs pennies per minute.
+  - Redirect toward outcome-based per-resolution pricing.

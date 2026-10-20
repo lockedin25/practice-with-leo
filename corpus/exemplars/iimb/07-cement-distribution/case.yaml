@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 07-cement-distribution-v1
+title: Cement Multimodal Logistics
+school: IIM-B
+status: approved
+rights_status: original
+category: operations
+industry: heavy_manufacturing_and_steel
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a leading cement producer in Southern India producing 15M MT annually. Logistics costs represent
+    32% of total delivered cost, severely eroding margins against northern competitors.
+  objective: Design a multimodal logistics network (rail, road, and coastal shipping) to reduce freight cost per bag by 15%.
+  opening_requirements:
+  - Name Cement Multimodal Logistics and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - "Confirm primary metric (Freight Cost Per Metric Ton (\u20B9/MT)) and time horizon (twelve months)."
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: "Freight Cost Per Metric Ton (\u20B9/MT)"
+  decision_question: How should cement distribution be optimized across road, rail, and coastal shipping to reduce logistics
+    spend?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Over-reliance on direct road trucking (>60% share) for distances exceeding 400 km due to rail wagon shortages,
+    while coastal shipping remains un-utilized despite coastal plant and warehouse locations.
+  what_the_case_wanted_to_test: Heavy commodity freight economics, modal cost curves (road vs rail vs coastal shipping), private
+    freight terminal (PFT) capex, and bulk vs bagged handling.
+  pivotal_insight: "Coastal shipping from Andhra to Tamil Nadu costs \u20B9450/MT vs \u20B91,850/MT by road; investing in\
+    \ coastal bagging terminals unlocks 65% freight savings for coastal consumption markets."
+  common_traps:
+  - Assuming fuel diesel surcharges are the only driver of freight cost.
+  - Building road trucking fleets on company balance sheet.
+  - Ignoring railway rake turnaround detention penalties.
+  takeaway_lesson: In low-value high-weight commodities (cement, steel, coal), modal shift to rail and coastal shipping creates
+    insurmountable cost advantages over direct road transport for distances >300 km.
+  suggested_readings:
+  - knowledge_base/industries/14_heavy_manufacturing_and_steel.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/02_issue_tree_structuring.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

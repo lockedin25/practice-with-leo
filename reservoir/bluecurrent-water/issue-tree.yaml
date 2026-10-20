@@ -1,0 +1,90 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+
+root:
+  id: objective.nrw-reduction
+  label: Recommend an 18-month intervention plan to reduce 42% NRW and restore utility financial sustainability without tariff hikes.
+
+nodes:
+  - id: physical-losses
+    type: branch
+    label: Physical infrastructure leaks and pressure dynamics
+    status: valid_branch
+    evidence:
+      - loss.profile
+      - zone_variation
+    conclusion: Physical leaks represent ~21% NRW, heavily concentrated in aged high-pressure distribution zones.
+
+  - id: commercial-losses
+    type: branch
+    label: Apparent/commercial losses and metering accuracy
+    status: valid_branch
+    evidence:
+      - loss.profile
+      - metering
+    conclusion: Commercial losses represent ~21% NRW, driven by uncalibrated bulk commercial meters and unbilled informal connections.
+
+  - id: dma-leak-prioritization
+    type: mechanism
+    label: Test DMA zoning vs blanket citywide pipe replacement
+    status: pivotal_test
+    evidence:
+      - capability
+      - zone_variation
+    conclusion: District Metered Areas with night-flow analysis isolate 80% of physical leaks in 20% of pipe network at a fraction of blanket capex.
+
+  - id: commercial-regularisation
+    type: mechanism
+    label: Test bulk meter calibration and informal regularisation
+    status: pivotal_test
+    evidence:
+      - metering
+      - economics
+      - risk
+    conclusion: Calibrating commercial meters yields immediate high-margin revenue; community regularisation prevents pushback and captures volume.
+
+  - id: diagnosis
+    type: diagnosis
+    label: Synthesize root causes and operational priorities
+    status: hidden_target
+    evidence:
+      - dma-leak-prioritization
+      - commercial-regularisation
+    conclusion: >-
+      Utility faces dual physical/commercial leakage; capital-intensive blanket replacement fails budget limits;
+      prioritizing high-loss DMA pressure management and commercial meter calibration delivers fast cash flow under frozen tariffs.
+
+  - id: actions
+    type: recommendation
+    label: 3-Pillar 18-Month Action Plan
+    status: synthesis
+    evidence:
+      - recommendation.dma
+      - recommendation.revenue
+      - recommendation.service
+    conclusion: Roll out DMA zoning in top pressure zones, calibrate commercial meters while offering regularisation, and publish supply schedules.
+
+edges:
+  - { from: objective.nrw-reduction, to: physical-losses, relation: investigate }
+  - { from: objective.nrw-reduction, to: commercial-losses, relation: investigate }
+  - { from: physical-losses, to: dma-leak-prioritization, relation: motivates }
+  - { from: commercial-losses, to: commercial-regularisation, relation: motivates }
+  - { from: dma-leak-prioritization, to: diagnosis, relation: supports }
+  - { from: commercial-regularisation, to: diagnosis, relation: supports }
+  - { from: diagnosis, to: actions, relation: determines }
+
+acceptable_routes:
+  - id: loss-decomposition-first
+    sequence: [physical-losses, commercial-losses, dma-leak-prioritization, commercial-regularisation, diagnosis, actions]
+    interviewer_behaviour: Encourage candidate to split 42% NRW into physical vs commercial buckets before evaluating solutions.
+
+  - id: commercial-revenue-first
+    sequence: [commercial-losses, commercial-regularisation, physical-losses, dma-leak-prioritization, diagnosis, actions]
+    interviewer_behaviour: Allow focus on quick-win revenue recovery from bulk meters before transitioning to network leak repairs.
+
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+    - Ask candidate to state their hypothesis separating physical pipeline loss from commercial unbilled water.
+    - Clarify that citywide pipe replacement exceeds municipal capital budgets.
+    - Redirect candidate toward district-level night-flow metering and large commercial customer calibration.

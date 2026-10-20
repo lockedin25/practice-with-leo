@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.solar-manufacturing
+  label: Evaluate 5 GW solar cell and module manufacturing investment.
+nodes:
+- id: policy-and-market-demand
+  type: branch
+  label: ALMM Mandates & 40% Customs Duty Protection
+  status: valid_branch
+  evidence: []
+  conclusion: ALMM and 40% BCD create guaranteed domestic demand of 30 GW/year.
+- id: technology-node-selection
+  type: branch
+  label: PERC vs TOPCon vs HJT Cell Efficiency
+  status: valid_branch
+  evidence: []
+  conclusion: N-type TOPCon delivers 24.5% efficiency and commands a 12% price premium.
+- id: integration-and-pli-economics
+  type: branch
+  label: Cell+Module Integration & PLI Subsidies
+  status: valid_branch
+  evidence: []
+  conclusion: "Integrated Cell+Module captures \u20B91,250 Cr PLI subsidies, achieving 16.2% equity IRR."
+- id: diagnosis
+  type: diagnosis
+  label: Integrated TOPCon Manufacturing Viability
+  status: hidden_target
+  evidence:
+  - policy-and-market-demand
+  - technology-node-selection
+  - integration-and-pli-economics
+  conclusion: "Investment is highly lucrative (16.2% IRR) under ALMM protection if executed as an integrated Cell+Module TOPCon\
+    \ facility qualifying for \u20B91,250 Cr PLI incentives."
+- id: actions
+  type: recommendation
+  label: 3-Pillar Solar Industrial Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Build 5 GW integrated TOPCon plant, execute PLI milestone compliance, and lock multi-year wafer supply agreements.
+edges:
+- from: objective.solar-manufacturing
+  to: policy-and-market-demand
+  relation: investigate
+- from: objective.solar-manufacturing
+  to: technology-node-selection
+  relation: investigate
+- from: objective.solar-manufacturing
+  to: integration-and-pli-economics
+  relation: investigate
+- from: policy-and-market-demand
+  to: diagnosis
+  relation: supports
+- from: technology-node-selection
+  to: diagnosis
+  relation: supports
+- from: integration-and-pli-economics
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: technology-first
+  sequence:
+  - policy-and-market-demand
+  - technology-node-selection
+  - integration-and-pli-economics
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from policy tariff barriers to cell technology selection and PLI economics.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate why pure module assembly has lower margins than cell manufacturing.
+  - Clarify that ALMM mandates domestic cells for government tenders.
+  - Redirect toward N-type TOPCon cell efficiency and PLI subsidy economics.

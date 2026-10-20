@@ -1,0 +1,91 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+
+root:
+  id: objective.retail-growth
+  label: Recommend customer and distribution strategy to deliver 25% profitable retail income growth over 3 years without reckless credit expansion.
+
+nodes:
+  - id: customer-segmentation
+    type: branch
+    label: Market sizing and customer segment growth potential
+    status: valid_branch
+    evidence:
+      - segments.current
+      - market.opportunity
+    conclusion: Urban affluent is saturated (55% share); tier-2 emerging affluent (12M households) represents primary high-growth market.
+
+  - id: distribution-unit-economics
+    type: mechanism
+    label: Compare full branch vs digital RM hub economics
+    status: pivotal_test
+    evidence:
+      - channel.cost
+      - economics.segment
+    conclusion: Traditional full branches cost 4x more than digital RM hubs; digital onboarding + advisory hubs achieve positive customer LTV.
+
+  - id: competitive-differentiation
+    type: branch
+    label: Positioning against legacy private banks and fintechs
+    status: valid_branch
+    evidence:
+      - competition
+      - company.position
+    conclusion: White space exists between branch-heavy incumbents and purely transactional fintechs by offering digital payroll + advisory.
+
+  - id: credit-risk-and-sequencing
+    type: mechanism
+    label: Underwriting data availability and product cross-sell sequencing
+    status: pivotal_test
+    evidence:
+      - capability
+      - risk.credit
+      - objective.scope
+    conclusion: Sparse local credit data makes upfront unsecured lending risky; bank must anchor on payroll CASA first and season credit risk.
+
+  - id: diagnosis
+    type: diagnosis
+    label: Synthesize optimal growth strategy and risk controls
+    status: hidden_target
+    evidence:
+      - customer-segmentation
+      - distribution-unit-economics
+      - credit-risk-and-sequencing
+    conclusion: >-
+      To capture 25% growth profitably, Northstar must expand into tier-2 emerging affluent households via asset-light
+      digital RM hubs, anchoring relationships on corporate salary accounts and seasoning credit cross-sell.
+
+  - id: actions
+    type: recommendation
+    label: 3-Pillar 3-Year Strategic Growth Roadmap
+    status: synthesis
+    evidence:
+      - recommendation.hub
+      - recommendation.sequence
+      - recommendation.measure
+    conclusion: Pilot digital RM hubs in key tier-2 cities, anchor corporate payroll partnerships, and gate credit on transaction seasoning.
+
+edges:
+  - { from: objective.retail-growth, to: customer-segmentation, relation: investigate }
+  - { from: objective.retail-growth, to: competitive-differentiation, relation: investigate }
+  - { from: customer-segmentation, to: distribution-unit-economics, relation: motivates }
+  - { from: distribution-unit-economics, to: credit-risk-and-sequencing, relation: requires_risk_gating }
+  - { from: credit-risk-and-sequencing, to: diagnosis, relation: supports }
+  - { from: competitive-differentiation, to: diagnosis, relation: supports }
+  - { from: diagnosis, to: actions, relation: determines }
+
+acceptable_routes:
+  - id: segment-first
+    sequence: [customer-segmentation, distribution-unit-economics, credit-risk-and-sequencing, diagnosis, actions]
+    interviewer_behaviour: Guide candidate through segment growth potential, branch unit economics, and credit risk-gating.
+
+  - id: distribution-first
+    sequence: [competitive-differentiation, customer-segmentation, distribution-unit-economics, credit-risk-and-sequencing, diagnosis, actions]
+    interviewer_behaviour: Probe candidate on competitive white space before evaluating distribution channels and underwriting safeguards.
+
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+    - Ask candidate to state hypothesis comparing metro affluent saturation with tier-2 emerging affluent opportunity.
+    - Clarify that building full-service brick-and-mortar branches is 4x too expensive for tier-2 unit economics.
+    - Redirect candidate toward assessing digital onboarding paired with corporate payroll relationships and risk-gated lending.

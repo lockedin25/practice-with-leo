@@ -1,0 +1,74 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.hfc-margin
+  label: Restore housing finance company NIM and credit quality.
+nodes:
+- id: yield-and-funds
+  type: branch
+  label: Lending Yields vs Cost of Funds
+  status: valid_branch
+  evidence: []
+  conclusion: Spreads remained steady; margin drop is driven by acquisition commissions and credit loss.
+- id: sourcing-channels
+  type: branch
+  label: DSA Broker Sourcing vs Direct Branches
+  status: valid_branch
+  evidence: []
+  conclusion: DSA broker share grew to 75% while broker fees surged to 2.2% of loan value.
+- id: underwriting-quality
+  type: branch
+  label: Credit Underwriting & Builder Projects
+  status: valid_branch
+  evidence: []
+  conclusion: Defaults clustered in DSA-sourced builder subvention schemes and unverified cash borrowers.
+- id: diagnosis
+  type: diagnosis
+  label: DSA Channel Escalation & Underwriting Dilution
+  status: hidden_target
+  evidence:
+  - sourcing-channels
+  - underwriting-quality
+  conclusion: Over-reliance on third-party DSAs led to 2.2% broker cost inflation and adverse credit selection in builder
+    subvention schemes.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Lending Channel Turnaround
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Expand in-house direct sourcing, enforce broker default clawbacks, and tighten self-employed credit underwriting.
+edges:
+- from: objective.hfc-margin
+  to: yield-and-funds
+  relation: investigate
+- from: objective.hfc-margin
+  to: sourcing-channels
+  relation: investigate
+- from: objective.hfc-margin
+  to: underwriting-quality
+  relation: investigate
+- from: sourcing-channels
+  to: diagnosis
+  relation: supports
+- from: underwriting-quality
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: channel-first
+  sequence:
+  - yield-and-funds
+  - sourcing-channels
+  - underwriting-quality
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate to dissect loan sourcing channels and delinquency patterns.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to compare credit performance between branch-sourced and DSA-sourced loans.
+  - Clarify that wholesale borrowing costs are normal.
+  - Redirect toward broker fee structures and builder project risk.

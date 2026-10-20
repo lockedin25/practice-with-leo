@@ -1,0 +1,75 @@
+schema_version: reservoir-v1
+case_id: metrolink-mobility-v1
+title: MetroLink Mobility
+status: approved
+rights_status: original
+category: operations
+industry: urban_transit
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, operations, capacity analysis, stakeholder judgement, synthesis]
+
+candidate_opening:
+  context: >-
+    MetroLink operates city buses under a public service contract. Ridership has
+    fallen 12 percent while operating subsidies have risen, and the city wants an improvement plan.
+  objective: >-
+    Identify the main operational cause and recommend service changes to restore ridership and reliability without reducing access over eighteen months.
+  opening_requirements:
+    - Name MetroLink and describe its public transit operating network (1,100 buses).
+    - Identify the core problem (12% ridership drop and rising municipal subsidy requirements).
+    - Confirm the 18-month timeline and fixed fleet budget constraint.
+    - Ask clarifying questions regarding ridership patterns across corridors, schedule reliability, and alternative modal choices.
+
+objective_function:
+  primary_metric: reliable passenger trips per subsidy rupee
+  decision_question: How can MetroLink improve reliability and ridership within its current fleet budget?
+  time_horizon: eighteen months
+  expected_candidate_output:
+    - Route and corridor-level ridership loss diagnosis.
+    - Identification of schedule variance as driver of commuter modal shift.
+    - Fleet reallocation and dynamic dispatch plan within fixed budget.
+    - 100-day execution milestones and stakeholder safeguards.
+  design_principle: >-
+    Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+
+case_essence:
+  core_mechanism: >-
+    Schedule instability and route schedule elasticity. Construction on 2 main commuter corridors
+    degraded on-time arrival from 81% to 58%; commuters defected to 2-wheelers/shared cabs due to
+    arrival variance, while off-peak buses on those same corridors ran at <30% load factor.
+  what_the_case_wanted_to_test: >-
+    Transportation elasticity with respect to headway variance vs price, dynamic fleet asset
+    reallocation, and diagnosing passenger modal defection.
+  pivotal_insight: >-
+    Demand loss is driven by waiting-time variance, not fare levels; dynamic terminal dispatch
+    and reallocating off-peak buses to peak corridor frequencies restores reliability within the existing fleet budget.
+  common_traps:
+    - Slashing bus fares or introducing subsidized monthly passes to attract riders when reliability and wait-time variance are the real pain points.
+    - Requesting capital expenditure to purchase more buses when existing fleet utilization on off-peak routes is below 30%.
+    - Canceling routes in low-density neighborhoods that serve as vital feeder lines without auditing corridor congestion bottlenecks.
+  takeaway_lesson: >-
+    In public transit and urban logistics, schedule adherence and wait-time predictability have a
+    far higher demand elasticity than nominal fares.
+  suggested_readings:
+    - knowledge_base/industries/01_logistics_and_cold_chain.md
+    - knowledge_base/case_types/unconventional_and_abstract.md
+    - knowledge_base/methodology/02_issue_tree_structuring.md
+
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+    - clarification
+    - drill_down
+    - synthesis
+
+reservoir_files:
+  - facts.yaml
+  - issue-tree.yaml
+  - conversation-policy.yaml
+  - validation.md

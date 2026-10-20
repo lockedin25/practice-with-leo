@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 01-fintech-bnpl-default-v1
+title: Fintech BNPL Credit Risk
+school: ISB
+status: approved
+rights_status: original
+category: operations
+industry: fintech_and_payments
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a venture-backed Buy-Now-Pay-Later (BNPL) checkout fintech integrated across 20,000 Indian e-commerce
+    merchants. First-payment default (FPD) rates on new user checkouts jumped from 4.2% to 11.8%, eroding unit margins.
+  objective: Diagnose the drivers of BNPL first-payment default and design a real-time risk-gating underwriting model.
+  opening_requirements:
+  - Name Fintech BNPL Credit Risk and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (First-Payment Default (FPD %) and Checkout Conversion Rate (%)) and time horizon (six months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: First-Payment Default (FPD %) and Checkout Conversion Rate (%)
+  decision_question: Why did BNPL first-payment defaults surge and how should checkout friction vs credit risk be optimized?
+  time_horizon: six months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "Frictionless instant onboarding with zero credit bureau verification for sub-\u20B92,000 purchases exploited\
+    \ by bot syndicates and synthetic identity fraud during festive sales."
+  what_the_case_wanted_to_test: Fintech checkout friction vs fraud trade-off, device fingerprinting, transaction velocity
+    gating, and post-purchase credit limit escalation.
+  pivotal_insight: Removing all OTP/identity steps to boost merchant conversion attracted fraud rings targeting high-liquidity
+    electronics and gift cards; introducing silent device-binding and merchant SKU category risk-gating cuts fraud by 70%
+    with zero checkout drop-off.
+  common_traps:
+  - "Requiring a full 5-minute PAN/Aadhaar video KYC for every \u20B9500 purchase, which destroys merchant checkout conversion\
+    \ by 60%."
+  - Stopping all lending on e-commerce platforms.
+  - Assuming honest consumers suddenly stopped paying EMIs.
+  takeaway_lesson: In instant embedded fintech lending, sub-second underwriting must rely on silent device and transaction
+    behavioral telemetry rather than heavy user-facing verification friction.
+  suggested_readings:
+  - knowledge_base/industries/15_fintech_and_payments.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

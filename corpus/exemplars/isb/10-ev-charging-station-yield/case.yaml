@@ -1,0 +1,72 @@
+schema_version: reservoir-v1
+case_id: 10-ev-charging-station-yield-v1
+title: EV Fast-Charging Network Yield
+school: ISB
+status: approved
+rights_status: original
+category: operations
+industry: automotive_and_ev
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client operates a public network of 400 DC Fast-Charging stations (60 kW / 120 kW) across Indian highways
+    and metro malls. Station utilization averages only 12%, resulting in negative network EBITDA due to high electricity demand
+    charges.
+  objective: Diagnose low charging station utilization and design dynamic time-of-day pricing and fleet tie-ups to achieve
+    EBITDA breakeven.
+  opening_requirements:
+  - Name EV Fast-Charging Network Yield and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Station Utilization (%) and EBITDA per Charging Gun) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Station Utilization (%) and EBITDA per Charging Gun
+  decision_question: How should EV charging station tariffs and site partnerships be restructured to double capacity utilization?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "Fixed grid maximum demand charges (MVA penalties) with peak utilization occurring only 3 hours per day,\
+    \ while commercial EV taxi fleets avoid stations due to high daytime spot tariffs (\u20B922/kWh)."
+  what_the_case_wanted_to_test: EV charging unit economics, fixed grid demand charges vs energy charges, dynamic Time-of-Day
+    (ToD) tariff structuring, and commercial fleet anchor partnerships.
+  pivotal_insight: "Fixed grid demand charges cost \u20B945,000/month per station regardless of power drawn; offering discounted\
+    \ off-peak tariffs (\u20B914/kWh) to commercial taxi fleets during mid-day and overnight lulls raises station utilization\
+    \ from 12% to 32% without adding demand charges."
+  common_traps:
+  - Raising charging tariffs across the board, which drives private EV owners to charge exclusively at home.
+  - Building more highway charging stations before fixing city network utilization.
+  - Assuming battery swapping is the only viable solution.
+  takeaway_lesson: In fixed-capacity utility infrastructure with high grid demand charges, profitability requires filling
+    off-peak valley hours with guaranteed commercial fleet volume.
+  suggested_readings:
+  - knowledge_base/industries/10_automotive_and_ev.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

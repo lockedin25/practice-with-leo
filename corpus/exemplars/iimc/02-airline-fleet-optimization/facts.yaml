@@ -1,0 +1,44 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: fleet.operations
+  domain: company
+  release_level: broad_context
+  content: Client operates 180 A320s flying 6.2 sectors/day per tail with 11.2 daily block hours.
+- id: tat.inflation
+  domain: operations
+  release_level: sharp_question
+  content: Average TAT increased from 25 to 36 minutes across metro airports, causing flight cascading delays and eliminating
+    the 7th daily sector.
+- id: critical.path
+  domain: operations
+  release_level: hypothesis_backed
+  content: Critical path audit reveals passenger deplaning/boarding takes 22 minutes (single jet bridge door) and cabin cleaning
+    starts only after full deplaning.
+  dependencies:
+  - tat.inflation
+- id: utilization.value
+  domain: financials
+  release_level: hypothesis_backed
+  content: "Achieving 25-minute TAT enables 1 additional flight per tail daily, generating \u20B9650 Cr in incremental annual\
+    \ network revenue."
+  dependencies:
+  - critical.path
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: TAT expanded to 36 mins because passenger deplaning and cabin cleaning operate sequentially through a single jet
+    bridge door; switching to dual-door boarding and concurrent cabin cleaning recovers 25-min TAT and unlocks 1 flight/day
+    per aircraft.
+- id: recommendation.dual_boarding
+  domain: recommendation
+  release_level: synthesis_support
+  content: Enforce dual-door boarding/deplaning using aerobridge for front door and mobile ramp stairs for rear door.
+- id: recommendation.concurrent_cleaning
+  domain: recommendation
+  release_level: synthesis_support
+  content: Deploy sectional cabin cleaning crews to start row cleaning concurrently as front-half passengers deplane.
+- id: recommendation.gate_baggage
+  domain: recommendation
+  release_level: synthesis_support
+  content: Pre-stage baggage tugs at the gate 10 minutes prior to aircraft touchdown for instant offloading.

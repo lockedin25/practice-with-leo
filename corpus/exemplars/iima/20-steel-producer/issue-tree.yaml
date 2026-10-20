@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.steel-mill-ebitda
+  label: Restore secondary steel induction mill EBITDA margin.
+nodes:
+- id: power-and-tariffs
+  type: branch
+  label: Specific Power Consumption (kWh/ton) & Tariffs
+  status: valid_branch
+  evidence: []
+  conclusion: "Power use rose 32% (to 765 kWh/ton) while grid tariffs rose to \u20B97.60/kWh."
+- id: sponge-iron-metallurgy
+  type: branch
+  label: Sponge Iron Metallization & Yield
+  status: valid_branch
+  evidence: []
+  conclusion: 76% metallization sponge iron increased slag volume and melting energy.
+- id: captive-power-options
+  type: branch
+  label: Captive Generation & Waste Heat Recovery
+  status: valid_branch
+  evidence: []
+  conclusion: Plant has zero captive power, exposing 100% of load to state grid tariffs.
+- id: diagnosis
+  type: diagnosis
+  label: Low-Grade DRI Sponge Iron Power Penalty
+  status: hidden_target
+  evidence:
+  - power-and-tariffs
+  - sponge-iron-metallurgy
+  - captive-power-options
+  conclusion: Buying low-metallization sponge iron increased power consumption by 32%, turning rising power tariffs into a
+    crippling margin blow.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Energy & Raw Material Optimization
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Restore 84% metallization sourcing, install 15 MW waste-heat captive power, and automate oxygen lancing.
+edges:
+- from: objective.steel-mill-ebitda
+  to: power-and-tariffs
+  relation: investigate
+- from: objective.steel-mill-ebitda
+  to: sponge-iron-metallurgy
+  relation: investigate
+- from: objective.steel-mill-ebitda
+  to: captive-power-options
+  relation: investigate
+- from: power-and-tariffs
+  to: diagnosis
+  relation: supports
+- from: sponge-iron-metallurgy
+  to: diagnosis
+  relation: supports
+- from: captive-power-options
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: energy-first
+  sequence:
+  - power-and-tariffs
+  - sponge-iron-metallurgy
+  - captive-power-options
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from power cost breakdown to sponge iron metallization chemistry.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to evaluate specific power consumption per ton of steel.
+  - Clarify that TMT bar selling prices are healthy.
+  - Redirect inquiry toward sponge iron quality and its impact on electric melting energy.

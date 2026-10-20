@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.hospital-throughput
+  label: Eliminate elective surgery cancellations and optimize ICU flow.
+nodes:
+- id: bed-utilization-by-unit
+  type: branch
+  label: 'Occupancy Breakdown: Ward vs ICU vs OR'
+  status: valid_branch
+  evidence: []
+  conclusion: Wards are 64% full while ICU runs at 96%, blocking Operating Rooms.
+- id: patient-discharge-cycle
+  type: branch
+  label: ICU-to-Ward Transfer & Discharge Delays
+  status: valid_branch
+  evidence: []
+  conclusion: Cleared patients occupy ICU beds for 14.2 hours waiting for ward clearance and billing.
+- id: tpa-and-ward-turnaround
+  type: branch
+  label: Insurance TPA Approvals & Housekeeping
+  status: valid_branch
+  evidence: []
+  conclusion: Administrative discharge delays create artificial bed shortages during morning peak admissions.
+- id: diagnosis
+  type: diagnosis
+  label: Downstream ICU Transfer Blockage
+  status: hidden_target
+  evidence:
+  - bed-utilization-by-unit
+  - patient-discharge-cycle
+  - tpa-and-ward-turnaround
+  conclusion: High-margin surgeries are cancelled because ICU beds are choked by cleared patients experiencing a 14-hour discharge
+    lag to general wards.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Patient Flow Debottlenecking
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Create a Transit Discharge Lounge, expand HDU step-down capacity, and automate digital TPA insurance clearances.
+edges:
+- from: objective.hospital-throughput
+  to: bed-utilization-by-unit
+  relation: investigate
+- from: objective.hospital-throughput
+  to: patient-discharge-cycle
+  relation: investigate
+- from: objective.hospital-throughput
+  to: tpa-and-ward-turnaround
+  relation: investigate
+- from: bed-utilization-by-unit
+  to: diagnosis
+  relation: supports
+- from: patient-discharge-cycle
+  to: diagnosis
+  relation: supports
+- from: tpa-and-ward-turnaround
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: flow-first
+  sequence:
+  - bed-utilization-by-unit
+  - patient-discharge-cycle
+  - tpa-and-ward-turnaround
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from overall occupancy to ICU vs ward discharge bottlenecks.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate why surgeries are cancelled if general wards are 36% empty.
+  - Clarify that operating rooms have surgeon availability.
+  - Redirect inquiry toward ICU bed availability and discharge transfer times.

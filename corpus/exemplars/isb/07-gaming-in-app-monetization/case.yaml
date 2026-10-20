@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 07-gaming-in-app-monetization-v1
+title: Real-Money Gaming Tax & Liquidity
+school: ISB
+status: approved
+rights_status: original
+category: pricing
+industry: telecom_and_media
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a top Indian real-money skill gaming platform (Poker and Rummy). The government introduced a 28%
+    Goods and Services Tax (GST) on full contest entry amounts, threatening platform viability.
+  objective: Redesign platform rake fees, tournament prize pools, and VIP loyalty rewards to absorb the 28% GST impact without
+    user churn.
+  opening_requirements:
+  - Name Real-Money Gaming Tax & Liquidity and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Monthly Active Depositors (MAD) and Net Gaming Revenue (NGR)) and time horizon (six months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Monthly Active Depositors (MAD) and Net Gaming Revenue (NGR)
+  decision_question: How should platform rake and table prize pools be restructured under the 28% GST regime?
+  time_horizon: six months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Tax incidence and table liquidity dynamics. Passing 100% of 28% GST directly to players reduces return-to-player
+    (RTP) payouts, causing casual players to deplete their wallet balances 3x faster and churn.
+  what_the_case_wanted_to_test: Gaming platform economics, Gross Gaming Revenue (GGR) vs Net Gaming Revenue (NGR), rake fee
+    elasticity, liquidity matchmaking, and player lifetime value.
+  pivotal_insight: If players lose money rapidly due to tax deductions, table liquidity collapses; subsidizing GST on initial
+    deposit via bonus non-withdrawable gameplay credits increases playing velocity, generating enough incremental rake to
+    offset tax costs.
+  common_traps:
+  - Passing the entire 28% tax as a direct upfront deduction on player deposits, causing a 45% drop in player lifetime.
+  - Exiting skill gaming entirely to offer free casual games with low ad monetization.
+  - Attempting illegal offshore corporate tax avoidance.
+  takeaway_lesson: In transaction-taxed two-sided marketplace platforms, subsidizing player entry via gameplay bonus credits
+    preserves marketplace liquidity and increases transaction velocity.
+  suggested_readings:
+  - knowledge_base/industries/07_telecom_and_media.md
+  - knowledge_base/case_types/pricing_strategy.md
+  - knowledge_base/methodology/04_data_gathering_and_notes.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

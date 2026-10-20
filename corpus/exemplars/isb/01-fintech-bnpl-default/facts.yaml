@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: bnpl.scale
+  domain: company
+  release_level: broad_context
+  content: "Fintech processes 2.5M monthly BNPL transactions with an average ticket size of \u20B91,850."
+- id: fpd.surge
+  domain: financials
+  release_level: sharp_question
+  content: "FPD jumped to 11.8%, resulting in \u20B938 Cr in monthly credit write-offs."
+- id: fraud.pattern
+  domain: risk
+  release_level: hypothesis_backed
+  content: 82% of defaults cluster in digital gift vouchers, gaming credits, and mobile phones ordered to temporary addresses
+    from emulator devices.
+  dependencies:
+  - fpd.surge
+- id: device.telemetry
+  domain: operations
+  release_level: hypothesis_backed
+  content: Implementing automated device-ID hashing, SIM-binding, and IP velocity limits flags 88% of fraudulent checkouts
+    without user friction.
+  dependencies:
+  - fraud.pattern
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: FPD surged to 11.8% because frictionless 1-click checkout was exploited by emulator fraud syndicates buying liquid
+    vouchers; solution requires silent device-fingerprinting and category-level risk gating.
+- id: recommendation.device_risk
+  domain: recommendation
+  release_level: synthesis_support
+  content: Deploy silent SDK device fingerprinting, emulator detection, and SIM-binding on all merchant checkout pages.
+- id: recommendation.category_gating
+  domain: recommendation
+  release_level: synthesis_support
+  content: Require step-up UPI autopay mandate authentication for high-risk digital gift cards and electronics.
+- id: recommendation.graduated_limits
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Start new users with a conservative \u20B91,000 credit line, escalating dynamically only after 2 on-time repayment\
+    \ cycles."

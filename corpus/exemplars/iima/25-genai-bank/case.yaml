@@ -1,0 +1,72 @@
+schema_version: reservoir-v1
+case_id: 25-genai-bank-v1
+title: GenAI Wealth Advisory Compliance
+school: IIM-A
+status: approved
+rights_status: original
+category: unconventional_and_abstract
+industry: banking_and_financial_services
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a global private bank with $200B AUM. It piloted a Generative AI copilot to automate investment
+    advisory suitability compliance notes, but senior wealth managers reject the tool and compliance audit failure rate is
+    26%.
+  objective: Diagnose the GenAI adoption and accuracy failure and propose a hybrid human-AI compliance operating model.
+  opening_requirements:
+  - Name GenAI Wealth Advisory Compliance and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Audit Compliance Pass Rate (%) and Advisor Time Saved per Note (hours)) and time horizon (six
+    months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Audit Compliance Pass Rate (%) and Advisor Time Saved per Note (hours)
+  decision_question: Why did the GenAI advisory compliance pilot fail and how should the human-in-the-loop workflow be redesigned?
+  time_horizon: six months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Hallucination risk in portfolio regulatory disclosures and legal liability assignment. When AI generated
+    erroneous suitability justifications, compliance held the human advisor legally liable, so advisors spent more time fact-checking
+    AI notes than drafting them manually.
+  what_the_case_wanted_to_test: Enterprise GenAI adoption, human-in-the-loop workflow engineering, regulatory liability allocation,
+    and prompt grounding on structured client CRM data.
+  pivotal_insight: Advisors rejected GenAI not out of tech resistance, but because the bank imposed 100% personal regulatory
+    liability on advisors for any AI hallucination without providing verification source-attribution citations.
+  common_traps:
+  - Blaming advisors as technologically incompetent or change-resistant.
+  - Switching foundation LLM model providers expecting zero hallucinations in complex wealth regulation.
+  - Removing human oversight and automating client investment sign-offs completely.
+  takeaway_lesson: In high-liability regulated industries, enterprise GenAI succeeds only when the interface provides verifiable
+    source-citation provenance and operating procedures shift from manual editing to structured human verification gates.
+  suggested_readings:
+  - knowledge_base/industries/04_banking_and_financial_services.md
+  - knowledge_base/case_types/unconventional_and_abstract.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

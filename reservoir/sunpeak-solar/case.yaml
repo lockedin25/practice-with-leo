@@ -1,0 +1,75 @@
+schema_version: reservoir-v1
+case_id: sunpeak-solar-v1
+title: SunPeak Solar
+status: approved
+rights_status: original
+category: pricing
+industry: distributed_energy
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, pricing, unit economics, customer insight, synthesis]
+
+candidate_opening:
+  context: >-
+    SunPeak Solar sells rooftop solar systems to small businesses. Lead volume is
+    strong, but only 9 percent of qualified leads convert, well below management's 18 percent target.
+  objective: >-
+    Diagnose the conversion bottleneck and recommend a pricing and offer redesign to raise profitable conversion to 18 percent over twelve months.
+  opening_requirements:
+    - Name SunPeak Solar and describe its commercial rooftop solar installation model.
+    - Identify the performance problem (9% conversion vs 18% target despite strong qualified lead generation).
+    - Confirm the 12-month decision horizon and profitable conversion metric.
+    - Ask clarifying questions on sales funnel drop-off points, customer segment economics, pricing models, and financing options.
+
+objective_function:
+  primary_metric: profitable installation conversion
+  decision_question: How should SunPeak change its offer to raise profitable conversion?
+  time_horizon: twelve months
+  expected_candidate_output:
+    - Funnel analysis isolating drop-off to the final cash quote stage.
+    - Customer cash-flow and hurdle rate diagnosis (upfront capex vs monthly opex savings).
+    - Redesigned 3-pillar commercial offer (financed monthly payment model, segment prioritization, lender pre-approval integration).
+    - Credit risk governance and 100-day execution milestones.
+  design_principle: >-
+    Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+
+case_essence:
+  core_mechanism: >-
+    Upfront capex hurdle vs operational cash-flow economics. SME factory owners understand long-term
+    energy savings but reject large upfront lump-sum cash quotes to protect working capital; a financed
+    5-year monthly payment model makes monthly loan payments strictly lower than grid electricity savings from month one.
+  what_the_case_wanted_to_test: >-
+    Pricing structure design, cash-flow vs lifecycle cost perception in commercial B2B sales,
+    OPEX vs CAPEX financing models (PPA / EMI), and customer hurdle rates.
+  pivotal_insight: >-
+    Customers are not price-elastic to total lifecycle cost—they are cash-flow constrained;
+    offering an OPEX-equivalent financed monthly instalment unlocks immediate positive ROI for prospects.
+  common_traps:
+    - Offering upfront hardware discounts or lowering solar panel pricing, which erodes installer gross margin without solving customer working-capital constraints.
+    - Blaming poor conversion on lead quality or sales team negotiation skills rather than the commercial payment structure.
+    - Pitching a 15-year net present value (NPV) calculation to SME owners who operate on 6-month cash conversion cycles.
+  takeaway_lesson: >-
+    In B2B clean-tech and industrial equipment, converting high-capex assets requires re-packaging
+    the economic value proposition into day-one cash-positive operating expenditure models.
+  suggested_readings:
+    - knowledge_base/industries/11_energy_and_renewables.md
+    - knowledge_base/case_types/pricing_strategy.md
+    - knowledge_base/methodology/04_data_gathering_and_notes.md
+
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+    - clarification
+    - drill_down
+    - synthesis
+
+reservoir_files:
+  - facts.yaml
+  - issue-tree.yaml
+  - conversation-policy.yaml
+  - validation.md

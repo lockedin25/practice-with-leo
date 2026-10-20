@@ -1,0 +1,182 @@
+/* ==========================================================================
+   Sign-in surface. Tokens, brand, and button primitives come from tokens.css.
+   ========================================================================== */
+
+.auth-body {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 28px 20px;
+  background-color: var(--bg-base);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+}
+
+.auth-topbar-actions {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+}
+
+.auth-shell {
+  width: min(460px, 100%);
+}
+
+.auth-card {
+  padding: 38px 36px 32px;
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-xl);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand-primary), var(--gold-primary));
+}
+
+.auth-brand {
+  margin-bottom: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.auth-title {
+  margin: 0 0 10px;
+  font-family: var(--font-serif);
+  font-size: 2.125rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--ink-primary);
+}
+
+.auth-lede {
+  margin: 0 0 24px;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+}
+
+.auth-alert {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border: 1px solid var(--status-danger);
+  border-radius: var(--r-md);
+  background: var(--status-danger-bg);
+  font-size: 0.8438rem;
+  line-height: 1.5;
+  color: var(--status-danger);
+}
+
+/* Google's brand guidance: a neutral surface, its own mark, unmodified. */
+.google-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--ink-primary);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.google-button:hover {
+  background: var(--bg-subtle);
+  border-color: var(--ink-muted);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.google-button:active {
+  transform: translateY(1px);
+}
+
+.google-button.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.google-mark {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.auth-note {
+  margin: 12px 0 0;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.auth-points {
+  display: grid;
+  gap: 10px;
+  margin: 26px 0 0;
+  padding: 22px 0 0;
+  border-top: 1px dashed var(--line-dashed);
+  list-style: none;
+}
+
+.auth-points li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+}
+
+.auth-tick {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--brand-light);
+}
+
+.auth-tick::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brand-primary);
+}
+
+.auth-fineprint {
+  margin: 20px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+@media (max-width: 640px) {
+  .auth-card {
+    padding: 28px 22px 24px;
+    border-radius: var(--r-lg);
+  }
+  .auth-title { font-size: 1.75rem; }
+}

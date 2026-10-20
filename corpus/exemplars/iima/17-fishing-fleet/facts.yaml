@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: fleet.overview
+  domain: company
+  release_level: broad_context
+  content: Client operates 30 motorized 24-meter deep-sea trawlers on 20-day Arabian Sea voyages.
+- id: voyage.cost
+  domain: financials
+  release_level: sharp_question
+  content: Marine diesel fuel represents 56% of total voyage cost, up 35% over two years.
+- id: catch.composition
+  domain: operations
+  release_level: hypothesis_backed
+  content: High-value yellowfin tuna represents only 20% of net volume; 45% is low-value bycatch discarded at sea to save
+    cold-hold ice.
+  dependencies:
+  - voyage.cost
+- id: scouting.efficiency
+  domain: operations
+  release_level: hypothesis_backed
+  content: Trawlers average 9 days of active search cruise per 20-day trip without satellite oceanographic sea-surface temperature
+    data.
+  dependencies:
+  - catch.composition
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Voyages are unprofitable because trawlers spend 9 days burning fuel searching blindly while discarding 45% of catch
+    (bycatch) due to lack of onboard chilling and commercial surimi tie-ups.
+- id: recommendation.satellite
+  domain: recommendation
+  release_level: synthesis_support
+  content: Subscribe to ISRO/INCOIS Potential Fishing Zone (PFZ) satellite thermal maps to cut search cruise time by 40%.
+- id: recommendation.bycatch
+  domain: recommendation
+  release_level: synthesis_support
+  content: Install onboard blast freezers and contract with coastal surimi/fishmeal processors to monetize secondary catch.
+- id: recommendation.fuel_efficiency
+  domain: recommendation
+  release_level: synthesis_support
+  content: Implement engine speed governance (trolling at 8 knots vs 12 knots) to reduce diesel burn by 22%.

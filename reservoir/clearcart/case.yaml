@@ -1,0 +1,75 @@
+schema_version: reservoir-v1
+case_id: clearcart-v1
+title: ClearCart
+status: approved
+rights_status: original
+category: growth_strategy
+industry: ecommerce_marketplace
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, cohort analysis, growth strategy, prioritisation, synthesis]
+
+candidate_opening:
+  context: >-
+    ClearCart is an online marketplace for home and lifestyle products. New
+    customer acquisition is growing, but repeat purchase has fallen and marketing efficiency is deteriorating.
+  objective: >-
+    Find the highest-value retention intervention over the next twelve months to restore repeat rates and improve contribution-margin LTV.
+  opening_requirements:
+    - Name the client and e-commerce marketplace business model.
+    - Identify the core problem (falling repeat rates from 26% to 17% and deteriorating CAC/LTV).
+    - Confirm the 12-month decision horizon and contribution-margin LTV metric.
+    - Ask clarifying questions on product category breakdown, customer cohorts, and fulfillment models.
+
+objective_function:
+  primary_metric: contribution-margin lifetime value
+  decision_question: Which retention lever should ClearCart prioritise, and why?
+  time_horizon: twelve months
+  expected_candidate_output:
+    - Root cause diagnosis of repeat rate collapse by category and cohort.
+    - Prioritized retention strategy (white-glove bulky fulfillment vs marketing discounts).
+    - Supplier/merchant SLA governance and economic impact.
+    - 100-day execution milestones.
+  design_principle: >-
+    Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+
+case_essence:
+  core_mechanism: >-
+    Fulfilment model quality breakdown across high-value categories. Low repeat is concentrated
+    in bulky furniture/decor (not consumables) due to delivery delays, transit damage, and lack
+    of installation support under unmanaged 3P seller logistics.
+  what_the_case_wanted_to_test: >-
+    Cohort retention decomposition by category and delivery channel, diagnosing post-purchase customer
+    friction, and recognizing the limits of performance marketing in masking operational defects.
+  pivotal_insight: >-
+    Subsidizing repeat marketing/discounts burns cash without addressing root dissatisfaction;
+    enforcing SLA/white-glove delivery standards on high-value furniture sellers fixes the churn driver.
+  common_traps:
+    - Increasing retargeting spend, coupon discounts, or loyalty points to boost repeat rates without diagnosing category-specific delivery damage.
+    - Blaming rising CAC on competitive advertising bids instead of falling LTV across bulky product cohorts.
+    - Treating home decor and bulky furniture with the same parcel delivery SLAs as apparel and small accessories.
+  takeaway_lesson: >-
+    Customer churn in marketplace platforms is almost always an operational SLA failure in high-involvement
+    categories, not an acquisition marketing deficiency.
+  suggested_readings:
+    - knowledge_base/industries/02_ecommerce_and_marketplaces.md
+    - knowledge_base/case_types/growth_strategy.md
+    - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+    - clarification
+    - drill_down
+    - synthesis
+
+reservoir_files:
+  - facts.yaml
+  - issue-tree.yaml
+  - conversation-policy.yaml
+  - validation.md

@@ -1,0 +1,970 @@
+/* ==========================================================================
+   Case Library
+   Page-local styles only. Palette, type, shell, navbar, buttons, chips,
+   eyebrow and the 44px touch-target rules all come from tokens.css.
+
+   Breakpoints, and nothing else: 1200px, 900px, 640px.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-main {
+  flex: 1;
+  padding: 44px 0 72px;
+}
+
+/* --- Header --------------------------------------------------------------- */
+
+.lib-head {
+  max-width: 640px;
+  margin-bottom: 32px;
+}
+
+.lib-title {
+  margin: 14px 0 12px;
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 2.875rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--ink-primary);
+}
+
+.lib-lede {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+}
+
+.lib-scale {
+  margin-top: 10px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+/* --- Controls ------------------------------------------------------------- */
+
+.controls {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.search-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.search-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.search-glyph {
+  position: absolute;
+  left: 15px;
+  width: 17px;
+  height: 17px;
+  color: var(--ink-muted);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  min-width: 0;
+  height: 50px;
+  padding: 0 52px 0 43px;
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-md);
+  background: var(--surface-raised);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  outline: none;
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.search-input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.search-input:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--brand-tint);
+}
+
+/* Real button, real name, 44px target, own focus ring. */
+.search-clear {
+  position: absolute;
+  right: 3px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.search-clear svg {
+  width: 26px;
+  height: 26px;
+  padding: 5px;
+  border-radius: var(--r-pill);
+  background: var(--bg-subtle);
+  transition: background var(--transition-fast);
+}
+
+.search-clear:hover {
+  color: var(--ink-primary);
+}
+
+.search-clear:hover svg {
+  background: var(--brand-light);
+}
+
+.search-clear:active svg {
+  background: var(--brand-tint-hover);
+}
+
+.filters-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  min-height: 50px;
+  padding: 0 16px;
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-md);
+  background: var(--surface-raised);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 650;
+  cursor: pointer;
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.filters-toggle svg {
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+
+.filters-toggle:hover {
+  border-color: var(--line-strong);
+  background: var(--bg-subtle);
+}
+
+.filters-toggle[aria-expanded="true"] {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+}
+
+.filters-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--r-pill);
+  background: var(--brand-primary);
+  color: var(--brand-on);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- View switch and sort ------------------------------------------------ */
+
+.view-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.view-switch {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-pill);
+  background: var(--bg-subtle);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.view-switch::-webkit-scrollbar {
+  display: none;
+}
+
+.view-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-height: 40px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+/* Compact 40px pill, 44px hit area, same trick tokens.css uses on chips. */
+.view-tab::before {
+  content: "";
+  position: absolute;
+  inset: 50% 0 auto 0;
+  transform: translateY(-50%);
+  height: 44px;
+}
+
+.view-tab:hover {
+  color: var(--ink-primary);
+}
+
+.view-tab.is-active {
+  background: var(--surface-raised);
+  color: var(--brand-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+.select {
+  min-height: 46px;
+  padding: 0 34px 0 14px;
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-md);
+  background: var(--surface-raised);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7a74' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.select:focus {
+  border-color: var(--brand-primary);
+}
+
+.select-block {
+  width: 100%;
+  max-width: 320px;
+}
+
+/* --- Filters panel ------------------------------------------------------- */
+
+.filters-scrim {
+  display: none;
+}
+
+.filters-panel {
+  padding: 18px 20px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-md);
+}
+
+.filters-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.filters-panel-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.filters-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: -10px -10px -10px 0;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.filters-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.filters-close:hover {
+  color: var(--ink-primary);
+}
+
+.filters-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.filter-group {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.filter-legend {
+  padding: 0;
+  margin-bottom: 10px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.filter-hint {
+  margin: -6px 0 10px;
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+
+.filter-group-quiet {
+  padding-top: 14px;
+  border-top: 1px dashed var(--line-dashed);
+}
+
+.filter-group-quiet .filter-legend {
+  color: var(--ink-secondary);
+}
+
+/* 14px row gap keeps the 44px hit areas from overlapping between rows. */
+.chip-set {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 8px;
+}
+
+/* Compact pill, 44px target. tokens.css grows .filter-chip with a pseudo
+   element, so only the look is defined here. */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 13px;
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-pill);
+  background: var(--surface-raised);
+  color: var(--ink-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.filter-chip:hover {
+  border-color: var(--line-strong);
+  background: var(--bg-subtle);
+  color: var(--ink-primary);
+}
+
+.filter-chip[aria-pressed="true"] {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary);
+  color: var(--brand-on);
+}
+
+.filter-chip-count {
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.62;
+}
+
+.filters-panel-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-subtle);
+}
+
+/* --- Results line -------------------------------------------------------- */
+
+.results-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.results-line {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+.results-reset {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand-primary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* --- Recommended next rail ---------------------------------------------- */
+
+.rail {
+  margin-bottom: 34px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--line-subtle);
+}
+
+.rail-head {
+  margin-bottom: 16px;
+}
+
+.rail-title {
+  font-family: var(--font-serif);
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink-primary);
+}
+
+.rail-note {
+  margin-top: 4px;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+.rail-track {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+  gap: 16px;
+}
+
+/* --- Cases grid --------------------------------------------------------- */
+
+.cases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: 18px;
+}
+
+/* The library can take a moment to personalise. Case-shaped placeholders make
+   that wait legible without a decorative spinner that can be distorted by a
+   browser or cached stylesheet. */
+.cases-loading {
+  display: contents;
+}
+
+.case-skeleton {
+  min-height: 276px;
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-lg);
+  background:
+    linear-gradient(var(--paper-deep), var(--paper-deep)) 20px 22px / 38% 10px no-repeat,
+    linear-gradient(var(--paper-deep), var(--paper-deep)) 20px 56px / 68% 24px no-repeat,
+    linear-gradient(var(--paper-deep), var(--paper-deep)) 20px 112px / 88% 9px no-repeat,
+    linear-gradient(var(--paper-deep), var(--paper-deep)) 20px 132px / 72% 9px no-repeat,
+    linear-gradient(var(--paper-deep), var(--paper-deep)) 20px calc(100% - 48px) / 34% 30px no-repeat,
+    var(--surface-raised);
+  box-shadow: var(--shadow-xs);
+}
+
+/* One result used to sit in the left third of a three-column grid. A single
+   hit gets a wider card plus a deliberate companion panel instead. */
+.cases-grid[data-density="single"] {
+  grid-template-columns: minmax(0, 600px) minmax(0, 300px);
+  align-items: start;
+}
+
+.cases-grid[data-density="pair"] {
+  grid-template-columns: repeat(2, minmax(min(300px, 100%), 430px));
+}
+
+.cases-grid[data-density="empty"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.grid-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 64px 20px;
+  border: 1px dashed var(--line-dashed);
+  border-radius: var(--r-lg);
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.grid-state-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.grid-state p {
+  font-size: 0.875rem;
+  max-width: 42ch;
+}
+
+/* --- Case card ---------------------------------------------------------- */
+
+.case-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 18px 20px 20px;
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.case-card:hover,
+.case-card:focus-within {
+  transform: translateY(-2px);
+  border-color: var(--brand-primary);
+  box-shadow: var(--shadow-card);
+}
+
+/* Progress reads on the card edge before any text is parsed. */
+.case-card[data-state="in_progress"] {
+  border-left: 3px solid var(--gold-primary);
+}
+
+.case-card[data-state="solved"] {
+  border-left: 3px solid var(--brand-primary);
+}
+
+.case-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.case-kind {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  min-width: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.case-type {
+  color: var(--brand-primary);
+}
+
+.case-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--ink-muted);
+}
+
+.case-level::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.case-level-foundation { color: var(--status-info); }
+.case-level-intermediate { color: var(--gold-deep); }
+.case-level-advanced { color: var(--status-danger); }
+
+.case-state {
+  flex: none;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.case-state-in_progress {
+  background: var(--gold-light);
+  color: var(--gold-deep);
+}
+
+.case-state-solved {
+  background: var(--brand-light);
+  color: var(--brand-primary);
+}
+
+.case-name {
+  font-family: var(--font-serif);
+  font-size: 1.3125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink-primary);
+  margin-bottom: 7px;
+}
+
+/* The real decision question, three lines at most in the dense grid. */
+.case-question {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+  margin-bottom: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.case-origin {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-subtle);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+
+.case-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.case-secondary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ink-secondary);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.case-secondary:hover {
+  color: var(--brand-primary);
+}
+
+.case-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.case-skill {
+  padding: 3px 8px;
+  border-radius: var(--r-xs);
+  background: var(--bg-subtle);
+  color: var(--ink-secondary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+
+.case-reason {
+  margin-bottom: 12px;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--gold-deep);
+}
+
+/* Rail and single-result cards have room to breathe, so the question is
+   not clamped and the skills are worth showing. */
+.case-card-wide .case-name {
+  font-size: 1.5rem;
+}
+
+.case-card-wide .case-question {
+  display: block;
+  font-size: 0.9375rem;
+  overflow: visible;
+}
+
+/* --- Companion panel for a single result -------------------------------- */
+
+.nudge {
+  padding: 18px 20px;
+  border: 1px dashed var(--line-dashed);
+  border-radius: var(--r-lg);
+  background: var(--bg-subtle);
+}
+
+.nudge-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  margin-bottom: 4px;
+}
+
+.nudge-note {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+  margin-bottom: 10px;
+}
+
+.nudge-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.nudge-list a,
+.nudge-list button {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand-primary);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nudge-list a:hover,
+.nudge-list button:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --- Card primary action ------------------------------------------------ */
+/* Stretched over the whole card, so the target is the card, not the pill. */
+.btn-start-case {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--brand-primary);
+  border-radius: var(--r-pill);
+  background: var(--brand-primary);
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn-start-case::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-lg);
+}
+
+.btn-start-case:hover,
+.case-card:hover .btn-start-case {
+  background: var(--brand-lift);
+  border-color: var(--brand-lift);
+}
+
+.btn-reset-case {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-muted);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-reset-case:hover {
+  color: var(--status-danger);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.btn-reset-case[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Controls the stretched action must not swallow. Non-interactive card
+   content stays underneath so a tap anywhere still opens the case. */
+.case-secondary,
+.nudge-list a,
+.nudge-list button {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Responsive --------------------------------------------------------- */
+
+@media (max-width: 1200px) {
+  .cases-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .page-main {
+    padding: 32px 0 56px;
+  }
+
+  .cases-grid[data-density="single"],
+  .cases-grid[data-density="pair"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .view-row {
+    align-items: stretch;
+  }
+
+  .view-switch {
+    flex: 1 1 240px;
+  }
+
+  .sort-field .select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .lib-head {
+    margin-bottom: 26px;
+  }
+
+  .cases-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .search-row {
+    flex-wrap: wrap;
+  }
+
+  .filters-toggle {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .view-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sort-field .select {
+    width: 100%;
+  }
+
+  /* Compact sheet rather than a panel that pushes the grid down a screen. */
+  .filters-scrim:not(.hidden) {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 120;
+    background: rgba(0, 0, 0, 0.42);
+  }
+
+  .filters-panel {
+    position: fixed;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 130;
+    max-height: 86vh;
+    overflow-y: auto;
+    padding: 16px 18px 20px;
+    border: 0;
+    border-top: 1px solid var(--line-strong);
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    box-shadow: var(--shadow-xl);
+  }
+
+  .filters-panel-foot {
+    position: sticky;
+    bottom: -20px;
+    padding-bottom: 4px;
+    background: var(--surface-raised);
+  }
+
+  .select-block {
+    max-width: none;
+  }
+}

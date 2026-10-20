@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: d2c.baseline
+  domain: company
+  release_level: broad_context
+  content: "Client sells organic serums, moisturizers, and sunscreens (AOV \u20B91,100) with 68% gross margin."
+- id: digital.cac
+  domain: financials
+  release_level: sharp_question
+  content: "Blended digital CAC rose from \u20B9420 to \u20B9850 due to iOS privacy changes and ad bidding competition, erasing\
+    \ first-order profitability."
+- id: modern_trade.terms
+  domain: economics
+  release_level: hypothesis_backed
+  content: "Modern Trade supermarket chains demand 38% total margin, \u20B95 lakh per SKU slotting fees per chain, and return-to-vendor\
+    \ privileges on unsold stock."
+  dependencies:
+  - digital.cac
+- id: ebo.economics
+  domain: economics
+  release_level: hypothesis_backed
+  content: "300 sq ft kiosk/EBO in top-tier malls costs \u20B92.5L/mo rent, generates \u20B912L/mo revenue, and delivers 26%\
+    \ store EBITDA margin with 8-month capex payback."
+  dependencies:
+  - modern_trade.terms
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Online CAC doubled to \u20B9850, breaking unit economics; Modern Trade demands punitive 38% margins and slotting\
+    \ fees, making mall-based Exclusive Brand Outlets (EBO kiosks) the superior 26% EBITDA growth channel."
+- id: recommendation.ebo_rollout
+  domain: recommendation
+  release_level: synthesis_support
+  content: Open 40 branded mall kiosks and EBOs in top 6 metros with trained beauty consultants.
+- id: recommendation.selective_modern_trade
+  domain: recommendation
+  release_level: synthesis_support
+  content: Enter only specialty beauty retailers (Nykaa/Sephora) with negotiated 25% margins, avoiding generic grocery supermarkets.
+- id: recommendation.omnichannel_crm
+  domain: recommendation
+  release_level: synthesis_support
+  content: Unify offline POS loyalty with the online app to drive omnichannel repeat purchases with zero incremental CAC.

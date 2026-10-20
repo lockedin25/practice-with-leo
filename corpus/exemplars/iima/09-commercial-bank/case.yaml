@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 09-commercial-bank-v1
+title: SME Commercial Bank Loan Book
+school: IIM-A
+status: approved
+rights_status: original
+category: operations
+industry: banking_and_financial_services
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a mid-sized Indian private commercial bank. Non-performing assets (NPAs) in the textile and engineering
+    SME export loan portfolio surged from 2.8% to 7.4% in twelve months.
+  objective: Diagnose the sudden spike in SME export loan defaults and recommend a loan monitoring and risk containment framework.
+  opening_requirements:
+  - Name SME Commercial Bank Loan Book and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Gross NPA Ratio and Early Warning Signal (EWS) Lead Time) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Gross NPA Ratio and Early Warning Signal (EWS) Lead Time
+  decision_question: What caused the surge in SME export loan defaults and how can credit risk monitoring be overhauled?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Working capital cash conversion cycle elongation caused by Red Sea global container shipping freight disruption
+    and delayed export invoice factoring, while bank monitoring relied on lagging annual audited balance sheets instead of
+    live GST/e-way bill data.
+  what_the_case_wanted_to_test: Trade finance economics, supply chain working capital cycles, macroeconomic shipping shocks,
+    and live data credit monitoring.
+  pivotal_insight: Exporters have valid buyer orders, but transit delays lengthened working capital cycles from 60 to 140
+    days; SME cash reserves drained, causing technical default on 90-day bank overdrafts.
+  common_traps:
+  - Assuming borrowers engaged in deliberate promoter fraud or fund siphoning without checking export order books.
+  - Initiating immediate aggressive asset seizures that liquidate viable businesses facing temporary liquidity delays.
+  - Blaming currency exchange rate movements when exports are hedged.
+  takeaway_lesson: In export and trade financing, external logistics shocks stretch customer cash conversion cycles; credit
+    underwriting must use real-time GST and freight telemetry rather than static annual financial statements.
+  suggested_readings:
+  - knowledge_base/industries/04_banking_and_financial_services.md
+  - knowledge_base/case_types/unconventional_and_abstract.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

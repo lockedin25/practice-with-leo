@@ -1,0 +1,75 @@
+schema_version: reservoir-v1
+case_id: loom-and-leaf-v1
+title: Loom & Leaf
+status: approved
+rights_status: original
+category: turnaround
+industry: apparel_retail
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, profitability, inventory analysis, business judgement, synthesis]
+
+candidate_opening:
+  context: >-
+    Loom & Leaf is a mid-market apparel retailer with 95 stores and an online
+    channel. Revenue is flat, cash is tightening, and gross margin has dropped by six points in one year.
+  objective: >-
+    Diagnose the margin decline and propose a twelve-month turnaround plan that restores profitability and protects brand equity.
+  opening_requirements:
+    - Name Loom & Leaf and its mid-market apparel retail model (95 stores + e-commerce).
+    - Identify the core problem (6 percentage point gross margin drop and tightening working capital).
+    - Confirm the 12-month turnaround timeline and gross margin / cash release metrics.
+    - Ask clarifying questions on product assortment, COGS inflation vs markdowns, and inventory aging.
+
+objective_function:
+  primary_metric: gross margin and working-capital release
+  decision_question: What should Loom & Leaf do to restore margin and reduce inventory risk?
+  time_horizon: twelve months
+  expected_candidate_output:
+    - Decomposition of gross margin decline into COGS inflation vs markdown erosion.
+    - Identification of SKU sprawl and inventory aging in seasonal trend capsules.
+    - Prioritized 3-pillar turnaround plan (assortment discipline, test-and-react buying, targeted clearance).
+    - 100-day cash release and margin recovery milestones.
+  design_principle: >-
+    Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+
+case_essence:
+  core_mechanism: >-
+    Assortment complexity and inventory aging trap. Buying team expanded SKU count by 35% in fast-trend
+    capsules with locked long-lead buys; low sell-through led to aged stock (>180 days rose from 12% to 29%),
+    massive clearance markdowns, and working capital lockup, while core basics remained highly profitable.
+  what_the_case_wanted_to_test: >-
+    Inventory markdown dynamics in retail merchandising, SKU-level contribution variance, open-to-buy
+    governance, and the bullwhip effect of long offshore lead times on fast-fashion capsules.
+  pivotal_insight: >-
+    The margin drop is not fabric cost inflation but inventory markdown erosion caused by unvalidated trend
+    over-buying; core basics subsidize unprofitable trend sprawl.
+  common_traps:
+    - Assuming gross margin decline is driven by raw material (cotton/polyester) price inflation.
+    - Recommending across-the-board store closures without analyzing SKU-level product sell-through and category contribution.
+    - Cutting prices across all apparel lines to generate cash, further destroying brand equity and core basic margins.
+  takeaway_lesson: >-
+    In fashion and specialty retail, gross margin collapse is almost always an inventory aging and markdown
+    problem caused by SKU proliferation rather than supplier cost inflation.
+  suggested_readings:
+    - knowledge_base/industries/09_retail_and_fashion.md
+    - knowledge_base/case_types/profitability.md
+    - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+    - clarification
+    - drill_down
+    - synthesis
+
+reservoir_files:
+  - facts.yaml
+  - issue-tree.yaml
+  - conversation-policy.yaml
+  - validation.md

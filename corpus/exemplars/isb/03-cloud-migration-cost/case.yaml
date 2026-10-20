@@ -1,0 +1,73 @@
+schema_version: reservoir-v1
+case_id: 03-cloud-migration-cost-v1
+title: Cloud Migration Infrastructure Cost
+school: ISB
+status: approved
+rights_status: original
+category: digital_transformation
+industry: saas_and_b2b_tech
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is a top Indian private bank that migrated its core retail digital banking apps to public cloud (AWS/Azure).\
+    \ Monthly cloud operating expenditure ballooned from \u20B94 Cr to \u20B916 Cr, exceeding business case forecasts by 300%."
+  objective: Diagnose the cloud cost runaway and design a FinOps governance and reserved instance optimization framework.
+  opening_requirements:
+  - Name Cloud Migration Infrastructure Cost and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - "Confirm primary metric (Monthly Cloud OpEx (\u20B9 Cr) and Compute Utilization Efficiency (%)) and time horizon (six\
+    \ months)."
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: "Monthly Cloud OpEx (\u20B9 Cr) and Compute Utilization Efficiency (%)"
+  decision_question: Why did public cloud costs explode post-migration and how can cloud infrastructure spend be optimized
+    by 40%?
+  time_horizon: six months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Lift-and-shift architecture with unreserved on-demand compute instances and unmonitored dev/test environments.
+    Engineering teams provisioned peak-capacity uncompressed virtual machines 24/7 on expensive on-demand pricing with zero
+    auto-scaling or reserved instance commitments.
+  what_the_case_wanted_to_test: Cloud economics, lift-and-shift vs cloud-native refactoring, on-demand vs reserved instances/savings
+    plans, and FinOps unit governance.
+  pivotal_insight: Bank developers treated the cloud like infinite corporate on-premise hardware, leaving 450 oversized test
+    servers running 24/7 on on-demand rates; switching to 3-year Savings Plans, automated overnight shutdown, and auto-scaling
+    saves 48% immediately.
+  common_traps:
+  - Recommending migrating everything back to legacy physical on-premise data centers.
+  - Blaming cloud provider data egress network fees without checking compute instance utilization.
+  - Assuming cybersecurity compliance tools caused the bill explosion.
+  takeaway_lesson: Cloud migration without architectural modernization (auto-scaling) and FinOps commercial governance (reserved
+    commitments) turns variable agility into runaway fixed operating costs.
+  suggested_readings:
+  - knowledge_base/industries/08_saas_and_b2b_tech.md
+  - knowledge_base/case_types/growth_strategy.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

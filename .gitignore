@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+data/
+.gstack/
+
+# Local agent state and generated package metadata
+.agents/
+.claude/
+*.egg-info/

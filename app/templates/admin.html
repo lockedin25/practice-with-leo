@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% set context_badge = "Admin console" %}
+{% set show_viewer = true %}
+{% block title %}Admin Console · Leo{% endblock %}
+{% block body_class %}console-body{% endblock %}
+{% block stylesheets %}
+<link rel="stylesheet" href="/static/admin.css" />
+{% endblock %}
+{% block content %}
+<main class="console shell" aria-label="Admin console">
+  {# The nav badge already says "Admin console", so this head carries the
+     headline and the one thing it cannot: how fresh the numbers are. #}
+  <header class="console-head">
+    <div>
+      <h1>Every candidate, every transcript</h1>
+      <p class="muted" id="freshness">Loading…</p>
+    </div>
+    <div class="console-head-actions">
+      <button class="btn btn-secondary btn-sm" id="refresh" type="button">Refresh</button>
+    </div>
+  </header>
+
+  <section class="tiles" id="tiles" aria-label="Headline metrics"></section>
+
+  <section class="panel-grid">
+    <article class="card chart-card">
+      <header class="card-head">
+        <p class="eyebrow">Attempts started, last 14 days</p>
+        <span class="counter" id="chart-total">0</span>
+      </header>
+      <div class="bars" id="bars"></div>
+      <div class="bar-axis"><span id="axis-start"></span><span id="axis-end"></span></div>
+    </article>
+
+    <article class="card">
+      <header class="card-head"><p class="eyebrow">Stage reached</p></header>
+      <div class="breakdown" id="stage-breakdown"></div>
+    </article>
+
+    <article class="card">
+      <header class="card-head"><p class="eyebrow">Cases practised</p></header>
+      <div class="breakdown" id="case-breakdown"></div>
+    </article>
+  </section>
+
+  <section class="card table-card">
+    <header class="card-head">
+      <p class="eyebrow">Candidates</p>
+      <span class="counter" id="users-count">0</span>
+    </header>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th class="numeric">Attempts</th>
+            <th class="numeric">Completed</th>
+            <th class="numeric">Avg turns</th>
+            <th class="numeric">Facts</th>
+            <th>Last seen</th>
+          </tr>
+        </thead>
+        <tbody id="users-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card table-card">
+    <header class="card-head">
+      <p class="eyebrow">Attempts</p>
+      <div class="table-actions">
+        <label class="sr-only" for="user-filter">Filter by candidate</label>
+        <select class="select" id="user-filter"><option value="">All candidates</option></select>
+        <span class="counter" id="attempts-count">0</span>
+      </div>
+    </header>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Case</th>
+            <th>Stage</th>
+            <th class="numeric">Turns</th>
+            <th class="numeric">Facts</th>
+            <th class="numeric">Minutes</th>
+            <th>Started</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="attempts-body"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<div class="drawer-veil hidden" id="drawer-veil"></div>
+<aside class="drawer hidden" id="drawer" aria-label="Attempt transcript" tabindex="-1">
+  <header class="drawer-head">
+    <div>
+      <p class="eyebrow">Transcript</p>
+      <h2 class="drawer-title" id="drawer-title">Attempt</h2>
+      <div class="drawer-meta" id="drawer-meta"></div>
+    </div>
+    <button class="drawer-close" id="drawer-close" type="button" aria-label="Close transcript">
+      <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M6.6 6.6l10.8 10.8M17.4 6.6L6.6 17.4" /></svg>
+    </button>
+  </header>
+  <div class="drawer-body" id="drawer-body"></div>
+</aside>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<template id="message-template">
+  <article class="message">
+    <span class="avatar" aria-hidden="true">
+      <svg viewBox="0 0 32 32" class="avatar-glyph" fill="none">
+        <rect width="32" height="32" rx="8" fill="var(--brand-primary)"/>
+        <path d="M9 8.5C9 7.67 9.67 7 10.5 7H13V19H22.5C23.33 19 24 19.67 24 20.5V23C24 23.83 23.33 24.5 22.5 24.5H10.5C9.67 24.5 9 23.83 9 23V8.5Z" fill="#ffffff"/>
+        <path d="M18.5 7.5L23.5 12.5L18.5 17.5L13.5 12.5Z" fill="var(--gold-primary)"/>
+      </svg>
+    </span>
+    <div class="message-body">
+      <p class="message-role"></p>
+      <div class="bubble"><p class="message-content"></p></div>
+    </div>
+  </article>
+</template>
+{% endblock %}
+{% block scripts %}<script src="/static/admin.js"></script>{% endblock %}

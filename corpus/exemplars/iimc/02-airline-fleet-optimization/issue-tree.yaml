@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.airline-tat
+  label: Compress aircraft turnaround time from 36 to 25 minutes.
+nodes:
+- id: tat-critical-path
+  type: branch
+  label: Ground Turnaround Critical Path Breakdown
+  status: valid_branch
+  evidence: []
+  conclusion: Passenger deplaning (12m), cleaning (8m), and boarding (14m) occur sequentially.
+- id: passenger-flow-bottleneck
+  type: branch
+  label: Single-Door vs Dual-Door Passenger Flow
+  status: valid_branch
+  evidence: []
+  conclusion: Single-door boarding takes 22 mins; dual-door front/rear boarding takes 11 mins.
+- id: ground-handling-concurrency
+  type: branch
+  label: Concurrent Refueling, Baggage & Cleaning
+  status: valid_branch
+  evidence: []
+  conclusion: Staggering cleaning concurrently with deplaning saves 7 minutes.
+- id: diagnosis
+  type: diagnosis
+  label: Sequential Bottlenecks on Single-Door Critical Path
+  status: hidden_target
+  evidence:
+  - tat-critical-path
+  - passenger-flow-bottleneck
+  - ground-handling-concurrency
+  conclusion: TAT is 36 mins because deplaning, cleaning, and boarding run sequentially on a single door; parallel dual-door
+    boarding restores 25-min TAT and unlocks 1 additional flight per tail.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Turnaround Process Redesign
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Implement dual-door boarding, sectional concurrent cabin cleaning, and pre-staged baggage logistics.
+edges:
+- from: objective.airline-tat
+  to: tat-critical-path
+  relation: investigate
+- from: objective.airline-tat
+  to: passenger-flow-bottleneck
+  relation: investigate
+- from: objective.airline-tat
+  to: ground-handling-concurrency
+  relation: investigate
+- from: tat-critical-path
+  to: diagnosis
+  relation: supports
+- from: passenger-flow-bottleneck
+  to: diagnosis
+  relation: supports
+- from: ground-handling-concurrency
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: critical-path-first
+  sequence:
+  - tat-critical-path
+  - passenger-flow-bottleneck
+  - ground-handling-concurrency
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate through the 36-minute critical path timeline.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what activities make up the 36-minute ground turnaround.
+  - Clarify that aircraft technical refueling takes only 12 minutes.
+  - Redirect toward passenger boarding flow and sequential cabin cleaning.

@@ -1,0 +1,27 @@
+{# The one site footer.
+
+   landing.html and cases.html each carried their own near-identical version
+   under different class names (.footer-* and .lib-footer-*). Pages that are
+   workspaces rather than destinations (the practice room, sign-in) render no
+   footer at all. A page may pass footer_note to add a line of its own, which
+   is how the debrief carries its evaluator version. #}
+<footer class="site-footer shell">
+  <div class="site-footer-top">
+    <div class="site-footer-brand">
+      {% with grad_id = "foot", show_badge = false %}{% include "_brand.html" %}{% endwith %}
+      <p class="site-footer-motto">Your calm, incisive AI case interviewer.</p>
+    </div>
+    <nav class="site-footer-links" aria-label="Footer">
+      <a href="/">Home</a>
+      <a href="/cases">Case library</a>
+      <a href="/practice">Practice room</a>
+      <a href="/profile">Your progress</a>
+    </nav>
+  </div>
+  <p class="site-footer-legal">
+    &copy; Leo MBB Prep. Built for strategic rigour.
+    {% if footer_note_id is defined and footer_note_id %}
+      <span class="muted" id="{{ footer_note_id }}"></span>
+    {% endif %}
+  </p>
+</footer>

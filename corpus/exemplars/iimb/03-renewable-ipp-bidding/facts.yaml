@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: tender.terms
+  domain: company
+  release_level: broad_context
+  content: Tender mandates 1,200 MW supply with guaranteed 85% peak-hour availability (6 AM-9 AM and 6 PM-11 PM).
+- id: capex.costs
+  domain: financials
+  release_level: sharp_question
+  content: "Solar capex is \u20B93.4 Cr/MW; Wind capex is \u20B96.2 Cr/MW; BESS lithium storage is \u20B91.4 Cr/MWh with 10-year\
+    \ life."
+- id: generation.profile
+  domain: operations
+  release_level: hypothesis_backed
+  content: Solar CUF is 24% (daytime only); Wind CUF is 34% with peak generation from 6 PM to 2 AM in Gujarat/Tamil Nadu.
+  dependencies:
+  - capex.costs
+- id: tariff.sensitivity
+  domain: economics
+  release_level: hypothesis_backed
+  content: "A 100% solar + storage model requires \u20B94.10/kWh tariff for 14% IRR; an optimal 60:40 Solar:Wind + 250 MWh\
+    \ BESS model achieves 14% IRR at \u20B93.32/kWh."
+  dependencies:
+  - generation.profile
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Competitive bidding at \u20B93.32/kWh requires a complementary 60:40 Solar-Wind generation mix, which cuts expensive\
+    \ BESS storage capex by 45% by utilizing evening wind generation."
+- id: recommendation.mix
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Bid at \u20B93.34/kWh using a 700 MW Solar + 500 MW Wind + 250 MWh BESS configuration to secure 14.5% equity IRR."
+- id: recommendation.procurement
+  domain: recommendation
+  release_level: synthesis_support
+  content: Lock long-term Tier-1 solar module procurement contracts with ALMM domestic exemption clauses.
+- id: recommendation.storage_option
+  domain: recommendation
+  release_level: synthesis_support
+  content: Structure BESS contract with performance degradation warranties and cell replacement guarantees at year 7.

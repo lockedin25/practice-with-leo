@@ -1,0 +1,25 @@
+{
+  "date": "2026-08-25",
+  "url": "http://127.0.0.1:8000",
+  "designScore": "B-",
+  "aiSlopScore": "A-",
+  "categoryGrades": {
+    "visualHierarchy": "B-",
+    "typography": "B+",
+    "spacingAndLayout": "B-",
+    "colorAndContrast": "B",
+    "interactionStates": "B-",
+    "responsive": "C",
+    "contentQuality": "B-",
+    "aiSlop": "A-",
+    "motion": "B",
+    "performanceFeel": "B"
+  },
+  "findings": [
+    {"id": "UI-001", "title": "Mobile horizontal overflow", "impact": "high", "category": "responsive"},
+    {"id": "UI-002", "title": "Undersized mobile touch targets", "impact": "high", "category": "interactionStates"},
+    {"id": "UI-003", "title": "Landing duplicates the full case catalogue", "impact": "high", "category": "visualHierarchy"},
+    {"id": "UI-004", "title": "Library lacks a recommendation-led hierarchy", "impact": "high", "category": "contentQuality"},
+    {"id": "UI-005", "title": "Mobile navigation removes primary destinations", "impact": "high", "category": "responsive"}
+  ]
+}

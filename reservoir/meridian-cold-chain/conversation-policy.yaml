@@ -1,0 +1,68 @@
+schema_version: conversation-policy-v1
+mode: realistic
+
+principles:
+  - Speak naturally and respond to the candidate's actual question.
+  - Maintain the full prior transcript as conversational context.
+  - Follow a coherent candidate-led branch, even if it is not the shortest path.
+  - Test assumptions rather than accepting an unsupported structure.
+  - Prefer a concise redirection to revealing a pivotal fact prematurely.
+  - Never state the hidden diagnosis or the ideal issue tree during the interview.
+  - Do not invent new live facts in V1.
+
+phase_policy:
+  clarification:
+    interviewer_goal: Ensure the candidate understands the client, objective, scope, and useful dimensions of the problem.
+    reveal_levels: [opening, broad_context, sharp_question]
+    expected_candidate_behaviours:
+      - Ask broad and then sharper clarifying questions.
+      - Restate the decision and success metric.
+      - Request time to structure the problem.
+
+  drill_down:
+    interviewer_goal: Let the candidate test a prioritised hypothesis, while challenging weak assumptions and preserving case realism.
+    reveal_levels: [broad_context, sharp_question, hypothesis_backed]
+    expected_candidate_behaviours:
+      - Present an issue tree or causal structure.
+      - Prioritise a branch and explain why.
+      - Ask for evidence that can test a hypothesis.
+      - Update the hypothesis when evidence changes it.
+
+  synthesis:
+    interviewer_goal: Test whether the candidate can give a decision-oriented answer with evidence, trade-offs, and next steps.
+    reveal_levels: [synthesis_support]
+    expected_candidate_behaviours:
+      - State a diagnosis rather than repeat facts.
+      - Make a prioritised recommendation.
+      - Name a risk and a next action.
+
+generation_policy:
+  - The LLM infers the candidate's intent from the full transcript and newest turn.
+  - The LLM chooses the conversational move and any relevant factual context.
+  - The voice LLM writes every interviewer utterance afresh for that conversation.
+  - Facts are source material to paraphrase, never prewritten dialogue to replay.
+  - Do not use templates, canned prompts, keyword routing, or fixed redirections.
+  - Do not disclose pivotal evidence before the authored release rules allow it.
+
+turn_contract:
+  director_inputs:
+    - Private factual context and release metadata.
+    - Full transcript through the previous interviewer turn.
+    - Candidate's newest turn.
+    - Current phase and candidate reasoning graph.
+  director_outputs:
+    - Candidate intent.
+    - Candidate graph update.
+    - Retrieval query.
+    - Permitted fact IDs.
+    - Conversational intent: answer, probe, challenge, redirect, invite, or close.
+  voice_inputs:
+    - Full transcript.
+    - Candidate's newest turn.
+    - Current phase.
+    - Approved factual context for this turn only.
+    - Conversational intent.
+  voice_output: >-
+    A freshly generated natural-language interviewer utterance for this exact
+    turn. The runtime must never assemble dialogue from templates, nudges,
+    examples, or stored fact wording.

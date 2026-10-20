@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.ev-entry
+  label: Recommend E2W vehicle architecture and market entry strategy.
+nodes:
+- id: market-segment-duty-cycles
+  type: branch
+  label: Customer Segmentation & Daily Mileage
+  status: valid_branch
+  evidence: []
+  conclusion: B2B delivery rides 120 km/day (swapping fit); B2C rides 25 km/day (home charge fit).
+- id: infrastructure-unit-economics
+  type: branch
+  label: Swapping Station Capex vs Fast Charging
+  status: valid_branch
+  evidence: []
+  conclusion: "Swapping requires \u20B918L/station and 25 swaps/day; viable only with dense B2B fleet demand."
+- id: regulatory-interoperability
+  type: branch
+  label: Battery Standards & Subsidies
+  status: valid_branch
+  evidence: []
+  conclusion: Fragmented battery standards make universal public swapping risky without OEM partnerships.
+- id: diagnosis
+  type: diagnosis
+  label: Bifurcated Architecture Strategy
+  status: hidden_target
+  evidence:
+  - market-segment-duty-cycles
+  - infrastructure-unit-economics
+  - regulatory-interoperability
+  conclusion: 'Neither architecture fits both markets: deploy battery swapping for high-mileage B2B commercial fleets and
+    fixed home-charging batteries for B2C retail.'
+- id: actions
+  type: recommendation
+  label: 3-Pillar EV Market Entry Roadmap
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Launch BaaS commercial fleet model with swapping, launch fixed-pack retail scooter, and repurpose second-life
+    batteries for grid storage.
+edges:
+- from: objective.ev-entry
+  to: market-segment-duty-cycles
+  relation: investigate
+- from: objective.ev-entry
+  to: infrastructure-unit-economics
+  relation: investigate
+- from: objective.ev-entry
+  to: regulatory-interoperability
+  relation: investigate
+- from: market-segment-duty-cycles
+  to: diagnosis
+  relation: supports
+- from: infrastructure-unit-economics
+  to: diagnosis
+  relation: supports
+- from: regulatory-interoperability
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: customer-first
+  sequence:
+  - market-segment-duty-cycles
+  - infrastructure-unit-economics
+  - regulatory-interoperability
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from rider daily mileage profiles to infrastructure station economics.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to compare daily charging needs of a food delivery rider vs an office commuter.
+  - Clarify that B2C consumers have home power sockets.
+  - Redirect toward segmenting product architecture between B2B and B2C.

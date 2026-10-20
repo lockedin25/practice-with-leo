@@ -1,0 +1,41 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: network.growth
+  domain: company
+  release_level: broad_context
+  content: Client expanded network from 50 to 75 outlets in Delhi NCR in 12 months.
+- id: sssg.trend
+  domain: financials
+  release_level: sharp_question
+  content: Same-store sales at legacy 50 stores declined 8% YoY, while new stores generated 30% lower revenue than forecasted.
+- id: geography.overlap
+  domain: operations
+  release_level: hypothesis_backed
+  content: Mobile geofencing data confirms 72% customer overlap between new stores and legacy stores located within 1 km.
+  dependencies:
+  - sssg.trend
+- id: channel.split
+  domain: customers
+  release_level: hypothesis_backed
+  content: Delivery sales grew but dine-in traffic split evenly between nearby stores, failing to cover duplicate store fixed
+    rents.
+  dependencies:
+  - geography.overlap
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: 'Negative SSSG is driven by direct store cannibalization: new stores placed within 500m-1km of legacy outlets split
+    dine-in footfall without expanding trade area catchment.'
+- id: recommendation.territory
+  domain: recommendation
+  release_level: synthesis_support
+  content: Establish strict 2.5 km minimum radial distance zoning rules for new full-service dine-in restaurants.
+- id: recommendation.cloud_kitchen
+  domain: recommendation
+  release_level: synthesis_support
+  content: Serve high-density delivery demand through low-capex cloud kitchen pods rather than expensive dine-in street retail.
+- id: recommendation.relocate
+  domain: recommendation
+  release_level: synthesis_support
+  content: Relocate or consolidate 8 severely cannibalizing underperforming stores to unserved sub-markets.

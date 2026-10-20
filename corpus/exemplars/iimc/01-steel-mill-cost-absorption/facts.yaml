@@ -1,0 +1,44 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: mill.capacity
+  domain: company
+  release_level: broad_context
+  content: Client operates 4 blast furnaces producing 6M MT of crude steel annually, integrated with captive iron ore mines.
+- id: cost.structure
+  domain: financials
+  release_level: sharp_question
+  content: "Total production cost is \u20B942,000/ton (\u20B928,000 variable, \u20B914,000 fixed). Spot HRC price dropped\
+    \ to \u20B938,000/ton."
+- id: thermal.constraints
+  domain: operations
+  release_level: hypothesis_backed
+  content: "Damping down blast furnaces reduces volume by 30% but increases unit fixed cost to \u20B918,600/ton and risks\
+    \ refractory skulling ($35M repair)."
+  dependencies:
+  - cost.structure
+- id: value_add.spread
+  domain: commercial
+  release_level: hypothesis_backed
+  content: "Specialty automotive-grade Cold Rolled Closed Annealed (CRCA) steel sells at \u20B952,000/ton with positive contribution\
+    \ margin of \u20B914,000/ton."
+  dependencies:
+  - thermal.constraints
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Throttling output increases cash burn by losing fixed cost absorption and risking refractory damage; mill must\
+    \ maintain 100% blast furnace output while maximizing downstream conversion into automotive CRCA (+\u20B914k margin)."
+- id: recommendation.max_utilization
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Maintain 100% blast furnace utilization to fully absorb \u20B914,000/ton fixed overhead."
+- id: recommendation.mix_shift
+  domain: recommendation
+  release_level: synthesis_support
+  content: Shift product mix from 70% commodity HRC to 60% value-added automotive CRCA and color-coated sheets.
+- id: recommendation.pulverized_coal
+  domain: recommendation
+  release_level: synthesis_support
+  content: Increase Pulverized Coal Injection (PCI) from 120 kg to 180 kg/ton to substitute expensive imported metallurgical
+    coking coal.

@@ -1,0 +1,77 @@
+schema_version: reservoir-v1
+case_id: aster-diagnostics-v1
+title: Aster Diagnostics
+status: approved
+rights_status: original
+category: market_entry
+industry: healthcare_services
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, market sizing, entry strategy, operations, synthesis]
+
+candidate_opening:
+  context: >-
+    Aster Diagnostics operates high-quality diagnostic centres in six Indian
+    metros. It is considering entry into tier-two cities, where organised testing is underpenetrated.
+  objective: >-
+    Decide whether and how Aster should enter the tier-two-city market over a three-year horizon.
+  opening_requirements:
+    - Name the client and its core healthcare business model.
+    - Confirm the entry objective and geographical focus (tier-2 cities).
+    - Confirm the decision metric (risk-adjusted ROIC) and timeline (3 years).
+    - Ask clarifying questions regarding capabilities, competition, and customer segments.
+
+objective_function:
+  primary_metric: risk-adjusted return on invested capital
+  decision_question: Should Aster enter tier-two cities, and with what operating model?
+  time_horizon: three years
+  expected_candidate_output:
+    - Market attractiveness assessment with segment unit economics.
+    - Clear operating model recommendation (hub-and-spoke vs standalone).
+    - Core implementation risks (logistics, doctor trust, regulatory).
+    - 100-day execution milestones.
+  design_principle: >-
+    Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+
+case_essence:
+  core_mechanism: >-
+    Fixed cost leverage vs capacity utilization trap. High-capex imaging/radiology hubs
+    cannot reach breakeven utilization in tier-2 cities alone during the first 2 years;
+    a hub-and-spoke collection network with twice-daily 4-hour sample logistics to a
+    regional processing hub achieves positive contribution at much lower volume.
+  what_the_case_wanted_to_test: >-
+    Decoupling asset-heavy specialized services (radiology/imaging) from asset-light routine logistics
+    (pathology sample collection) when evaluating geographical expansion into lower-density markets.
+  pivotal_insight: >-
+    Tier-2 patients require trust and quick routine results, but localized demand volume is too thin
+    to amortize ₹15–20 Cr metro-style radiology capex; a regional hub-and-spoke model captures 70% of market
+    volume with 20% of capital expenditure.
+  common_traps:
+    - Replicating the full-service metro hub model in tier-2 cities, creating crippling fixed depreciation costs and low ROIC.
+    - Competing solely on test price against unorganized mom-and-pop labs rather than leveraging doctor trust and report accuracy.
+    - Attempting to open collection centers beyond the 4-hour specimen transport radius, causing sample degradation and SLA violations.
+  takeaway_lesson: >-
+    When scaling healthcare or service networks into secondary markets, split the value chain into
+    decentralized low-capex collection points and centralized high-throughput processing centers.
+  suggested_readings:
+    - knowledge_base/industries/03_pharma_and_healthcare.md
+    - knowledge_base/case_types/market_entry.md
+    - knowledge_base/methodology/01_preliminary_questions.md
+
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+    - clarification
+    - drill_down
+    - synthesis
+
+reservoir_files:
+  - facts.yaml
+  - issue-tree.yaml
+  - conversation-policy.yaml
+  - validation.md

@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: market.size
+  domain: market
+  release_level: broad_context
+  content: Indian E2W market is projected to reach 4M annual units by 2028, split 30% B2B commercial fleets and 70% B2C retail.
+- id: swapping.economics
+  domain: economics
+  release_level: sharp_question
+  content: "Battery swapping station costs \u20B918 lakh, requires 1.8 battery packs per scooter, and breaks even at 25 swaps/day."
+- id: rider.duty_cycle
+  domain: customers
+  release_level: hypothesis_backed
+  content: B2B delivery riders travel 120 km/day and cannot wait 45 mins for fast charging; B2C commuters travel 25 km/day
+    and charge at home.
+  dependencies:
+  - swapping.economics
+- id: battery.standards
+  domain: regulation
+  release_level: hypothesis_backed
+  content: Government interoperability standards for swappable batteries remain fragmented across manufacturers.
+  dependencies:
+  - rider.duty_cycle
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: 'Optimal strategy is a bifurcated dual-platform: deploy battery swapping exclusively for commercial B2B fleets
+    (Zomato/Swiggy/Amazon) where high daily utilization pays off station capex, while selling fixed-battery scooters with
+    portable home chargers for B2C retail.'
+- id: recommendation.b2b_swapping
+  domain: recommendation
+  release_level: synthesis_support
+  content: Launch dedicated B2B commercial scooter with battery-as-a-service (BaaS) swapping in top 6 metros.
+- id: recommendation.b2c_home
+  domain: recommendation
+  release_level: synthesis_support
+  content: Launch premium B2C retail scooter with 3.5 kWh fixed battery and bundled home smart charger.
+- id: recommendation.second_life
+  domain: recommendation
+  release_level: synthesis_support
+  content: Monetize degraded 70% SOH batteries by redeploying them into stationary solar grid storage.

@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.darkstore-ebitda
+  label: Optimize dark store labor productivity and achieve store EBITDA breakeven.
+nodes:
+- id: labor-cost-and-productivity
+  type: branch
+  label: Picker Productivity & Labor Cost per Order
+  status: valid_branch
+  evidence: []
+  conclusion: Pickers fulfill only 18 orders/hr, spending 72% of time walking aisles.
+- id: store-layout-and-slotting
+  type: branch
+  label: SKU Placement & High-Velocity Golden Zones
+  status: valid_branch
+  evidence: []
+  conclusion: Fast-moving dairy/snacks are located at the back, maximizing walking distance.
+- id: order-batching-algorithms
+  type: branch
+  label: Single-Order vs Multi-Order Batch Picking
+  status: valid_branch
+  evidence: []
+  conclusion: 3-order batch picking with pick-to-light cuts pick time from 210s to 65s.
+- id: diagnosis
+  type: diagnosis
+  label: Suboptimal Layout Slotting & Single-Order Walking Waste
+  status: hidden_target
+  evidence:
+  - labor-cost-and-productivity
+  - store-layout-and-slotting
+  - order-batching-algorithms
+  conclusion: Dark stores lose money because poor layout slotting and single-order picking waste 72% of labor time walking;
+    golden-zone re-slotting and batch carts double throughput.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Micro-Fulfillment Overhaul
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Re-slot top SKUs in front Golden Zone, deploy 3-order batch-picking carts, and synchronize rider arrival dispatch.
+edges:
+- from: objective.darkstore-ebitda
+  to: labor-cost-and-productivity
+  relation: investigate
+- from: objective.darkstore-ebitda
+  to: store-layout-and-slotting
+  relation: investigate
+- from: objective.darkstore-ebitda
+  to: order-batching-algorithms
+  relation: investigate
+- from: labor-cost-and-productivity
+  to: diagnosis
+  relation: supports
+- from: store-layout-and-slotting
+  to: diagnosis
+  relation: supports
+- from: order-batching-algorithms
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: productivity-first
+  sequence:
+  - labor-cost-and-productivity
+  - store-layout-and-slotting
+  - order-batching-algorithms
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from labor cost breakdown to warehouse slotting and batching.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what percentage of a picker's time is spent walking vs picking.
+  - Clarify that dark store inventory is in stock.
+  - Redirect toward SKU slotting near dispatch and multi-order batching.

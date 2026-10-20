@@ -1,0 +1,52 @@
+{# The practice room toolbar. Deliberately not the site header: this is a
+   session HUD (timer, voice, end practice), built from the same primitives. #}
+<header class="topbar">
+  <div class="topbar-inner">
+    {% with grad_id = "room", show_badge = false %}{% include "_brand.html" %}{% endwith %}
+
+    <a class="nav-cases-link" href="/cases">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7"></rect>
+        <rect x="14" y="3" width="7" height="7"></rect>
+        <rect x="14" y="14" width="7" height="7"></rect>
+        <rect x="3" y="14" width="7" height="7"></rect>
+      </svg>
+      <span>Cases</span>
+    </a>
+
+    <p class="session-label">
+      <span class="pulse-dot" aria-hidden="true"></span>
+      <span id="session-status-text">Leo is listening</span>
+      <span class="session-mode" id="session-mode">Realistic</span>
+    </p>
+
+    <div class="topbar-actions">
+      <div class="timer" id="timer" role="timer" aria-label="Time remaining in this practice">
+        <svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
+          <circle cx="12" cy="12" r="8.25" />
+          <path d="M12 8.4V12l2.6 1.7" />
+        </svg>
+        <span class="timer-value" id="timer-value">30:00</span>
+      </div>
+
+      <div class="voice-controls hidden" id="voice-controls">
+        <span class="voice-status" id="voice-status" aria-live="polite">Chat</span>
+        <button class="button button-ghost" id="voice-toggle" type="button">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="voice-mic-icon">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+            <line x1="8" y1="23" x2="16" y2="23"></line>
+          </svg>
+          <span>Start voice</span>
+        </button>
+      </div>
+
+      {% include "_theme_toggle.html" %}
+
+      <button class="button button-ghost" id="end-attempt" type="button">End practice</button>
+
+      {% include "_user_menu.html" %}
+    </div>
+  </div>
+</header>

@@ -1,0 +1,37 @@
+schema_version: conversation-policy-v1
+mode: realistic
+principles:
+- Speak naturally and respond directly to candidate inquiries.
+- Follow candidate-led hypothesis testing and structured problem solving.
+- Challenge generic framework dumping and unverified assumptions.
+- 'Preserve hidden diagnosis: never disclose interviewer_only facts during candidate turns.'
+- Demand practical commercial and operational grounding in final synthesis.
+phase_policy:
+  clarification:
+    interviewer_goal: Ensure candidate understands SME Commercial Bank Loan Book's operating model, core challenge, and evaluation
+      criteria.
+    reveal_levels:
+    - broad_context
+    - sharp_question
+    expected_candidate_behaviours:
+    - Clarify company background and operating context.
+    - Inquire about performance baseline and market conditions.
+    - Confirm primary metric and time horizon.
+  drill_down:
+    interviewer_goal: Guide candidate through hypothesis-led inquiry into the pivotal economic mechanism.
+    reveal_levels:
+    - broad_context
+    - sharp_question
+    - hypothesis_backed
+    expected_candidate_behaviours:
+    - Present a MECE problem structure tailored to the business.
+    - Prioritize high-impact branches and formulate testable hypotheses.
+    - Analyze unit economic drivers and operational bottlenecks.
+  synthesis:
+    interviewer_goal: Evaluate top-down executive summary, 3-pillar action plan, and risk mitigations.
+    reveal_levels:
+    - synthesis_support
+    expected_candidate_behaviours:
+    - Deliver a crisp, recommendation-first synthesis.
+    - Present 3 structured implementation pillars.
+    - Identify key execution risks and 100-day roadmap.

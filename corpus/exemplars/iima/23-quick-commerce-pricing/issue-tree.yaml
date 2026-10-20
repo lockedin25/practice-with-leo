@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.qcommerce-pricing
+  label: Achieve positive unit contribution margin in quick-commerce delivery.
+nodes:
+- id: order-level-cost-stack
+  type: branch
+  label: Fulfillment Cost Stack vs Take-Rate Margin
+  status: valid_branch
+  evidence: []
+  conclusion: "Fixed fulfillment cost (\u20B960) exceeds product margin (\u20B940 on \u20B9220 AOV), losing \u20B922/order."
+- id: basket-size-distribution
+  type: branch
+  label: Basket Size Breakdown & Loss Contribution
+  status: valid_branch
+  evidence: []
+  conclusion: "Sub-\u20B9199 orders are 42% of volume and lose \u20B934/drop; \u20B9399+ orders are profitable (+\u20B918)."
+- id: fee-elasticity-and-pass
+  type: branch
+  label: Delivery Fee Elasticity & VIP Pass Model
+  status: valid_branch
+  evidence: []
+  conclusion: Small delivery fees lift AOV by 24% with minimal churn; VIP pass drives basket bundling.
+- id: diagnosis
+  type: diagnosis
+  label: Small Basket Free Delivery Subsidy Bleed
+  status: hidden_target
+  evidence:
+  - order-level-cost-stack
+  - basket-size-distribution
+  - fee-elasticity-and-pass
+  conclusion: "Quick commerce loses \u20B922/order because free delivery on sub-\u20B9199 orders fails to cover fixed \u20B9\
+    60 dark store and rider fulfillment costs."
+- id: actions
+  type: recommendation
+  label: 3-Pillar Quick-Commerce Pricing Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: "Enforce \u20B9299 free delivery threshold, introduce surge handling fees, and launch paid quarterly VIP subscription."
+edges:
+- from: objective.qcommerce-pricing
+  to: order-level-cost-stack
+  relation: investigate
+- from: objective.qcommerce-pricing
+  to: basket-size-distribution
+  relation: investigate
+- from: objective.qcommerce-pricing
+  to: fee-elasticity-and-pass
+  relation: investigate
+- from: order-level-cost-stack
+  to: diagnosis
+  relation: supports
+- from: basket-size-distribution
+  to: diagnosis
+  relation: supports
+- from: fee-elasticity-and-pass
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: unit-cost-first
+  sequence:
+  - order-level-cost-stack
+  - basket-size-distribution
+  - fee-elasticity-and-pass
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate through per-order cost stack analysis.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - "Ask candidate to calculate profit contribution on a \u20B9150 order vs a \u20B9450 order."
+  - "Clarify that rider payouts of \u20B944 are non-negotiable."
+  - Redirect toward minimum order value thresholds and paid VIP subscriptions.

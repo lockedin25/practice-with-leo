@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.insurance-loss-ratio
+  label: Reduce motor third-party loss ratio below 85%.
+nodes:
+- id: product-line-split
+  type: branch
+  label: Own Damage (OD) vs Third Party (TP) Losses
+  status: valid_branch
+  evidence: []
+  conclusion: OD is healthy (62%); TP loss ratio exploded to 118%.
+- id: geographic-and-court-clustering
+  type: branch
+  label: Geographic & Legal Tribunal Clustering
+  status: valid_branch
+  evidence: []
+  conclusion: Losses clustered in 4 rural district tribunals with 22-month delayed filings.
+- id: fraud-syndicate-mechanics
+  type: branch
+  label: Police FIR Fabrication & Vehicle Substitution
+  status: valid_branch
+  evidence: []
+  conclusion: Syndicates substitute insured commercial trucks into untraced hit-and-run accidents.
+- id: diagnosis
+  type: diagnosis
+  label: Staged Legal Tribunal Fraud Syndicates
+  status: hidden_target
+  evidence:
+  - product-line-split
+  - geographic-and-court-clustering
+  - fraud-syndicate-mechanics
+  conclusion: Loss ratio explosion is caused by organized tribunal fraud staging delayed fake bodily injury claims on commercial
+    trucks in specific rural districts.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Fraud Defense Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy on-ground SIU forensic teams, defend court cases using GPS/FASTag telemetry, and settle genuine claims
+    via Lok Adalats.
+edges:
+- from: objective.insurance-loss-ratio
+  to: product-line-split
+  relation: investigate
+- from: objective.insurance-loss-ratio
+  to: geographic-and-court-clustering
+  relation: investigate
+- from: objective.insurance-loss-ratio
+  to: fraud-syndicate-mechanics
+  relation: investigate
+- from: product-line-split
+  to: diagnosis
+  relation: supports
+- from: geographic-and-court-clustering
+  to: diagnosis
+  relation: supports
+- from: fraud-syndicate-mechanics
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: claims-first
+  sequence:
+  - product-line-split
+  - geographic-and-court-clustering
+  - fraud-syndicate-mechanics
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from OD vs TP split to court-level geographic anomalies.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate whether own-damage or third-party liability is responsible for the loss.
+  - Clarify that actual road accident counts have not increased.
+  - Redirect inquiry toward legal tribunal filings, claim delays, and vehicle fraud.

@@ -1,0 +1,44 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: user.base
+  domain: company
+  release_level: broad_context
+  content: App processes 400,000 monthly teleconsults, mostly for episodic acute fever/colds.
+- id: unit.economics
+  domain: financials
+  release_level: sharp_question
+  content: "Doctor payout is \u20B9220/call while user fee is \u20B999, losing \u20B9121 per teleconsult with 91% user churn\
+    \ after 30 days."
+- id: chronic.opportunity
+  domain: market
+  release_level: hypothesis_backed
+  content: 32% of users are diagnosed with pre-diabetes, diabetes, or hypertension during consultations, but receive no structured
+    follow-up care plan.
+  dependencies:
+  - unit.economics
+- id: care_plan.financials
+  domain: economics
+  release_level: hypothesis_backed
+  content: "Diabetic Care Subscription (\u20B91,499/month) bundling connected glucometer, monthly lab tests, doctor reviews,\
+    \ and home medicine delivery delivers 42% gross margin and \u20B99,200 LTV."
+  dependencies:
+  - chronic.opportunity
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Teleconsult app loses \u20B9121/call because it operates as a one-off acute triage tool with 91% churn; pivoting\
+    \ to recurring chronic care management (diabetes/hypertension) lifts annual LTV from \u20B9180 to \u20B99,200."
+- id: recommendation.chronic_bundles
+  domain: recommendation
+  release_level: synthesis_support
+  content: Launch structured 3-month and 12-month Chronic Care Management plans for diabetes, cardiac health, and PCOS.
+- id: recommendation.pharma_diagnostics
+  domain: recommendation
+  release_level: synthesis_support
+  content: Automate recurring home medicine refills and quarterly home diagnostic blood panels within the subscription.
+- id: recommendation.corporate_wellness
+  domain: recommendation
+  release_level: synthesis_support
+  content: Package the chronic management subscription as an employer corporate wellness benefit co-funded by group health
+    insurers.

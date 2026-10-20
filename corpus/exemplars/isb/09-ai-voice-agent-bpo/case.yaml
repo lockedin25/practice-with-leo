@@ -1,0 +1,73 @@
+schema_version: reservoir-v1
+case_id: 09-ai-voice-agent-bpo-v1
+title: BPO Generative AI Voice Agents
+school: ISB
+status: approved
+rights_status: original
+category: digital_transformation
+industry: saas_and_b2b_tech
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a global IT-BPO customer service provider with 40,000 call center agents. Clients are demanding
+    40% cost reductions by replacing Tier-1 human customer agents with Generative AI voice agents, threatening the BPO's FTE-based
+    billing model.
+  objective: Design a business model transition from headcount-based FTE billing to outcome-based AI+Human hybrid customer
+    experience contracts.
+  opening_requirements:
+  - Name BPO Generative AI Voice Agents and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Operating Margin (%) and Contract Revenue Retention) and time horizon (eighteen months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Operating Margin (%) and Contract Revenue Retention
+  decision_question: How should the BPO restructure its commercial contracts and delivery model to thrive amid AI voice automation?
+  time_horizon: eighteen months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Revenue cannibalization in FTE billing. Billing clients $22/hour per human agent means automated AI voice
+    resolution ($0.15/minute) cannibalizes 50% of call volume, destroying top-line revenue under traditional time-and-materials
+    contracts unless pricing shifts to Pay-Per-Resolved-Call.
+  what_the_case_wanted_to_test: IT-BPO commercial models, FTE to outcome pricing transition, conversational AI voice latency,
+    agent copilot productivity, and CSAT SLAs.
+  pivotal_insight: Under FTE billing, AI automation shrinks BPO revenue by 40%; by transitioning to 'Pay-Per-Resolution' ($1.80
+    per resolved query), the BPO uses AI to handle Tier-1 at 85% gross margin while upskilling humans for complex Tier-2 advisory.
+  common_traps:
+  - Resisting AI deployment to protect legacy hourly human headcount billing, leading enterprise clients to switch to pure-play
+    AI startups.
+  - Firing 50% of human agents without testing AI hallucination and accent understanding on complex calls.
+  - Assuming AI voice agents can handle 100% of emotional customer disputes.
+  takeaway_lesson: When generative AI disrupts legacy labor-arbitrage services, service providers must abandon hourly FTE
+    billing and adopt value-based outcome pricing to capture software-like gross margins.
+  suggested_readings:
+  - knowledge_base/industries/08_saas_and_b2b_tech.md
+  - knowledge_base/case_types/pricing_strategy.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

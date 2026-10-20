@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.cv-loan-npa
+  label: Contain commercial vehicle loan NPAs and deploy telematics risk management.
+nodes:
+- id: diesel-inflation-cash-squeeze
+  type: branch
+  label: Diesel Inflation & Trucker Operating Cash Flow
+  status: valid_branch
+  evidence: []
+  conclusion: "Fuel inflation dropped trucker net income to \u20B914k/mo against \u20B928k monthly EMI."
+- id: telematics-early-warning
+  type: branch
+  label: IoT Mileage Telemetry & Early Warning Signals
+  status: valid_branch
+  evidence: []
+  conclusion: Mileage drops (<180 km/day) predict loan default 45 days in advance with 88% accuracy.
+- id: repayment-flexibility
+  type: branch
+  label: Dynamic Mileage-Linked EMI Restructuring
+  status: valid_branch
+  evidence: []
+  conclusion: Mileage-linked flexible EMIs reduce 90+ DPD defaults by 55%.
+- id: diagnosis
+  type: diagnosis
+  label: Fuel Inflation Cash-Flow Squeeze & Telematics Mitigation
+  status: hidden_target
+  evidence:
+  - diesel-inflation-cash-squeeze
+  - telematics-early-warning
+  - repayment-flexibility
+  conclusion: Defaults are driven by diesel inflation squeezing monthly cash below EMI obligations; IoT telematics provides
+    45-day early warning and enables dynamic flexible repayment structures.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Connected Vehicle Lending Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy IoT telematics on all fleets, offer mileage-linked flexible EMIs, and connect truckers to digital freight
+    load boards.
+edges:
+- from: objective.cv-loan-npa
+  to: diesel-inflation-cash-squeeze
+  relation: investigate
+- from: objective.cv-loan-npa
+  to: telematics-early-warning
+  relation: investigate
+- from: objective.cv-loan-npa
+  to: repayment-flexibility
+  relation: investigate
+- from: diesel-inflation-cash-squeeze
+  to: diagnosis
+  relation: supports
+- from: telematics-early-warning
+  to: diagnosis
+  relation: supports
+- from: repayment-flexibility
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: telematics-first
+  sequence:
+  - diesel-inflation-cash-squeeze
+  - telematics-early-warning
+  - repayment-flexibility
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from trucker operating cash flow to telematics predictive data.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what percentage of a truck's monthly operating cost is diesel fuel.
+  - Clarify that small truckers cannot increase freight rates immediately.
+  - Redirect toward IoT telematics predictive tracking and flexible EMI structures.

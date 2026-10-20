@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.telehealth-monetization
+  label: Transform teleconsultation platform into a profitable chronic care ecosystem.
+nodes:
+- id: acute-teleconsult-losses
+  type: branch
+  label: Episodic Teleconsult Unit Economics & Churn
+  status: valid_branch
+  evidence: []
+  conclusion: "Loses \u20B9121/call on subsidized \u20B999 acute consults with 91% 30-day user churn."
+- id: chronic-disease-market
+  type: branch
+  label: Chronic Prevalence & Prescription Stickiness
+  status: valid_branch
+  evidence: []
+  conclusion: 32% of users have chronic conditions requiring ongoing medicine and lab testing.
+- id: care-plan-packaging
+  type: branch
+  label: Subscription Bundling (Doctor + Lab + Pharmacy)
+  status: valid_branch
+  evidence: []
+  conclusion: "Chronic care subscription delivers \u20B99,200 LTV at 42% margin with 72% retention."
+- id: diagnosis
+  type: diagnosis
+  label: Acute Care Loss-Leader & Chronic Care Subscription Pivot
+  status: hidden_target
+  evidence:
+  - acute-teleconsult-losses
+  - chronic-disease-market
+  - care-plan-packaging
+  conclusion: Platform burns money on one-off acute consultations; monetization requires converting the 32% chronic patient
+    cohort into recurring care management subscriptions.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Digital Health Transformation
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Launch chronic care subscriptions, integrate automated pharmacy/lab fulfillment, and sell to corporate health
+    plans.
+edges:
+- from: objective.telehealth-monetization
+  to: acute-teleconsult-losses
+  relation: investigate
+- from: objective.telehealth-monetization
+  to: chronic-disease-market
+  relation: investigate
+- from: objective.telehealth-monetization
+  to: care-plan-packaging
+  relation: investigate
+- from: acute-teleconsult-losses
+  to: diagnosis
+  relation: supports
+- from: chronic-disease-market
+  to: diagnosis
+  relation: supports
+- from: care-plan-packaging
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: economics-first
+  sequence:
+  - acute-teleconsult-losses
+  - chronic-disease-market
+  - care-plan-packaging
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from per-call economics to chronic subscription LTV.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate how much recurring revenue an acute cough/cold patient generates vs a diabetic patient.
+  - Clarify that 32% of users have chronic illnesses.
+  - Redirect toward chronic disease care subscriptions and medicine delivery.

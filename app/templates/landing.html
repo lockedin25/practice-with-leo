@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% set nav_active = "home" %}
+{% block title %}Leo · AI Case Interviewer for MBB Candidates{% endblock %}
+{% block description %}Practise consulting cases with Leo, an AI case interviewer who follows your reasoning and releases evidence when you earn it.{% endblock %}
+{% block stylesheets %}
+<link rel="stylesheet" href="/static/landing.css" />
+{% endblock %}
+{% block content %}
+<main class="landing">
+  <!-- ── Hero ───────────────────────────────────────────────── -->
+  <section class="hero shell">
+    <div class="hero-copy">
+      <p class="eyebrow hero-eyebrow">
+        <span class="pulse-dot"></span>
+        <span>AI case interviewer for MBB candidates</span>
+      </p>
+      <h1>Practise with <em>Leo.</em> Think sharper in the room.</h1>
+      <p class="hero-body">
+        Leo runs a live, adaptive case interview around your reasoning. Formulate hypotheses, drive the structure, and unlock facts only when your logic earns them.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary btn-lg" href="/cases">Browse cases <span class="arrow">→</span></a>
+        <a class="btn btn-secondary btn-lg" href="/practice">Enter practice room</a>
+      </div>
+      <dl class="hero-proof">
+        <div>
+          <dt id="proof-case-count">69</dt>
+          <dd>Case scenarios</dd>
+        </div>
+        <div>
+          <dt>30 min</dt>
+          <dd>Per focused session</dd>
+        </div>
+        <div>
+          <dt>0</dt>
+          <dd>Scripted replies</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="hero-composition" aria-label="Sample case interview flow">
+      <div class="case-window">
+        <div class="window-top">
+          <span class="live-status-dot"></span>
+          <span>LIVE CASE INTERVIEW</span>
+          <span class="window-clock">18:42</span>
+        </div>
+        <p class="window-title">Meridian Cold Chain</p>
+        <div class="window-message">
+          <span class="sender-tag">LEO · INTERVIEWER</span>
+          <p>Revenue is stable. The more useful question is how the unit economics differ across the service lines Meridian operates.</p>
+        </div>
+        <div class="window-candidate">
+          <span class="sender-tag">YOU · CANDIDATE</span>
+          <p>I want to test whether the customer mix has shifted toward low-margin storage, then compare contribution margin by temperature tier.</p>
+        </div>
+        <div class="window-evidence">
+          <span class="evidence-pill">01</span>
+          <p>Evidence released: Segment Mix &amp; Capacity Utilization</p>
+        </div>
+      </div>
+      <p class="composition-note"><span>LEO RUNTIME</span> Evidence released only when earned.</p>
+    </div>
+  </section>
+
+  <!-- ── How it works ───────────────────────────────────────── -->
+  <section class="principles shell" id="how-it-works">
+    <div class="section-intro">
+      <h2>One conversation. <em>Real consequences.</em></h2>
+      <p class="section-lead">Master the diagnostic rigor expected at McKinsey, BCG, and Bain.</p>
+    </div>
+
+    <div class="principle-grid">
+      <article class="principle-card">
+        <p class="step-number">01</p>
+        <h3>Choose a business problem</h3>
+        <p>Pick a focused 30-minute case across profitability, market growth, M&amp;A due diligence, operations, and public sector strategy.</p>
+      </article>
+      <article class="principle-card">
+        <p class="step-number">02</p>
+        <h3>Lead the analysis and the hypothesis</h3>
+        <p>Leo follows your logic. He answers directly when you isolate key drivers and challenges unfounded assumptions with realistic partner rigor.</p>
+      </article>
+      <article class="principle-card">
+        <p class="step-number">03</p>
+        <h3>Deliver the recommendation</h3>
+        <p>Synthesize the core recommendation, supporting data, key risks, and immediate next steps, backed by an objective rubric-based debrief.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── The interview architecture ─────────────────────────── -->
+  <section class="difference">
+    <div class="shell difference-grid">
+      <h2>He follows your analysis, not just your <em>keywords.</em></h2>
+      <div class="difference-list">
+        <div class="diff-item">
+          <b>Candidate-led exploration</b>
+          <span>Take any valid alternate analytical branch without being forced back into a rigid predetermined script.</span>
+        </div>
+        <div class="diff-item">
+          <b>Gated factual reservoir</b>
+          <span>The case runtime guards hidden data. Leo never hallucinates or prematurely gives away the case diagnosis.</span>
+        </div>
+        <div class="diff-item">
+          <b>Authentic partner pushback</b>
+          <span>Concise, incisive, and calm. When you get stuck, Leo provides targeted steering rather than repeating generic prompts.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Curated starting path (not the full catalogue) ─────── -->
+  <section class="path shell" id="start-here">
+    <div class="section-intro">
+      <h2>Start with a path, <em>not a catalogue.</em></h2>
+      <p class="section-lead">Ten deliberately selected cases across core interview question types. The full library is one click away when you are ready for more.</p>
+    </div>
+
+    <ol class="case-grid" id="case-grid" aria-live="polite">
+      <li class="path-placeholder">Loading the starting path…</li>
+    </ol>
+
+    <div class="path-footer">
+      <p class="path-count" id="library-count">
+        69 scenarios in the full library: 12 MBB Core plus 57 exemplars from IIM-A, IIM-B, IIM-C, and ISB.
+      </p>
+      <a class="btn btn-secondary" id="browse-all-cases" href="/cases">Browse all cases <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <!-- ── Closing ────────────────────────────────────────────── -->
+  <section class="closing shell">
+    <div class="closing-content">
+      <h2>Make a clear call<br />under <em>pressure.</em></h2>
+      <p class="closing-lead">Start your first 30-minute practice interview with Leo now.</p>
+      <div class="closing-actions">
+        <a class="btn btn-light btn-lg" href="/cases">Browse cases <span class="arrow">→</span></a>
+        <a class="btn btn-ghost-light btn-lg" href="/practice">Enter practice room</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ── Footer ─────────────────────────────────────────────── -->
+<footer class="footer shell">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      {% with grad_id = "foot", show_badge = false %}{% include "_brand.html" %}{% endwith %}
+      <p class="footer-motto">Your calm, incisive AI case interviewer.</p>
+    </div>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="#how-it-works">How it works</a>
+      <a href="/cases">Case library</a>
+      <a href="/practice">Practice room</a>
+      <a href="/login">Sign in</a>
+    </nav>
+  </div>
+  <p class="footer-bottom">© Leo MBB Prep · Built for strategic rigor.</p>
+</footer>
+{% endblock %}
+{% block scripts %}<script src="/static/landing.js"></script>{% endblock %}

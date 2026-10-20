@@ -1,0 +1,75 @@
+schema_version: reservoir-v1
+case_id: forge-components-v1
+title: Forge Components
+status: approved
+rights_status: original
+category: mergers_and_acquisitions
+industry: industrial_manufacturing
+difficulty: advanced
+supported_durations: [30]
+skills_tested: [clarification, deal logic, synergy analysis, valuation judgement, synthesis]
+
+candidate_opening:
+  context: >-
+    Forge Components manufactures precision parts for industrial equipment. It
+    can acquire a smaller supplier, AlloyWorks, and the board needs a recommendation before exclusivity expires.
+  objective: >-
+    Assess whether Forge should acquire AlloyWorks and under what conditions over a three-year horizon.
+  opening_requirements:
+    - Name Forge Components and target AlloyWorks (casting supplier).
+    - Confirm the strategic mandate (evaluate acquisition before exclusivity expires).
+    - Confirm the primary decision metric (value creation versus standalone plan) and 3-year timeline.
+    - Ask clarifying questions regarding target standalone financials, synergies, capex requirements, and seller expectations.
+
+objective_function:
+  primary_metric: value creation versus standalone plan
+  decision_question: Should Forge acquire AlloyWorks, and what must be true for the deal to work?
+  time_horizon: three years
+  expected_candidate_output:
+    - Valuation and standalone viability evaluation.
+    - Quantified cost vs revenue synergy feasibility with risk haircuts.
+    - Integration and key-man risk mitigation plan.
+    - Final deal recommendation with price boundary conditions and earnout structure.
+  design_principle: >-
+    Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+
+case_essence:
+  core_mechanism: >-
+    Synergy valuation vs integration friction. Upfront seller valuation captures expected procurement
+    synergies (4% metal purchasing savings); cross-sell revenue synergies require 12–18 month engineering
+    qualification cycles; the target plant requires automation capex and relies heavily on its founder.
+  what_the_case_wanted_to_test: >-
+    Rigorous M&A valuation discipline, unbundling hard cost synergies from speculative revenue synergies,
+    and pricing target operational debt and key-man risk into transaction terms.
+  pivotal_insight: >-
+    The deal destroys value at the seller's asking multiple unless priced strictly on risk-adjusted,
+    phased procurement synergies with milestone-gated founder earnouts and automation capex factored in.
+  common_traps:
+    - Accepting the seller's revenue synergy forecasts without auditing OEM automotive re-qualification timelines (12-18 months).
+    - Overlooking necessary automation capex (₹8-12 Cr) required to bring AlloyWorks' casting tolerances up to Forge's tier-1 OEM standards.
+    - Failing to structure earnouts or non-compete agreements for the founder-led technical sales team.
+  takeaway_lesson: >-
+    Never pay upfront for revenue synergies that require lengthy customer re-certification; anchor M&A
+    purchase price on verified cost synergies and risk-gate the remainder through structured earnouts.
+  suggested_readings:
+    - knowledge_base/industries/14_heavy_manufacturing_and_steel.md
+    - knowledge_base/case_types/mergers_and_acquisitions.md
+    - knowledge_base/methodology/04_data_gathering_and_notes.md
+
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+    - clarification
+    - drill_down
+    - synthesis
+
+reservoir_files:
+  - facts.yaml
+  - issue-tree.yaml
+  - conversation-policy.yaml
+  - validation.md

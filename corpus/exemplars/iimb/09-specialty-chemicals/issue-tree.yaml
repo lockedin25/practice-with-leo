@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.agrochem-mna
+  label: Evaluate acquisition of domestic KSM chemical intermediate manufacturer.
+nodes:
+- id: supply-chain-vulnerability
+  type: branch
+  label: Chinese Import Exposure & Plant Disruptions
+  status: valid_branch
+  evidence: []
+  conclusion: 72% import reliance creates acute production disruption risk.
+- id: target-technical-capability
+  type: branch
+  label: Technical Fit & Synthesis Capabilities
+  status: valid_branch
+  evidence: []
+  conclusion: Target covers 3 critical KSMs with 45% spare capacity.
+- id: environmental-compliance-capex
+  type: branch
+  label: Pollution Control (ZLD) Compliance & Valuation
+  status: valid_branch
+  evidence: []
+  conclusion: "Target requires \u20B965 Cr ($8M) in mandatory ZLD capex, which must be deducted from purchase price."
+- id: diagnosis
+  type: diagnosis
+  label: Strategic Backward Integration with Environmental Capex Haircut
+  status: hidden_target
+  evidence:
+  - supply-chain-vulnerability
+  - target-technical-capability
+  - environmental-compliance-capex
+  conclusion: Acquisition is essential for supply security ($22M savings/yr) but requires an $8M price haircut to fund mandatory
+    Zero Liquid Discharge environmental upgrades.
+- id: actions
+  type: recommendation
+  label: 3-Pillar M&A Execution Terms
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deduct $8M for ZLD capex from purchase price, upgrade to continuous flow synthesis, and retain key R&D patent
+    chemists.
+edges:
+- from: objective.agrochem-mna
+  to: supply-chain-vulnerability
+  relation: investigate
+- from: objective.agrochem-mna
+  to: target-technical-capability
+  relation: investigate
+- from: objective.agrochem-mna
+  to: environmental-compliance-capex
+  relation: investigate
+- from: supply-chain-vulnerability
+  to: diagnosis
+  relation: supports
+- from: target-technical-capability
+  to: diagnosis
+  relation: supports
+- from: environmental-compliance-capex
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: strategic-first
+  sequence:
+  - supply-chain-vulnerability
+  - target-technical-capability
+  - environmental-compliance-capex
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from supply disruption risk to environmental regulatory due diligence.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what regulatory risks exist in chemical manufacturing plants.
+  - Clarify that the target has strong chemical synthesis know-how.
+  - Redirect toward environmental pollution notices and ZLD capital expenditure.

@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.mobility-ebitda
+  label: Restore self-drive mobility platform fleet EBITDA.
+nodes:
+- id: fleet-availability
+  type: branch
+  label: Available Fleet vs Grounded Vehicles
+  status: valid_branch
+  evidence: []
+  conclusion: 22% of fleet is grounded in workshops, reducing active fleet capacity.
+- id: accident-and-repair
+  type: branch
+  label: Accident Frequency & Repair Turnaround
+  status: valid_branch
+  evidence: []
+  conclusion: High accident rate and 24-day repair delays drain vehicle revenue days.
+- id: damage-recovery
+  type: branch
+  label: Insurance Settlement & Customer Recovery
+  status: valid_branch
+  evidence: []
+  conclusion: "Unrecovered cosmetic damage and deductibles cost \u20B94,800/car monthly."
+- id: diagnosis
+  type: diagnosis
+  label: Accident Downtime & Damage Cost Bleed
+  status: hidden_target
+  evidence:
+  - fleet-availability
+  - accident-and-repair
+  - damage-recovery
+  conclusion: Platform profitability is destroyed by 22% of cars being grounded in 24-day repair cycles, caused by driver
+    moral hazard and slow insurance resolution.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Fleet Protection Program
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy telematics driver monitoring, establish 5-day express repair network, and introduce borrower damage protection
+    fees.
+edges:
+- from: objective.mobility-ebitda
+  to: fleet-availability
+  relation: investigate
+- from: objective.mobility-ebitda
+  to: accident-and-repair
+  relation: investigate
+- from: objective.mobility-ebitda
+  to: damage-recovery
+  relation: investigate
+- from: fleet-availability
+  to: diagnosis
+  relation: supports
+- from: accident-and-repair
+  to: diagnosis
+  relation: supports
+- from: damage-recovery
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: availability-first
+  sequence:
+  - fleet-availability
+  - accident-and-repair
+  - damage-recovery
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from occupancy numbers to actual fleet grounding rates.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate why total fleet utilization is only 58% despite 90% weekend demand.
+  - Clarify that 1,750 cars are in garages.
+  - Redirect inquiry toward accident frequency and repair turnaround times.

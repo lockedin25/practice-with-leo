@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 06-port-operator-v1
+title: Container Port Operator
+school: IIM-A
+status: approved
+rights_status: original
+category: operations
+industry: logistics_and_cold_chain
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client operates a private container terminal at a major western Indian port. Average vessel turnaround time
+    has deteriorated from 18 hours to 34 hours, triggering severe demurrage penalties and shipping line defection.
+  objective: Diagnose the bottleneck causing container berth delays and recommend an operational debottlenecking plan.
+  opening_requirements:
+  - Name Container Port Operator and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Vessel Turnaround Time (hours) and Crane Moves Per Hour (GMPH)) and time horizon (six months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Vessel Turnaround Time (hours) and Crane Moves Per Hour (GMPH)
+  decision_question: What is causing vessel turnaround time to double at the container terminal, and how can berth productivity
+    be restored?
+  time_horizon: six months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Container yard stack congestion caused by customs clearance document batching and lack of direct port delivery
+    (DPD) clearance, causing yard crane jockeying (re-handling) to rise from 1.4 to 4.2 moves per loaded container.
+  what_the_case_wanted_to_test: Port operational queues, yard stack dwell time vs quay crane productivity, and re-handling
+    ratio bottlenecks.
+  pivotal_insight: Quay cranes operate at high speed, but are forced to halt because the yard is at 95% stack capacity; moving
+    one container requires shifting 3-4 blocking containers due to slow customs clearance.
+  common_traps:
+  - Assuming quay gantry crane mechanical failure or labor strikes at the berth.
+  - Recommending purchasing expensive new quay cranes that would only worsen yard congestion.
+  - Blaming vessel arrival bunching without auditing yard inventory dwell time.
+  takeaway_lesson: In intermodal transport terminals, seaside crane speed is governed by landside yard clearance velocity;
+    high yard stack utilization exponentially increases unproductive re-handling moves.
+  suggested_readings:
+  - knowledge_base/industries/01_logistics_and_cold_chain.md
+  - knowledge_base/case_types/unconventional_and_abstract.md
+  - knowledge_base/methodology/02_issue_tree_structuring.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

@@ -1,0 +1,69 @@
+schema_version: reservoir-v1
+case_id: 08-meal-coupon-co-v1
+title: Meal Voucher Digital Transformation
+school: IIM-A
+status: approved
+rights_status: original
+category: turnaround
+industry: fintech_and_payments
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a pioneer in corporate tax-exempt paper meal vouchers in India. Regulatory changes mandated complete
+    digitization, and revenue has plummeted 40% as corporate clients switched to digital payment apps.
+  objective: Formulate a digital turnaround strategy to rebuild employer and merchant monetization.
+  opening_requirements:
+  - Name Meal Voucher Digital Transformation and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Corporate Client Retention and Net Merchant Revenue) and time horizon (eighteen months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Corporate Client Retention and Net Merchant Revenue
+  decision_question: How should the meal voucher pioneer pivot its business model to compete against modern fintechs?
+  time_horizon: eighteen months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Loss of breakage float revenue and paper coupon printing fees following RBI prepaid payment instrument (PPI)
+    digital mandate, combined with merchant resistance to high 2.5% MDR on standard card rails.
+  what_the_case_wanted_to_test: Fintech regulatory disruption, breakage revenue elimination in digital wallets, merchant discount
+    rate (MDR) economics, and B2B corporate employee benefit bundling.
+  pivotal_insight: In paper coupons, 8% of vouchers expired unused (pure profit 'breakage'); digitization eliminated breakage
+    entirely while merchants refused to pay legacy 2.5% processing fees on digital cards.
+  common_traps:
+  - Trying to lobby the central bank to bring back paper meal vouchers.
+  - Slashing employee benefit card fees to zero without alternative monetization.
+  - Competing as a generic consumer UPI wallet against Google Pay and PhonePe.
+  takeaway_lesson: When regulatory digitization destroys legacy fee structures (breakage/paper fees), the business must pivot
+    from payment processing to an integrated SaaS employee benefits suite (gym, fuel, telecom, learning).
+  suggested_readings:
+  - knowledge_base/industries/15_fintech_and_payments.md
+  - knowledge_base/case_types/growth_strategy.md
+  - knowledge_base/methodology/01_preliminary_questions.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

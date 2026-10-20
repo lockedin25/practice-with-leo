@@ -1,0 +1,44 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: market.demand
+  domain: market
+  release_level: broad_context
+  content: India requires 30 GW of solar modules annually to meet its 500 GW 2030 renewable target.
+- id: policy.protection
+  domain: regulation
+  release_level: sharp_question
+  content: Government enforces 40% Basic Customs Duty on imported modules and mandates Approved List of Models and Manufacturers
+    (ALMM) for all grid projects.
+- id: tech.comparison
+  domain: operations
+  release_level: hypothesis_backed
+  content: P-type PERC (21.5% efficiency) is obsolete; N-type TOPCon (24.5% efficiency) costs $0.015/Wp more to build but
+    yields 8% higher energy output, commanding a 12% price premium.
+  dependencies:
+  - policy.protection
+- id: pli.financials
+  domain: financials
+  release_level: hypothesis_backed
+  content: "5 GW integrated Cell + Module TOPCon plant qualifies for \u20B91,250 Cr PLI cash incentives, delivering 16.2%\
+    \ equity IRR against 10.4% for pure module assembly."
+  dependencies:
+  - tech.comparison
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "5 GW solar manufacturing is highly viable (16.2% IRR) under ALMM policy protection, provided the company builds\
+    \ integrated Cell + Module lines using N-type TOPCon technology to capture \u20B91,250 Cr in PLI subsidies."
+- id: recommendation.topcon_tech
+  domain: recommendation
+  release_level: synthesis_support
+  content: Commit to 5 GW N-type TOPCon cell and module architecture with 24.5% efficiency rating.
+- id: recommendation.pli_application
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Structure investment to maximize Tranche-II PLI milestone disbursements of \u20B91,250 Cr."
+- id: recommendation.wafer_hedging
+  domain: recommendation
+  release_level: synthesis_support
+  content: Secure 3-year indexed wafer procurement contracts with Southeast Asian suppliers while exploring future ingot-wafer
+    integration.

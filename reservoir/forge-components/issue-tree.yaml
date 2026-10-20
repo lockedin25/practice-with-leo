@@ -1,0 +1,91 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+
+root:
+  id: objective.acquisition-evaluation
+  label: Evaluate whether Forge Components should acquire AlloyWorks and under what terms to create value over 3 years.
+
+nodes:
+  - id: strategic-fit
+    type: branch
+    label: Strategic rationale and portfolio fit
+    status: valid_branch
+    evidence:
+      - company.model
+      - target.profile
+      - alternatives
+    conclusion: AlloyWorks offers vertical integration into high-precision castings with 20% customer overlap.
+
+  - id: synergy-feasibility
+    type: mechanism
+    label: Hard cost synergies vs speculative revenue synergies
+    status: pivotal_test
+    evidence:
+      - cost_synergy
+      - revenue_synergy
+    conclusion: 4% metal procurement savings are real; revenue synergies require 12-18 month OEM re-qualification.
+
+  - id: plant-and-integration-costs
+    type: mechanism
+    label: Plant automation capex and key-man risk
+    status: pivotal_test
+    evidence:
+      - capacity
+      - integration
+    conclusion: Target plant requires automation capex to meet Forge standards; founder retention is critical to operations.
+
+  - id: valuation-and-deal-terms
+    type: mechanism
+    label: Test valuation against standalone value and synergy capture
+    status: pivotal_test
+    evidence:
+      - standalone
+      - valuation
+    conclusion: Asking price absorbs all procurement synergies upfront, leaving Forge with downside risk unless re-negotiated.
+
+  - id: diagnosis
+    type: diagnosis
+    label: Synthesize M&A decision and boundary conditions
+    status: hidden_target
+    evidence:
+      - synergy-feasibility
+      - plant-and-integration-costs
+      - valuation-and-deal-terms
+    conclusion: >-
+      Deal destroys value at seller's asking price; Forge should proceed conditionally, pricing the transaction
+      strictly on discounted procurement synergies with founder earnouts and automation capex offsets.
+
+  - id: actions
+    type: recommendation
+    label: 3-Pillar M&A Transaction Recommendations
+    status: synthesis
+    evidence:
+      - recommendation.price
+      - recommendation.integration
+      - recommendation.diligence
+    conclusion: Reprice deal to retain value, implement staged operational integration with founder earnouts, and execute focused confirmatory due diligence.
+
+edges:
+  - { from: objective.acquisition-evaluation, to: strategic-fit, relation: investigate }
+  - { from: objective.acquisition-evaluation, to: synergy-feasibility, relation: investigate }
+  - { from: synergy-feasibility, to: valuation-and-deal-terms, relation: motivates }
+  - { from: plant-and-integration-costs, to: valuation-and-deal-terms, relation: informs_capex }
+  - { from: strategic-fit, to: plant-and-integration-costs, relation: motivates }
+  - { from: valuation-and-deal-terms, to: diagnosis, relation: supports }
+  - { from: diagnosis, to: actions, relation: determines }
+
+acceptable_routes:
+  - id: synergy-valuation-first
+    sequence: [strategic-fit, synergy-feasibility, valuation-and-deal-terms, plant-and-integration-costs, diagnosis, actions]
+    interviewer_behaviour: Guide candidate to unbundle cost from revenue synergies, then probe seller valuation.
+
+  - id: operations-integration-first
+    sequence: [strategic-fit, plant-and-integration-costs, synergy-feasibility, valuation-and-deal-terms, diagnosis, actions]
+    interviewer_behaviour: Allow candidate to explore manufacturing capacity and founder risks before calculating net deal value.
+
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+    - Ask candidate to state hypothesis on synergy realization timing and net value creation.
+    - Highlight that revenue synergies have a 12-18 month engineering qualification lag.
+    - Redirect candidate toward comparing asking price against standalone earnings plus risk-adjusted cost synergies.

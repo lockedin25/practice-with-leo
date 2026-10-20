@@ -1,0 +1,44 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: screen.footprint
+  domain: company
+  release_level: broad_context
+  content: Client operates 180 screens across 35 Tier-2 cities (Lucknow, Indore, Coimbatore, Jaipur).
+- id: rpp.breakdown
+  domain: financials
+  release_level: sharp_question
+  content: "Ticket price averages \u20B9180, but F&B Spend Per Head (SPH) is only \u20B942 in Tier-2 (vs \u20B9135 in metros)."
+- id: fb.pricing
+  domain: pricing
+  release_level: hypothesis_backed
+  content: "Popcorn and beverage combos are priced at standard metro rates (\u20B9420-\u20B9550), leading 82% of Tier-2 patrons\
+    \ to skip concessions completely."
+  dependencies:
+  - rpp.breakdown
+- id: non_theatrical.demand
+  domain: customers
+  release_level: hypothesis_backed
+  content: Piloting live IPL cricket screenings and regional gaming tournaments on Tuesday/Wednesday evenings achieved 58%
+    seat occupancy.
+  dependencies:
+  - fb.pricing
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: "Tier-2 multiplexes underperform because metro-level \u20B9450 F&B pricing causes an 82% concession boycott, while\
+    \ weekday screens sit empty (18% occupancy) due to total reliance on theatrical movie slates."
+- id: recommendation.localized_fb
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Introduce localized F&B menu with regional snacks (samosas, chai, regional combos) priced affordably at \u20B9\
+    149-\u20B9199."
+- id: recommendation.event_cinema
+  domain: recommendation
+  release_level: synthesis_support
+  content: Monetize weekday daytime and evening lulls through live sports, corporate training bookings, and gaming events.
+- id: recommendation.subscription
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Launch a weekday 'MoviePass' subscription (\u20B9399/month for 4 weekday tickets) to build consistent habituated\
+    \ footfall."

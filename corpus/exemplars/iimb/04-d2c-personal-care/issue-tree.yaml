@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.d2c-omnichannel
+  label: Design profitable offline expansion strategy for D2C skincare brand.
+nodes:
+- id: digital-acquisition-ceiling
+  type: branch
+  label: Online CAC Inflation & Unit Margins
+  status: valid_branch
+  evidence: []
+  conclusion: "CAC rose to \u20B9850 on \u20B91,100 AOV, destroying online first-order profit."
+- id: offline-channel-economics
+  type: branch
+  label: Modern Trade vs EBO vs General Trade
+  status: valid_branch
+  evidence: []
+  conclusion: Modern Trade take-rates are 38% + slotting; EBO kiosks deliver 26% EBITDA and 8-month payback.
+- id: omnichannel-synergy
+  type: branch
+  label: Brand Equity & Omnichannel Loyalty
+  status: valid_branch
+  evidence: []
+  conclusion: Online brand recognition drives instant mall footfall without traditional offline advertising.
+- id: diagnosis
+  type: diagnosis
+  label: EBO Expansion Superiority over Modern Trade
+  status: hidden_target
+  evidence:
+  - digital-acquisition-ceiling
+  - offline-channel-economics
+  - omnichannel-synergy
+  conclusion: Online CAC exhaustion makes offline expansion mandatory; mall EBO kiosks capture premium brand equity at 26%
+    EBITDA, avoiding supermarket slotting fee dilution.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Omnichannel Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Roll out 40 mall EBO kiosks, partner selectively with specialty beauty chains, and unify omnichannel loyalty
+    data.
+edges:
+- from: objective.d2c-omnichannel
+  to: digital-acquisition-ceiling
+  relation: investigate
+- from: objective.d2c-omnichannel
+  to: offline-channel-economics
+  relation: investigate
+- from: objective.d2c-omnichannel
+  to: omnichannel-synergy
+  relation: investigate
+- from: digital-acquisition-ceiling
+  to: diagnosis
+  relation: supports
+- from: offline-channel-economics
+  to: diagnosis
+  relation: supports
+- from: omnichannel-synergy
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: channel-first
+  sequence:
+  - digital-acquisition-ceiling
+  - offline-channel-economics
+  - omnichannel-synergy
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from digital CAC inflation to comparing offline channel margins.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to compare economics between a supermarket shelf and a mall kiosk.
+  - "Clarify that general trade grocers do not stock \u20B91,100 serums."
+  - Redirect toward mall EBO kiosk economics and specialty beauty retail.

@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% set context_badge = "Case debrief" %}
+{% set show_transcript_link = true %}
+{% block title %}Debrief · Leo MBB Prep{% endblock %}
+{% block description %}Your evidence-based case debrief: scores, cited moments, and what to practise next.{% endblock %}
+{% block body_class %}debrief-body{% endblock %}
+{% block stylesheets %}
+<link rel="stylesheet" href="/static/debrief.css" />
+{% endblock %}
+{% block content %}
+<main class="debrief" aria-label="Case debrief">
+  <nav class="debrief-return" aria-label="Debrief navigation">
+    <a class="debrief-return-link" href="/practice">
+      <span aria-hidden="true">←</span>
+      Back to practice room
+    </a>
+  </nav>
+
+  <!-- Loading, error, and pending states replace the report content. -->
+  <section class="debrief-state hidden" id="debrief-state">
+    <span class="orbit" id="state-spinner"></span>
+    <h1 id="state-title">Leo is marking your case…</h1>
+    <p class="muted" id="state-note">The evaluator reads your transcript against the rubric. This usually takes under a minute.</p>
+    <div class="debrief-actions hidden" id="state-actions">
+      <button class="btn btn-primary" id="state-retry" type="button">Check again</button>
+      <a class="btn btn-secondary" href="/practice">Back to practice</a>
+    </div>
+  </section>
+
+  <!-- The report. Outcome, then evidence, then detail. -->
+  <div class="debrief-report hidden" id="debrief-report">
+
+    <!-- 1. Outcome. The score belongs to the title, not to a card floating
+            beside it, so the header owns both. -->
+    <header class="debrief-head">
+      <div class="debrief-head-text">
+        <p class="eyebrow"><span class="eyebrow-mark" aria-hidden="true"></span> Evidence-based debrief</p>
+        <h1 id="case-title">Your case</h1>
+        <p class="muted" id="report-subtitle"></p>
+      </div>
+      <div class="overall-card">
+        <p class="micro-label">Overall</p>
+        <p class="overall-value"><span id="overall-score">–</span><span class="overall-out-of">/5</span></p>
+        <span class="mbb-badge" id="mbb-badge"></span>
+      </div>
+      <p class="overall-note" id="overall-note"></p>
+    </header>
+
+    <section class="report-stage" aria-labelledby="scorecard-heading">
+      <header class="stage-head">
+        <div>
+          <p class="stage-kicker">01 · The headline</p>
+          <h2 id="scorecard-heading">Your scorecard</h2>
+          <p>Start with the result, then decide where to focus your next practice session.</p>
+        </div>
+      </header>
+
+      <section class="card executive-summary-card hidden" id="executive-summary-card">
+        <p class="eyebrow">Executive summary</p>
+        <p class="executive-summary-text" id="executive-summary-text"></p>
+      </section>
+
+      <section class="debrief-takeaways">
+        <article class="card takeaway-card">
+          <p class="micro-label">What worked</p>
+          <ul class="takeaway-list is-strengths" id="strength-list"></ul>
+        </article>
+        <article class="card takeaway-card">
+          <p class="micro-label">What to fix first</p>
+          <ul class="takeaway-list is-priorities" id="priority-list"></ul>
+          <div class="next-drill">
+            <p class="micro-label">Next drill</p>
+            <p id="drill-text"></p>
+          </div>
+        </article>
+      </section>
+
+      <section class="dimension-grid" id="dimension-grid" aria-label="Dimension breakdown"></section>
+    </section>
+
+    <section class="report-stage" aria-labelledby="behaviour-heading">
+      <header class="stage-head">
+        <div>
+          <p class="stage-kicker">02 · The evidence</p>
+          <h2 id="behaviour-heading">Behaviour review</h2>
+          <p>Review the missed markers first. Open a row for the coaching and transcript evidence.</p>
+        </div>
+      </header>
+
+      <article class="card checklist-card" aria-label="Observed behaviours">
+        <header class="card-head checklist-head">
+          <div>
+            <p class="eyebrow">Observed behaviours</p>
+            <p class="card-subtitle" id="checklist-summary" aria-live="polite">Loading behaviour markers…</p>
+          </div>
+          <div class="checklist-legend">
+            <label class="checklist-filter-label" for="checklist-status-filter">
+              <span>Show</span>
+              <select id="checklist-status-filter" class="checklist-filter">
+                <option value="missed" selected>Missed</option>
+                <option value="demonstrated">Demonstrated</option>
+                <option value="not_applicable">Not applicable</option>
+              </select>
+            </label>
+          </div>
+        </header>
+        <p class="checklist-empty hidden" id="checklist-empty" aria-live="polite"></p>
+        <ul class="checklist" id="checklist"></ul>
+      </article>
+
+      <article class="card development-card hidden" id="development-card">
+        <p class="eyebrow">Development areas, with guidance</p>
+        <div id="development-list"></div>
+      </article>
+    </section>
+
+    <section class="report-stage" aria-labelledby="masterclass-heading">
+      <header class="stage-head">
+        <div>
+          <p class="stage-kicker">03 · The masterclass</p>
+          <h2 id="masterclass-heading">Understand the case</h2>
+          <p>Use these deeper references to understand the case mechanism and benchmark stronger delivery.</p>
+        </div>
+      </header>
+
+      <section class="card masterclass-card hidden" id="case-wanted-card">
+        <p class="eyebrow">What this case was testing</p>
+        <div class="masterclass-grid">
+          <div class="masterclass-item">
+            <p class="micro-label">Core mechanism</p>
+            <p id="case-core-mechanism"></p>
+          </div>
+          <div class="masterclass-item">
+            <p class="micro-label">Pivotal insight</p>
+            <p id="case-pivotal-insight"></p>
+          </div>
+          <div class="masterclass-item">
+            <p class="micro-label">Your performance</p>
+            <p id="case-candidate-performance"></p>
+          </div>
+          <div class="masterclass-item">
+            <p class="micro-label">Gap to the top 1%</p>
+            <p id="case-optimal-gap"></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card golden-rewrites-card hidden" id="golden-rewrites-card">
+        <p class="eyebrow">Golden MBB rewrites</p>
+        <p class="card-subtitle">How a partner would deliver the same turn.</p>
+        <div id="golden-rewrites-list"></div>
+      </section>
+
+      <article class="card strengths-card hidden" id="strengths-card">
+        <p class="eyebrow">Strengths, in your own words</p>
+        <div id="strengths-list"></div>
+      </article>
+    </section>
+
+    <section class="report-stage" aria-labelledby="action-plan-heading">
+      <header class="stage-head">
+        <div>
+          <p class="stage-kicker">04 · Next practice</p>
+          <h2 id="action-plan-heading">Your action plan</h2>
+          <p>Open the drill first. Keep the supporting reading nearby when you want to go deeper.</p>
+        </div>
+      </header>
+
+      <section class="card action-plan-card hidden" id="action-plan-card">
+        <details class="action-disclosure" id="drill-block" open>
+          <summary>
+            <span>
+              <span class="micro-label">Targeted drill</span>
+              <strong id="drill-title"></strong>
+            </span>
+            <span class="disclosure-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="action-disclosure-body">
+            <p class="drill-meta" id="drill-meta"></p>
+            <p class="drill-prompt" id="drill-prompt"></p>
+          </div>
+        </details>
+        <details class="action-disclosure" id="readings-block">
+          <summary>
+            <span>
+              <span class="micro-label">Suggested readings</span>
+              <strong>Build the underlying skill</strong>
+            </span>
+            <span class="disclosure-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="action-disclosure-body readings-block">
+            <ul id="readings-list"></ul>
+          </div>
+        </details>
+      </section>
+    </section>
+
+    <div class="debrief-bottom-actions">
+      <a class="btn btn-primary" href="/cases">Practise another case <span class="arrow">→</span></a>
+      <a class="btn btn-secondary" href="/profile">Your practice history</a>
+    </div>
+
+    <footer class="debrief-foot">
+      <p class="muted" id="version-note"></p>
+    </footer>
+  </div>
+</main>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<template id="evidence-template">
+  <figure class="evidence">
+    <blockquote class="evidence-quote"></blockquote>
+    <figcaption class="evidence-ref"></figcaption>
+  </figure>
+</template>
+{% endblock %}
+{% block scripts %}<script src="/static/debrief.js"></script>{% endblock %}

@@ -1,0 +1,769 @@
+/* ==========================================================================
+   Leo landing page.
+
+   Page composition only. The shell width, navbar, buttons, eyebrow, pulse dot,
+   arrow, card, and every colour / type / radius / shadow token belong to
+   tokens.css and are never redefined here.
+
+   Breakpoints, written literally, and nothing else:
+     1200px  laptop -> wide
+      900px  tablet -> laptop
+      640px  phone  -> small tablet
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-size: 16px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* One spacing rhythm for the whole page. Restated at the two lower
+   breakpoints so every band tightens together instead of drifting apart. */
+.landing {
+  --section-y: 96px;
+  --band-gap: 44px;
+}
+
+/* --- Hero ---------------------------------------------------------------- */
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: 56px;
+  padding: 60px 0 84px;
+}
+
+.hero-copy,
+.hero-composition {
+  min-width: 0;
+}
+
+.hero-eyebrow {
+  margin-bottom: 20px;
+}
+
+.hero-copy h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.375rem, 4.4vw, 4rem);
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  color: var(--ink-primary);
+  margin-bottom: 18px;
+}
+
+.hero-copy h1 em {
+  font-style: italic;
+  color: var(--brand-primary);
+}
+
+.hero-body {
+  max-width: 52ch;
+  margin-bottom: 26px;
+  font-size: 1.125rem;
+  line-height: 1.65;
+  color: var(--ink-secondary);
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: var(--band-gap);
+}
+
+.hero-proof {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line-subtle);
+}
+
+.hero-proof > div {
+  min-width: 0;
+}
+
+.hero-proof dt {
+  margin-bottom: 5px;
+  font-family: var(--font-serif);
+  font-size: clamp(1.625rem, 2.4vw, 2.125rem);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--brand-primary);
+}
+
+.hero-proof dd {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink-muted);
+}
+
+/* --- Simulated interview panel ------------------------------------------- */
+
+.hero-composition {
+  display: flex;
+  flex-direction: column;
+}
+
+.case-window {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  padding: 24px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-xl);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-xl);
+}
+
+.case-window::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand-primary), var(--gold-primary));
+}
+
+.window-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+}
+
+.live-status-dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--brand-primary);
+  box-shadow: 0 0 0 2px var(--brand-glow);
+}
+
+.window-clock {
+  margin-left: auto;
+}
+
+.window-title {
+  margin-bottom: 14px;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--ink-primary);
+}
+
+/* Both turns share the bubble geometry; only the fill differs. */
+.window-message,
+.window-candidate {
+  padding: 13px 15px;
+  margin-bottom: 12px;
+  border-radius: var(--r-md);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.window-message {
+  background: var(--bg-subtle);
+  color: var(--ink-primary);
+}
+
+.window-candidate {
+  width: 92%;
+  margin-left: auto;
+  background: var(--brand-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.sender-tag {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  opacity: 0.75;
+}
+
+.window-evidence {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line-dashed);
+  color: var(--brand-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.evidence-pill {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--brand-light);
+  color: var(--brand-primary);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}
+
+.composition-note {
+  margin-top: 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+.composition-note span {
+  color: var(--brand-primary);
+}
+
+/* --- Section headings ---------------------------------------------------- */
+
+.section-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin-bottom: 40px;
+}
+
+.section-intro h2 {
+  max-width: 22ch;
+  font-family: var(--font-serif);
+  font-size: clamp(1.875rem, 3.2vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--ink-primary);
+}
+
+.section-intro h2 em {
+  font-style: italic;
+  color: var(--brand-primary);
+}
+
+.section-lead {
+  max-width: 46ch;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+}
+
+/* --- How it works -------------------------------------------------------- */
+
+.principles {
+  padding: var(--section-y) 0;
+  border-top: 1px solid var(--line-subtle);
+}
+
+.principle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.principle-card {
+  padding: 28px 26px;
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.principle-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--brand-primary);
+  box-shadow: var(--shadow-card);
+}
+
+.step-number {
+  margin-bottom: 18px;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--brand-primary);
+}
+
+.principle-card h3 {
+  margin-bottom: 9px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink-primary);
+}
+
+.principle-card p:last-child {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--ink-secondary);
+}
+
+/* --- Interview architecture (dark band) ---------------------------------- */
+
+.difference {
+  padding: var(--section-y) 0;
+  background-color: var(--brand-deep);
+}
+
+.difference-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  align-items: center;
+  gap: 56px;
+}
+
+.difference-grid > * {
+  min-width: 0;
+}
+
+.difference h2 {
+  max-width: 20ch;
+  font-family: var(--font-serif);
+  font-size: clamp(1.875rem, 3.2vw, 2.75rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+}
+
+.difference h2 em {
+  font-style: italic;
+  color: var(--gold-primary);
+}
+
+.difference-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.diff-item {
+  display: grid;
+  grid-template-columns: minmax(0, 170px) minmax(0, 1fr);
+  gap: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.diff-item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.diff-item b {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.diff-item span {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+/* --- Starting path ------------------------------------------------------- */
+/* A curated preview, deliberately not the catalogue: the full library and its
+   filters live on /cases. Rows, not cards, so this reads as a sequence. */
+
+.path {
+  padding: var(--section-y) 0;
+}
+
+.case-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  list-style: none;
+}
+
+/* The row stretches to its neighbour so a case whose type wraps to two lines
+   does not leave a ragged edge beside a shorter one. */
+.case-grid > li {
+  display: grid;
+}
+
+.path-case {
+  display: grid;
+  /* The level column is fixed so the arrows line up down the grid. */
+  grid-template-columns: auto minmax(0, 1fr) 96px auto;
+  align-items: center;
+  gap: 16px;
+  min-height: 76px;
+  padding: 16px 20px;
+  border: 1px solid var(--line-base);
+  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-xs);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+}
+
+.path-case:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-primary);
+  box-shadow: var(--shadow-card);
+}
+
+.path-case:hover .arrow {
+  transform: translateX(3px);
+}
+
+.path-index {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-faint);
+}
+
+.path-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.path-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--ink-primary);
+}
+
+.path-meta {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--ink-muted);
+}
+
+.path-level {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: right;
+  color: var(--ink-muted);
+}
+
+.path-level[data-level="foundation"] {
+  color: var(--brand-primary);
+}
+
+.path-level[data-level="advanced"] {
+  color: var(--gold-deep);
+}
+
+.path-case .arrow {
+  color: var(--brand-primary);
+  font-size: 1rem;
+}
+
+.path-placeholder {
+  grid-column: 1 / -1;
+  padding: 34px 0;
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+}
+
+.path-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line-subtle);
+}
+
+.path-count {
+  max-width: 62ch;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--ink-secondary);
+}
+
+/* tokens.css grows .btn-sm to a 44px target but leaves the base .btn at 40px,
+   so the one full-size button on this page asks for the extra 4px. */
+.path-footer .btn {
+  min-height: 44px;
+}
+
+/* --- Closing ------------------------------------------------------------- */
+
+.closing {
+  margin-bottom: 72px;
+  padding: 68px clamp(24px, 5vw, 60px);
+  border-radius: var(--r-2xl);
+  background-color: var(--brand-deep);
+  background-image: radial-gradient(circle at 85% 20%, var(--gold-glow), transparent 38%);
+  color: #ffffff;
+}
+
+.closing-content {
+  max-width: 34ch;
+}
+
+.closing h2 {
+  margin-bottom: 14px;
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3.8vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.closing h2 em {
+  font-style: italic;
+  color: var(--gold-primary);
+}
+
+.closing-lead {
+  margin-bottom: 26px;
+  font-size: 1.0625rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.closing-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* --- Footer -------------------------------------------------------------- */
+
+.footer {
+  padding: 40px 0 26px;
+  border-top: 1px solid var(--line-subtle);
+  color: var(--ink-muted);
+}
+
+.footer-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin-bottom: 24px;
+}
+
+.footer-brand .brand {
+  min-height: 44px;
+  margin-bottom: 4px;
+  font-size: 1.125rem;
+}
+
+.footer-motto {
+  max-width: 34ch;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+}
+
+/* Compact link, 44px target. */
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: color var(--transition-fast);
+}
+
+.footer-links a:hover {
+  color: var(--brand-primary);
+}
+
+.footer-bottom {
+  padding-top: 18px;
+  border-top: 1px solid var(--line-subtle);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+  .landing {
+    --section-y: 84px;
+    --band-gap: 38px;
+  }
+
+  .hero {
+    gap: 40px;
+  }
+
+  .difference-grid {
+    gap: 40px;
+  }
+
+  .diff-item {
+    grid-template-columns: minmax(0, 145px) minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 900px) {
+  .landing {
+    --section-y: 68px;
+    --band-gap: 32px;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+    padding: 40px 0 60px;
+  }
+
+  .hero-body {
+    font-size: 1.0625rem;
+  }
+
+  .case-window {
+    max-width: none;
+  }
+
+  .section-intro {
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+
+  .section-intro h2,
+  .difference h2 {
+    max-width: none;
+  }
+
+  .principle-grid,
+  .case-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .difference-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
+  }
+
+  .diff-item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+  }
+
+  .closing {
+    padding: 52px clamp(22px, 5vw, 44px);
+    margin-bottom: 56px;
+  }
+
+  .closing-content {
+    max-width: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing {
+    --section-y: 54px;
+    --band-gap: 26px;
+  }
+
+  .hero {
+    padding: 28px 0 48px;
+  }
+
+  .hero-actions .btn,
+  .closing-actions .btn,
+  .path-footer .btn {
+    width: 100%;
+  }
+
+  .hero-proof {
+    gap: 12px;
+  }
+
+  .case-window {
+    padding: 20px 18px;
+  }
+
+  .window-candidate {
+    width: 100%;
+  }
+
+  /* The row becomes two lines so a long case title never has to share its
+     line with the difficulty. Every cell is placed explicitly. */
+  .path-case {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 8px 12px;
+    padding: 15px 16px;
+  }
+
+  .path-index {
+    grid-area: 1 / 1 / 2 / 2;
+  }
+
+  .path-level {
+    grid-area: 1 / 2 / 2 / 3;
+    text-align: left;
+  }
+
+  .path-case .arrow {
+    grid-area: 1 / 3 / 2 / 4;
+  }
+
+  .path-main {
+    grid-area: 2 / 1 / 3 / 4;
+  }
+
+  .path-title {
+    font-size: 1.125rem;
+  }
+
+  .footer-inner {
+    gap: 18px;
+  }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 0;
+  }
+}

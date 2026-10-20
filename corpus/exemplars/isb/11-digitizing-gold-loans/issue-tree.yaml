@@ -1,0 +1,78 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.gold-loan-digitization
+  label: Eliminate doorstep gold assay fraud and achieve 30-minute loan disbursement.
+nodes:
+- id: assay-fraud-vulnerabilities
+  type: branch
+  label: Manual Touchstone Testing vs Fake Gold
+  status: valid_branch
+  evidence: []
+  conclusion: "Manual acid testing fails to detect tungsten-core fake gold, causing \u20B914 Cr in auction losses."
+- id: tat-approval-bottlenecks
+  type: branch
+  label: Branch Verification Delays & TAT Inflation
+  status: valid_branch
+  evidence: []
+  conclusion: Waiting for manual branch manager approvals inflates doorstep TAT to 175 minutes.
+- id: portable-xrf-and-iot-security
+  type: branch
+  label: Portable XRF Spectrometry & Smart Pouches
+  status: valid_branch
+  evidence: []
+  conclusion: Portable XRF provides 45-second 99.9% purity testing; smart pouches secure custody.
+- id: diagnosis
+  type: diagnosis
+  label: Manual Assay Vulnerability & Branch Approval Latency
+  status: hidden_target
+  evidence:
+  - assay-fraud-vulnerabilities
+  - tat-approval-bottlenecks
+  - portable-xrf-and-iot-security
+  conclusion: Doorstep loans failed due to manual acid assay fraud and slow branch sign-offs; portable XRF hardware and automated
+    UPI disbursement deliver 28-minute zero-fraud execution.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Digital Gold Appraisal Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Deploy portable XRF spectrometers, use GPS biometric smart pouches, and execute instant automated UPI disbursements.
+edges:
+- from: objective.gold-loan-digitization
+  to: assay-fraud-vulnerabilities
+  relation: investigate
+- from: objective.gold-loan-digitization
+  to: tat-approval-bottlenecks
+  relation: investigate
+- from: objective.gold-loan-digitization
+  to: portable-xrf-and-iot-security
+  relation: investigate
+- from: assay-fraud-vulnerabilities
+  to: diagnosis
+  relation: supports
+- from: tat-approval-bottlenecks
+  to: diagnosis
+  relation: supports
+- from: portable-xrf-and-iot-security
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: fraud-first
+  sequence:
+  - assay-fraud-vulnerabilities
+  - tat-approval-bottlenecks
+  - portable-xrf-and-iot-security
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from collateral fraud losses to automated hardware testing solutions.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate how field officers currently verify gold purity in a customer's living room.
+  - Clarify that gold-plated jewelry passes basic scratch acid tests.
+  - Redirect toward portable XRF analyzers and automated digital LTV calculations.

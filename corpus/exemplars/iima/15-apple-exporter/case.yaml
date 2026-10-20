@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 15-apple-exporter-v1
+title: Fresh Fruit Export Quality Loss
+school: IIM-A
+status: approved
+rights_status: original
+category: operations
+industry: logistics_and_cold_chain
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is an Indian premium apple grower and exporter from Himachal Pradesh. European port consignment rejection
+    rates spiked from 3% to 19%, resulting in massive write-offs.
+  objective: Identify the operational breakdown in the export cold chain and recommend cold chain integrity controls.
+  opening_requirements:
+  - Name Fresh Fruit Export Quality Loss and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Consignment Rejection Rate (%)) and time horizon (six months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Consignment Rejection Rate (%)
+  decision_question: Why are export apple consignments spoiling before reaching European ports and how can cold chain integrity
+    be secured?
+  time_horizon: six months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "Cold chain thermal abuse during multi-modal transshipment. Reefer containers experienced power disconnects\
+    \ during 48-hour port terminal yard staging in Mumbai before ship loading, breaking the critical 0-2\xB0C controlled atmosphere."
+  what_the_case_wanted_to_test: Cold chain logistics, multi-modal transfer handoffs, perishable post-harvest respiration,
+    and IoT datalogger telemetry.
+  pivotal_insight: Orchard pre-cooling and sea freight reefer systems worked perfectly; spoilage occurred entirely during
+    the 48-hour land-to-sea port holding window where containers sat unplugged in direct sunlight.
+  common_traps:
+  - Assuming post-harvest fungal infection or improper pesticide washing in orchards.
+  - Blaming shipping lines for slow vessel ocean transit.
+  - Blaming packaging cardboard box crushing.
+  takeaway_lesson: In multi-modal perishable logistics, quality breakdown almost always occurs at intermodal handoff transfer
+    points where custody changes and auxiliary power is interrupted.
+  suggested_readings:
+  - knowledge_base/industries/01_logistics_and_cold_chain.md
+  - knowledge_base/case_types/unconventional_and_abstract.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

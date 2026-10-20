@@ -1,0 +1,91 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+
+root:
+  id: objective.decarbonisation-strategy
+  label: Prioritise 5-year decarbonisation investments to protect EBITDA margin and meet customer green procurement requirements.
+
+nodes:
+  - id: emissions-baseline
+    type: branch
+    label: Emissions profile and process origin
+    status: valid_branch
+    evidence:
+      - emissions_profile
+      - carbon_cost
+    conclusion: Clinker limestone calcination produces >80% of emissions, creating acute EBITDA vulnerability under carbon taxes.
+
+  - id: abatement-levers-and-macc
+    type: mechanism
+    label: Marginal Abatement Cost Curve (MACC) analysis
+    status: pivotal_test
+    evidence:
+      - levers
+      - economics
+    conclusion: Energy efficiency and SCM blended cements are NPV-positive today; CCUS and deep kiln revamps fail ROIC hurdles.
+
+  - id: plant-heterogeneity
+    type: branch
+    label: Facility-level raw material access and asset lifecycle
+    status: valid_branch
+    evidence:
+      - plant_variation
+      - quality
+    conclusion: Plants with proximate slag/fly ash can scale blended cement immediately; engineering certifications are vital for tenders.
+
+  - id: capital-rationing-and-commercial
+    type: mechanism
+    label: Capital envelope constraints and customer green premiums
+    status: pivotal_test
+    evidence:
+      - capital
+      - customer_demand
+    conclusion: Constrained capex prevents concurrent upgrades; anchor buyers will adopt low-carbon specs if certified without major premiums.
+
+  - id: diagnosis
+    type: diagnosis
+    label: Synthesize optimal decarbonization sequencing
+    status: hidden_target
+    evidence:
+      - emissions-baseline
+      - abatement-levers-and-macc
+      - plant-heterogeneity
+    conclusion: >-
+      To safeguard EBITDA and meet customer mandates under constrained capital, TerraBuild must sequence along the MACC curve:
+      deploy energy efficiency and SCM blended cements at receptive plants first, co-certifying with anchor buyers, while deferring CCUS.
+
+  - id: actions
+    type: recommendation
+    label: 3-Pillar 5-Year Decarbonisation Roadmap
+    status: synthesis
+    evidence:
+      - recommendation.sequence
+      - recommendation_commercial
+      - recommendation_options
+    conclusion: Plant-specific MACC sequencing (energy efficiency & SCM), anchor customer co-certification, and long-term CCUS option preservation.
+
+edges:
+  - { from: objective.decarbonisation-strategy, to: emissions-baseline, relation: investigate }
+  - { from: objective.decarbonisation-strategy, to: plant-heterogeneity, relation: investigate }
+  - { from: emissions-baseline, to: abatement-levers-and-macc, relation: motivates }
+  - { from: abatement-levers-and-macc, to: capital-rationing-and-commercial, relation: evaluates }
+  - { from: abatement-levers-and-macc, to: diagnosis, relation: supports }
+  - { from: plant-heterogeneity, to: diagnosis, relation: supports }
+  - { from: capital-rationing-and-commercial, to: actions, relation: constrains }
+  - { from: diagnosis, to: actions, relation: determines }
+
+acceptable_routes:
+  - id: macc-first
+    sequence: [emissions-baseline, abatement-levers-and-macc, plant-heterogeneity, capital-rationing-and-commercial, diagnosis, actions]
+    interviewer_behaviour: Guide candidate to evaluate abatement levers along the cost curve before examining plant-level variance.
+
+  - id: plant-portfolio-first
+    sequence: [emissions-baseline, plant-heterogeneity, abatement-levers-and-macc, diagnosis, actions]
+    interviewer_behaviour: Probe candidate on differences between kiln facilities and supplementary material access before formulating policy.
+
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+    - Ask candidate to state hypothesis on how to sequence decarbonization initiatives under limited capital.
+    - Clarify that CCUS and hydrogen kilns require massive capex and are currently uneconomic.
+    - Redirect candidate toward examining negative-cost energy efficiency and high-blend SCM cement economics.

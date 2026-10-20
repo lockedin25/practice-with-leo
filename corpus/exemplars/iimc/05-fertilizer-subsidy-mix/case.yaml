@@ -1,0 +1,73 @@
+schema_version: reservoir-v1
+case_id: 05-fertilizer-subsidy-mix-v1
+title: Fertilizer Subsidy & Product Mix
+school: IIM-C
+status: approved
+rights_status: original
+category: growth_strategy
+industry: heavy_manufacturing_and_steel
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is a leading Indian chemical and complex fertilizer manufacturer producing 2M MT of NPK/Urea. Delayed\
+    \ government subsidy disbursements have created a \u20B92,800 Cr working capital lockup, and EBITDA margins are capped\
+    \ at 4%."
+  objective: Redesign product portfolio toward non-subsidized specialty water-soluble fertilizers and bio-stimulants to improve
+    margin and cash flow.
+  opening_requirements:
+  - Name Fertilizer Subsidy & Product Mix and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (EBITDA margin and Working Capital Days) and time horizon (eighteen months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: EBITDA margin and Working Capital Days
+  decision_question: How should the fertilizer manufacturer transition its product portfolio to reduce reliance on government
+    subsidies?
+  time_horizon: eighteen months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Commodity subsidized fertilizers (Urea/DAP) have government-controlled retail prices and delayed 180-day
+    subsidy payouts, while specialized water-soluble fertilizers (WSF), micronutrients, and bio-fertilizers have free market
+    pricing, 28% gross margins, and zero subsidy dependency.
+  what_the_case_wanted_to_test: Regulated chemical economics, Nutrient Based Subsidy (NBS) scheme mechanics, working capital
+    subsidy arrears, and agronomy-led specialty fertilizer marketing.
+  pivotal_insight: Specialty water-soluble fertilizers for drip-irrigation horticulture represent only 8% of sales but generate
+    42% of profits on 100% cash terms without government subsidy risk.
+  common_traps:
+  - Lobbying for higher government urea subsidies instead of pivoting product mix.
+  - Selling subsidized DAP on credit to cash-strapped retailers.
+  - Ignoring the rapid growth of drip irrigation farming in India.
+  takeaway_lesson: In heavily regulated commodity industries with delayed state subsidies, strategic resilience requires pivoting
+    capacity into de-regulated, high-margin specialty value-added formulations.
+  suggested_readings:
+  - knowledge_base/industries/14_heavy_manufacturing_and_steel.md
+  - knowledge_base/case_types/growth_strategy.md
+  - knowledge_base/methodology/01_preliminary_questions.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

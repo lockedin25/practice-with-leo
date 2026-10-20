@@ -1,0 +1,20 @@
+{# Leo wordmark. grad_id keeps the SVG gradient ids unique per page. #}
+<a class="brand{% if brand_class is defined and brand_class %} {{ brand_class }}{% endif %}" href="{{ brand_href|default('/') }}" aria-label="Leo Home">
+  <svg class="brand-icon" viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden="true">
+    <defs>
+      <linearGradient id="{{ grad_id }}Leo" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="var(--brand-primary)"/>
+        <stop offset="100%" stop-color="var(--brand-deep)"/>
+      </linearGradient>
+      <linearGradient id="{{ grad_id }}Gold" x1="10" y1="8" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+        <stop offset="0%" stop-color="var(--gold-soft)"/>
+        <stop offset="100%" stop-color="var(--gold-primary)"/>
+      </linearGradient>
+    </defs>
+    <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#{{ grad_id }}Leo)" stroke="var(--line-base)" stroke-width="1"/>
+    <path d="M9 8.5C9 7.67 9.67 7 10.5 7H13V19H22.5C23.33 19 24 19.67 24 20.5V23C24 23.83 23.33 24.5 22.5 24.5H10.5C9.67 24.5 9 23.83 9 23V8.5Z" fill="#ffffff" fill-opacity="0.9"/>
+    <path d="M18.5 7.5L23.5 12.5L18.5 17.5L13.5 12.5Z" fill="url(#{{ grad_id }}Gold)"/>
+  </svg>
+  <span class="brand-name">Leo</span>
+  {% if show_badge|default(true) %}<span class="brand-badge">MBB Prep</span>{% endif %}
+</a>

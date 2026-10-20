@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.dredging-concession
+  label: Value port capital dredging concession and mitigate hydrological risk.
+nodes:
+- id: traffic-and-lighterage-savings
+  type: branch
+  label: Cape-Size Vessel Traffic & Lighterage Elimination
+  status: valid_branch
+  evidence: []
+  conclusion: "Deep draft eliminates \u20B9400/MT lighterage costs, attracting 150k DWT bulk carriers."
+- id: capital-vs-maintenance-dredging
+  type: branch
+  label: Upfront Capex vs Ongoing Siltation Dredging
+  status: valid_branch
+  evidence: []
+  conclusion: "Maintenance dredging costs \u20B990-140 Cr/yr depending on monsoon siltation volume."
+- id: contractual-risk-allocation
+  type: branch
+  label: Concession Terms & Siltation Risk Sharing
+  status: valid_branch
+  evidence: []
+  conclusion: Uncapped siltation risk drops IRR to 7.8%; requires a contractual risk-sharing collar.
+- id: diagnosis
+  type: diagnosis
+  label: Cape-Size Traffic Upside with Siltation Volatility
+  status: hidden_target
+  evidence:
+  - traffic-and-lighterage-savings
+  - capital-vs-maintenance-dredging
+  - contractual-risk-allocation
+  conclusion: Concession is commercially attractive (16% IRR) but vulnerable to monsoon siltation volatility, requiring a
+    contractual siltation collar and dedicated dredger procurement.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Concession Structuring Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Negotiate contractual siltation risk collar, secure long-term TSHD dredger lease, and lock minimum volume guarantees
+    with industrial anchors.
+edges:
+- from: objective.dredging-concession
+  to: traffic-and-lighterage-savings
+  relation: investigate
+- from: objective.dredging-concession
+  to: capital-vs-maintenance-dredging
+  relation: investigate
+- from: objective.dredging-concession
+  to: contractual-risk-allocation
+  relation: investigate
+- from: traffic-and-lighterage-savings
+  to: diagnosis
+  relation: supports
+- from: capital-vs-maintenance-dredging
+  to: diagnosis
+  relation: supports
+- from: contractual-risk-allocation
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: concession-first
+  sequence:
+  - traffic-and-lighterage-savings
+  - capital-vs-maintenance-dredging
+  - contractual-risk-allocation
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from vessel traffic demand to maintenance dredging siltation risk.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what happens to channel depth after monsoon ocean currents deposit silt.
+  - Clarify that capital dredging is only step one; maintenance is continuous.
+  - Redirect toward maintenance dredging cost volatility and contractual risk sharing.

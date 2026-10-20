@@ -1,0 +1,75 @@
+schema_version: reservoir-v1
+case_id: harvest-table-v1
+title: Harvest Table
+status: approved
+rights_status: original
+category: profitability
+industry: quick_service_restaurants
+difficulty: foundation
+supported_durations: [30]
+skills_tested: [clarification, tailored structure, unit economics, synthesis]
+
+candidate_opening:
+  context: >-
+    Harvest Table is a 180-store fast-casual restaurant chain in India. Sales
+    have grown for two years, but EBITDA margin has declined from 14 to 7 percent.
+  objective: >-
+    Determine the driver of the margin decline and recommend a twelve-month recovery plan to restore profitability.
+  opening_requirements:
+    - Name Harvest Table and its restaurant operating model (180 company-operated stores).
+    - Identify the performance problem (EBITDA margin dropped from 14% to 7% despite 5% same-store sales growth).
+    - Confirm the 12-month recovery timeline and EBITDA metric.
+    - Inquire about sales channels (dine-in, takeaway, delivery), food costs, labor, and aggregator terms.
+
+objective_function:
+  primary_metric: EBITDA margin
+  decision_question: Why has Harvest Table's margin fallen, and what should management do next?
+  time_horizon: twelve months
+  expected_candidate_output:
+    - Channel-level revenue and contribution margin breakdown.
+    - Root cause diagnosis of delivery aggregator economics and brand-funded discounting.
+    - Prioritized 3-pillar turnaround plan (channel pricing, direct ordering, off-peak labor).
+    - Implementation risks and 100-day milestones.
+  design_principle: >-
+    Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+
+case_essence:
+  core_mechanism: >-
+    Channel mix shift toward food delivery aggregators (delivery grew from 20% to 46% of sales).
+    Delivery orders contribute ₹35 on a ₹500 basket vs ₹110 for dine-in due to aggregator commissions,
+    packaging costs, and brand-funded discounts, while kitchen staffing remained fixed to dine-in peak patterns.
+  what_the_case_wanted_to_test: >-
+    Channel unit economics in quick-service restaurants, understanding aggregator take-rates and discounting
+    dilution, and restructuring labor/kitchen operations for omnichannel fulfillment.
+  pivotal_insight: >-
+    Sales growth is cannibalistic; delivery orders carry 68% lower unit contribution margin while diluting
+    direct customer relationships and straining off-peak labor efficiency.
+  common_traps:
+    - Celebrating top-line same-store sales growth without calculating contribution margin per channel.
+    - Blaming ingredient food inflation when raw material costs per dish remained flat in dine-in channels.
+    - Suggesting a complete exit from delivery aggregators rather than adjusting delivery-specific menu pricing and renegotiating commission tiers.
+  takeaway_lesson: >-
+    In multi-channel retail/foodservice, unblended channel unit economics dictate overall profitability;
+    volume growth in high-commission aggregator channels will compress enterprise margin unless pricing covers channel-specific cost-to-serve.
+  suggested_readings:
+    - knowledge_base/industries/13_food_and_beverage_restaurants.md
+    - knowledge_base/case_types/profitability.md
+    - knowledge_base/methodology/02_issue_tree_structuring.md
+
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+    - clarification
+    - drill_down
+    - synthesis
+
+reservoir_files:
+  - facts.yaml
+  - issue-tree.yaml
+  - conversation-policy.yaml
+  - validation.md

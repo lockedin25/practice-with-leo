@@ -1,0 +1,43 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: reit.portfolio
+  domain: company
+  release_level: broad_context
+  content: Client owns 12M sq ft Grade-A tech parks in Whitefield and Outer Ring Road, Bengaluru.
+- id: occupancy.drop
+  domain: financials
+  release_level: sharp_question
+  content: Vacancy rose to 24% as 18 large tech clients downsized leased space upon 3-year term expiry.
+- id: tenant.behavior
+  domain: customers
+  release_level: hypothesis_backed
+  content: Tech companies operate at 45% daily physical desk occupancy due to hybrid policies, seeking 30-40% smaller footprints.
+  dependencies:
+  - occupancy.drop
+- id: flex.demand
+  domain: market
+  release_level: hypothesis_backed
+  content: Third-party co-working and managed office operators in the same micromarket maintain 90% occupancy charging 25%
+    rent premiums.
+  dependencies:
+  - tenant.behavior
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Occupancy dropped from 94% to 76% because rigid 9-year traditional leases failed hybrid IT tenants who reduced
+    dedicated space; managed co-working operators in the same market thrive by offering flexible terms.
+- id: recommendation.flex
+  domain: recommendation
+  release_level: synthesis_support
+  content: Convert 3M sq ft of vacant space into internal branded enterprise managed flexible workspace charging 20% premium.
+- id: recommendation.core_flex
+  domain: recommendation
+  release_level: synthesis_support
+  content: Offer 'Core & Flex' lease contracts (70% long-term dedicated floor, 30% flexible shared credits across the tech
+    park).
+- id: recommendation.amenities
+  domain: recommendation
+  release_level: synthesis_support
+  content: Monetize centralized conference auditoriums, sports arenas, and F&B retail pavilions to generate non-rental ancillary
+    yield.

@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.multiplex-rpp
+  label: Boost Tier-2 multiplex Revenue Per Patron and weekday occupancy.
+nodes:
+- id: concession-spend-elasticity
+  type: branch
+  label: F&B Concession Pricing & Conversion Rate
+  status: valid_branch
+  evidence: []
+  conclusion: "Metro pricing (\u20B9450) causes 82% of Tier-2 patrons to avoid concession stands."
+- id: weekday-screen-utilization
+  type: branch
+  label: Theatrical Content Slates & Weekday Lulls
+  status: valid_branch
+  evidence: []
+  conclusion: Weekday occupancy is only 18% due to exclusive reliance on theatrical movie schedules.
+- id: alternate-content-monetization
+  type: branch
+  label: Live Sports, Gaming & Corporate Bookings
+  status: valid_branch
+  evidence: []
+  conclusion: Live sports screenings achieve 58% occupancy on weekday evenings.
+- id: diagnosis
+  type: diagnosis
+  label: F&B Price Resistance & Weekday Theatrical Lull
+  status: hidden_target
+  evidence:
+  - concession-spend-elasticity
+  - weekday-screen-utilization
+  - alternate-content-monetization
+  conclusion: Profitability lags because metro F&B pricing killed concession conversion in Tier-2 and screens sit empty on
+    weekdays without alternate content.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Entertainment Yield Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: "Launch localized \u20B9149-\u20B9199 F&B combos, screen live sports/gaming on weekdays, and introduce a weekday\
+    \ MoviePass subscription."
+edges:
+- from: objective.multiplex-rpp
+  to: concession-spend-elasticity
+  relation: investigate
+- from: objective.multiplex-rpp
+  to: weekday-screen-utilization
+  relation: investigate
+- from: objective.multiplex-rpp
+  to: alternate-content-monetization
+  relation: investigate
+- from: concession-spend-elasticity
+  to: diagnosis
+  relation: supports
+- from: weekday-screen-utilization
+  to: diagnosis
+  relation: supports
+- from: alternate-content-monetization
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: concession-first
+  sequence:
+  - concession-spend-elasticity
+  - weekday-screen-utilization
+  - alternate-content-monetization
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from F&B conversion metrics to weekday screen utilization.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - "Ask candidate what percentage of patrons purchase food at \u20B9450 per combo."
+  - Clarify that F&B has an 82% gross margin.
+  - Redirect toward localized affordable combos and weekday alternate content.

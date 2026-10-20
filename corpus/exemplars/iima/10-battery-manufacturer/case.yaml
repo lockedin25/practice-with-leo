@@ -1,0 +1,69 @@
+schema_version: reservoir-v1
+case_id: 10-battery-manufacturer-v1
+title: Lead-Acid Battery Manufacturer
+school: IIM-A
+status: approved
+rights_status: original
+category: profitability
+industry: heavy_manufacturing_and_steel
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a leading Indian lead-acid automotive battery manufacturer. Gross profit margins fell by 600 bps
+    over two years despite steady vehicle OEM battery sales volume.
+  objective: Diagnose the margin compression in automotive battery production and propose raw material sourcing reforms.
+  opening_requirements:
+  - Name Lead-Acid Battery Manufacturer and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Gross margin per battery unit) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Gross margin per battery unit
+  decision_question: Why did battery gross margins collapse and how should recycled lead procurement be restructured?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Raw material procurement cost surge caused by unorganized lead scrap recycling middlemen holding back scrap
+    supply, forcing the client to purchase expensive virgin LME-indexed imported lead.
+  what_the_case_wanted_to_test: Circular economy supply chain, scrap metal recycling economics, commodity indexing vs unorganized
+    scrap channels.
+  pivotal_insight: Recycled secondary lead is 25% cheaper than virgin imported lead, but unorganized scrap aggregators cartelized
+    supply; client's reverse logistics buy-back program only captured 20% of spent batteries.
+  common_traps:
+  - Assuming vehicle OEM price renegotiation caused the margin loss.
+  - Blaming sulfuric acid chemical price spikes without checking lead's 70% share of battery cost.
+  - Proposing pivoting immediately to lithium-ion cell manufacturing.
+  takeaway_lesson: In commodity manufacturing with heavy raw material cost concentration, building a closed-loop customer
+    recycling network protects margins from volatile open-market scrap cartels.
+  suggested_readings:
+  - knowledge_base/industries/14_heavy_manufacturing_and_steel.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

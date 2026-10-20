@@ -1,0 +1,34 @@
+schema_version: conversation-policy-v1
+mode: realistic
+
+principles:
+  - Speak naturally and respond directly to candidate questions about marketplace dynamics, cohorts, and fulfillment.
+  - Follow candidate-led cohort and category decomposition rather than jumping ahead.
+  - Challenge candidates who propose marketing discounts, loyalty programs, or ad spend increases without operational root cause analysis.
+  - "Preserve the hidden diagnosis: never volunteer that bulky furniture is the problem until the candidate asks about category splits."
+  - Require practical seller relationship management and SLA enforcement in final recommendations.
+
+phase_policy:
+  clarification:
+    interviewer_goal: Confirm candidate understands ClearCart's 3P marketplace model, the 26% to 17% repeat drop, rising CAC, and 12-month horizon.
+    reveal_levels: [broad_context, sharp_question]
+    expected_candidate_behaviours:
+      - Inquire about marketplace monetization and inventory model.
+      - Clarify the repeat rate definition (90-day cohort) and customer acquisition trends.
+      - Inquire about product categories and customer segments.
+
+  drill_down:
+    interviewer_goal: Guide candidate to isolate retention collapse to bulky furniture fulfillment and test unit economics of managed logistics.
+    reveal_levels: [broad_context, sharp_question, hypothesis_backed]
+    expected_candidate_behaviours:
+      - Decompose repeat purchase rates across product categories.
+      - Probe post-order fulfillment, delivery lead times, and transit damage.
+      - Compare financial leverage of retention improvement vs CAC reduction.
+
+  synthesis:
+    interviewer_goal: Evaluate top-down recommendation focusing on white-glove logistics, seller governance, and marketing budget reallocation.
+    reveal_levels: [synthesis_support]
+    expected_candidate_behaviours:
+      - Recommend structured logistics transformation over marketing discounting.
+      - Outline 3 clear pillars (white-glove fulfillment, search-algorithm SLA governance, post-delivery care).
+      - Address seller churn risk and 100-day pilot milestones.

@@ -1,0 +1,90 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+
+root:
+  id: objective.retail-turnaround
+  label: Diagnose 6-point gross margin collapse and design a 12-month turnaround to release working capital and protect brand.
+
+nodes:
+  - id: cost-of-goods-sold
+    type: branch
+    label: Supplier procurement costs, fabrics, and freight
+    status: valid_branch
+    evidence:
+      - financials.scope
+    conclusion: Fabric and factory procurement costs are stable; gross margin loss is 100% driven by markdowns and write-downs.
+
+  - id: inventory-aging-and-sprawl
+    type: branch
+    label: SKU assortment expansion and aging profile
+    status: valid_branch
+    evidence:
+      - inventory.age
+      - assortment
+    conclusion: SKU count expanded 35% in seasonal trend capsules; aged stock (>180 days) jumped from 12% to 29%.
+
+  - id: merchandising-economics
+    type: mechanism
+    label: Compare sell-through and contribution of basics vs trend capsules
+    status: pivotal_test
+    evidence:
+      - economics
+      - planning
+    conclusion: Core basics maintain full-price sell-through; trend capsules generate the vast majority of markdowns on locked long-lead buys.
+
+  - id: digital-returns-and-channels
+    type: mechanism
+    label: Online return dynamics and channel markdown impact
+    status: pivotal_test
+    evidence:
+      - channel
+      - brand_risk
+    conclusion: High digital returns on trend fits accelerate markdown pressure; blanket store discounting erodes brand equity.
+
+  - id: diagnosis
+    type: diagnosis
+    label: Synthesize root cause of margin erosion
+    status: hidden_target
+    evidence:
+      - inventory-aging-and-sprawl
+      - merchandising-economics
+      - digital-returns-and-channels
+    conclusion: >-
+      Margin collapse is caused by unvalidated trend SKU sprawl (35% increase) ordered on rigid long-lead buys,
+      accumulating aged inventory that forces massive promotional write-downs while core basics remain profitable.
+
+  - id: actions
+    type: recommendation
+    label: 3-Pillar 12-Month Turnaround Plan
+    status: synthesis
+    evidence:
+      - recommendation.assortment
+      - recommendation.inventory
+      - recommendation.digital
+    conclusion: Rationalize trend SKUs with test-and-react buying, implement dynamic in-season replenishment triggers, and clear aged stock via controlled channels.
+
+edges:
+  - { from: objective.retail-turnaround, to: cost-of-goods-sold, relation: investigate }
+  - { from: objective.retail-turnaround, to: inventory-aging-and-sprawl, relation: investigate }
+  - { from: inventory-aging-and-sprawl, to: merchandising-economics, relation: motivates }
+  - { from: inventory-aging-and-sprawl, to: digital-returns-and-channels, relation: motivates }
+  - { from: merchandising-economics, to: diagnosis, relation: supports }
+  - { from: digital-returns-and-channels, to: diagnosis, relation: supports }
+  - { from: cost-of-goods-sold, to: diagnosis, relation: rules_out_inflation }
+  - { from: diagnosis, to: actions, relation: determines }
+
+acceptable_routes:
+  - id: merchandising-first
+    sequence: [cost-of-goods-sold, inventory-aging-and-sprawl, merchandising-economics, diagnosis, actions]
+    interviewer_behaviour: Confirm fabric costs are flat, then guide candidate to investigate assortment sprawl and sell-through.
+
+  - id: inventory-aging-first
+    sequence: [inventory-aging-and-sprawl, merchandising-economics, digital-returns-and-channels, diagnosis, actions]
+    interviewer_behaviour: Probe candidate on why inventory >180 days doubled and how buying commitments were structured.
+
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+    - Ask candidate to state hypothesis separating supplier fabric cost from retail promotional markdowns.
+    - Clarify that supplier unit production costs are flat.
+    - Redirect candidate toward comparing sell-through and markdown losses between core basics and seasonal trend capsules.

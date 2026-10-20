@@ -1,0 +1,34 @@
+schema_version: conversation-policy-v1
+mode: realistic
+
+principles:
+  - Speak naturally and respond directly to the candidate's line of inquiry.
+  - Follow a structured candidate-led hypothesis rather than enforcing a rigid script.
+  - Challenge generic market entry frameworks (e.g. 4Ps or 3Cs) that fail to address healthcare unit economics.
+  - "Preserve the hidden diagnosis: never reveal that standalone imaging is unviable before the candidate tests hub utilization."
+  - Require clear operational logistics and doctor relationship grounding before accepting recommendations.
+
+phase_policy:
+  clarification:
+    interviewer_goal: Ensure candidate understands Aster's metro operating model, service lines, target geography, and ROIC hurdle.
+    reveal_levels: [broad_context, sharp_question]
+    expected_candidate_behaviours:
+      - Clarify current service mix (pathology vs radiology) and geography.
+      - Restate primary decision metric (risk-adjusted ROIC) and 3-year horizon.
+      - Inquire about market size, customer willingness to pay, and competition.
+
+  drill_down:
+    interviewer_goal: Guide candidate to evaluate standalone hub unit economics vs hub-and-spoke collection network logistics.
+    reveal_levels: [broad_context, sharp_question, hypothesis_backed]
+    expected_candidate_behaviours:
+      - Present a tailored market entry structure covering market sizing, competitive positioning, and operational economics.
+      - Test fixed vs variable cost structure of full diagnostic hubs.
+      - Discover the 4-hour sample stability logistics radius and regional processing advantage.
+
+  synthesis:
+    interviewer_goal: Evaluate top-down recommendation, risk mitigations, and execution milestones.
+    reveal_levels: [synthesis_support]
+    expected_candidate_behaviours:
+      - Deliver a crisp recommendation (enter via hub-and-spoke collection network).
+      - Detail 3 structured pillars (collection rollout, doctor partnerships, gated radiology capex).
+      - Highlight key risks (sample integrity, doctor trust, regulatory licensing) and mitigations.

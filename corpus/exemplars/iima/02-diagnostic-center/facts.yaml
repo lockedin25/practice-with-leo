@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: network.footprint
+  domain: company
+  release_level: broad_context
+  content: Client operates 22 diagnostic centers across Mumbai offering pathology and basic imaging.
+- id: patient.mix
+  domain: customers
+  release_level: sharp_question
+  content: Doctor-referred patients grew from 45% to 70% of total volume; direct walk-ins and corporate contracts declined.
+- id: commission.rates
+  domain: financials
+  release_level: hypothesis_backed
+  content: Physician referral payout commissions escalated from 20% to 38% of test price to defend against aggressive new
+    diagnostic entrants.
+  dependencies:
+  - patient.mix
+- id: test.economics
+  domain: economics
+  release_level: hypothesis_backed
+  content: Reagent costs per test are stable at 18%, but after a 38% doctor payout and center overhead, net contribution margin
+    per test fell from 32% to 14%.
+  dependencies:
+  - commission.rates
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Margin erosion is driven by doctor referral commissions jumping from 20% to 38% in response to competitor poaching,
+    while higher-margin direct walk-ins fell.
+- id: recommendation.b2b
+  domain: recommendation
+  release_level: synthesis_support
+  content: Build direct B2B corporate wellness and hospital outsourcing contracts with locked zero-commission pricing.
+- id: recommendation.digital
+  domain: recommendation
+  release_level: synthesis_support
+  content: Launch home sample collection app to capture direct consumer walk-ins with personalized health packages.
+- id: recommendation.specialty
+  domain: recommendation
+  release_level: synthesis_support
+  content: Shift test menu toward high-complexity specialized genomics/oncology tests where doctor referral fees are capped.

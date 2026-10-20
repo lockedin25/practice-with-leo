@@ -1,0 +1,21 @@
+{# Account chip, filled server side from the request's session.
+
+   Every id and the `hidden` convention are kept exactly as the client scripts
+   expect, so any page script that still toggles this menu simply re-applies
+   the state the server already rendered. #}
+<div class="user-menu{% if not user %} hidden{% endif %}" id="user-menu">
+  <button class="user-chip" id="user-chip" type="button" aria-haspopup="true" aria-expanded="false" title="Your account">
+    <span class="user-avatar" id="user-avatar" aria-hidden="true"
+          {% if user and user.picture %}style="background-image: url('{{ user.picture }}')"{% endif %}>{% if user and not user.picture %}{{ (user.name or user.email or "?")[:1]|upper }}{% endif %}</span>
+    <span class="user-name-label" id="user-name-label">{{ (user.name or user.email).split(" ")[0] if user else "Profile" }}</span>
+    <svg viewBox="0 0 24 24" class="icon user-caret" aria-hidden="true"><path d="M7 10l5 5 5-5" /></svg>
+  </button>
+  <div class="user-sheet hidden" id="user-sheet">
+    <p class="user-sheet-name" id="user-name">{{ user.name or user.email if user else "" }}</p>
+    <p class="user-sheet-email" id="user-email">{{ user.email if user else "" }}</p>
+    <a class="user-sheet-item" href="/profile"><strong>Your progress and history</strong></a>
+    <a class="user-sheet-item" href="/practice">Practice room</a>
+    <a class="user-sheet-item{% if not (user and user.is_admin) %} hidden{% endif %}" id="admin-link" href="/admin">Admin console</a>
+    <button class="user-sheet-item sign-out-btn" id="sign-out" type="button">Sign out</button>
+  </div>
+</div>

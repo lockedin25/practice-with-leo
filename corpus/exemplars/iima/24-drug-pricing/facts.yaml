@@ -1,0 +1,45 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: drug.efficacy
+  domain: company
+  release_level: broad_context
+  content: Drug extends median progression-free survival by 14 months in Stage IV non-small cell lung cancer.
+- id: market.demographics
+  domain: customers
+  release_level: sharp_question
+  content: India has 75,000 eligible lung cancer patients annually; only 8% have private insurance covering specialty oncology
+    biologics.
+- id: reference_price.risk
+  domain: regulation
+  release_level: hypothesis_backed
+  content: European and Middle Eastern health authorities benchmark Indian official invoice prices to negotiate mandatory
+    discounts.
+  dependencies:
+  - market.demographics
+- id: affordability.curve
+  domain: economics
+  release_level: hypothesis_backed
+  content: "Affordability analysis shows 12,000 patients can afford \u20B915 lakh ($18k) total therapy; only 400 patients\
+    \ can afford full US price of \u20B91 Cr ($120k)."
+  dependencies:
+  - reference_price.risk
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Direct price cuts would trigger international reference price erosion in Europe; company must protect nominal MRP
+    while capturing the 12,000-patient segment via an innovative 2-for-4 Patient Assistance Program and outcome-linked refunds.
+- id: recommendation.pap
+  domain: recommendation
+  release_level: synthesis_support
+  content: Structure a tiered Patient Assistance Program (e.g. 'Pay for 2 cycles, receive subsequent 4 cycles free') preserving
+    official invoice MRP.
+- id: recommendation.risk_share
+  domain: recommendation
+  release_level: synthesis_support
+  content: Offer 100% money-back guarantee to hospitals if patient disease progresses within the first 60 days of therapy.
+- id: recommendation.anti_diversion
+  domain: recommendation
+  release_level: synthesis_support
+  content: Apply unique serialized 2D matrix barcoding and track vial administration in designated partner hospitals to block
+    gray-market export.

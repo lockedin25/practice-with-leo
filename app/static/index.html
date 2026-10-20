@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leo · Case Interview Practice</title>
+    <meta name="description" content="Consulting case interview practice with Leo and evidence-based feedback." />
+    <link rel="icon" type="image/svg+xml" href="/static/logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500;1,6..72,600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/tokens.css" />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ── Top bar ─────────────────────────────────────────────── -->
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Leo Home">
+          <svg class="brand-icon" viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="topLeoGrad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="var(--brand-primary)"/>
+                <stop offset="100%" stop-color="var(--brand-deep)"/>
+              </linearGradient>
+              <linearGradient id="topGoldGrad" x1="10" y1="8" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="var(--gold-soft)"/>
+                <stop offset="100%" stop-color="var(--gold-primary)"/>
+              </linearGradient>
+            </defs>
+            <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#topLeoGrad)" stroke="var(--line-base)" stroke-width="1"/>
+            <path d="M9 8.5C9 7.67 9.67 7 10.5 7H13V19H22.5C23.33 19 24 19.67 24 20.5V23C24 23.83 23.33 24.5 22.5 24.5H10.5C9.67 24.5 9 23.83 9 23V8.5Z" fill="#ffffff" fill-opacity="0.9"/>
+            <path d="M18.5 7.5L23.5 12.5L18.5 17.5L13.5 12.5Z" fill="url(#topGoldGrad)"/>
+          </svg>
+          <span class="brand-name">Leo</span>
+        </a>
+
+        <a class="nav-cases-link" href="/cases">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>Cases</span>
+        </a>
+
+        <span class="rule" aria-hidden="true"></span>
+
+        <p class="session-label">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          <span id="session-status-text">Leo is listening</span>
+          <span class="session-mode" id="session-mode">Realistic</span>
+        </p>
+
+        <div class="topbar-actions">
+          <div class="timer" id="timer" role="timer" aria-label="Time remaining in this practice">
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon">
+              <circle cx="12" cy="12" r="8.25" />
+              <path d="M12 8.4V12l2.6 1.7" />
+            </svg>
+            <span class="timer-value" id="timer-value">30:00</span>
+          </div>
+
+          <div class="voice-controls hidden" id="voice-controls">
+            <span class="voice-status" id="voice-status" aria-live="polite">Chat</span>
+            <button class="button button-ghost" id="voice-toggle" type="button">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="voice-mic-icon">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+              <span>Start voice</span>
+            </button>
+          </div>
+
+          <button class="icon-button" id="theme-toggle" type="button" aria-label="Switch colour theme">
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon icon-sun">
+              <circle cx="12" cy="12" r="4.2" />
+              <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6l-1.4 1.4M7 17l-1.4 1.4" />
+            </svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true" class="icon icon-moon">
+              <path d="M20 14.1A8.2 8.2 0 1 1 9.9 4a6.6 6.6 0 0 0 10.1 10.1Z" />
+            </svg>
+          </button>
+
+          <button class="button button-ghost" id="end-attempt" type="button">End practice</button>
+
+          <div class="user-menu hidden" id="user-menu">
+            <button class="user-chip" id="user-chip" type="button" aria-haspopup="true" aria-expanded="false" title="Your Account">
+              <span class="user-avatar" id="user-avatar" aria-hidden="true"></span>
+              <span class="user-name-label" id="user-name-label">Profile</span>
+              <svg viewBox="0 0 24 24" class="icon user-caret" aria-hidden="true"><path d="M7 10l5 5 5-5" /></svg>
+            </button>
+            <div class="user-sheet hidden" id="user-sheet">
+              <p class="user-sheet-name" id="user-name"></p>
+              <p class="user-sheet-email" id="user-email"></p>
+              <a class="user-sheet-item" href="/profile"><strong>Your Progress &amp; History</strong></a>
+              <a class="user-sheet-item" href="/cases">Case Library (69 Cases)</a>
+              <a class="user-sheet-item hidden" id="admin-link" href="/admin">Admin Console</a>
+              <button class="user-sheet-item sign-out-btn" id="sign-out" type="button">Sign Out</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ── Workspace ───────────────────────────────────────────── -->
+      <main class="workspace">
+        <!-- ── Transcript & Chat Section (Always Visible) ───────── -->
+        <section class="transcript" id="transcript" aria-label="Case interview conversation">
+          <div class="case-header" id="case-header">
+            <p class="eyebrow">
+              <span class="eyebrow-mark" aria-hidden="true"></span>
+              Live case interview
+            </p>
+            <h1 id="case-title">Loading case…</h1>
+            <div class="case-tags" id="case-tags"></div>
+          </div>
+
+          <!-- ── Voice Mode Visualizer HUD Banner (Visible when Voice Mode is ON) ── -->
+          <div class="voice-hud hidden" id="voice-hud" aria-label="Live Voice Mode Visualizer">
+            <div class="voice-hud-inner">
+              <!-- Fluid Animated Neural Voice Orb -->
+              <div class="voice-visualizer" id="voice-visualizer" aria-hidden="true">
+                <div class="voice-orb">
+                  <div class="orb-core"></div>
+                </div>
+                <div class="voice-aura"></div>
+              </div>
+
+              <!-- Dynamic Voice Status, Mini Equalizer & Guidance -->
+              <div class="voice-hud-details">
+                <div class="voice-status-line">
+                  <div class="voice-state-pill" id="voice-state-pill">
+                    <span class="voice-state-dot"></span>
+                    <span id="voice-state-label">Connecting with Leo...</span>
+                  </div>
+                  <!-- Integrated Audio Waveform -->
+                  <div class="sound-wave-bars" aria-hidden="true">
+                    <span class="bar b1"></span>
+                    <span class="bar b2"></span>
+                    <span class="bar b3"></span>
+                    <span class="bar b4"></span>
+                    <span class="bar b5"></span>
+                  </div>
+                </div>
+                <p class="voice-guidance" id="voice-guidance">Think aloud · Formulate hypotheses · Ask for facts as you need them</p>
+              </div>
+
+              <!-- Voice HUD Controls -->
+              <div class="voice-hud-actions">
+                <button class="btn-voice-action" id="voice-return-chat" type="button" title="Mute microphone and type in chat">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  <span>Mute &amp; type</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="transcript-scroll" id="transcript-scroll">
+            <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+          </div>
+
+          <form class="composer" id="message-form">
+            <div class="composer-field">
+              <label class="sr-only" for="candidate-message">Your response</label>
+              <textarea
+                id="candidate-message"
+                rows="1"
+                placeholder="Ask Leo a question or talk through your reasoning…"
+                autocomplete="off"
+              ></textarea>
+              <div class="composer-foot">
+                <p class="composer-hint">
+                  <span><kbd>Enter</kbd> to send</span>
+                  <span class="hint-sep" aria-hidden="true">·</span>
+                  <span class="hint-extra"><kbd>Shift</kbd><kbd>Enter</kbd> for a new line</span>
+                </p>
+                <button class="send-button" id="send-message" type="submit" aria-label="Send response">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" class="icon icon-send">
+                    <path d="M12 19V5.6M12 5.6 6.4 11.2M12 5.6l5.6 5.6" />
+                  </svg>
+                  <span class="spinner" aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <div class="ended-bar hidden" id="ended-bar">
+            <div class="ended-copy">
+              <p class="ended-title">Practice complete</p>
+              <p class="ended-note">Your 10x Masterclass Debrief Report and BCG competency scores are ready.</p>
+            </div>
+            <div class="ended-actions" style="display: flex; gap: 8px; align-items: center; margin-left: auto; flex-wrap: wrap;">
+              <a class="btn btn-primary btn-sm" id="view-debrief-btn" href="#" style="background: var(--brand-primary); color: #fff;">
+                <span>View Full Debrief Report</span> <span class="arrow">→</span>
+              </a>
+              <button class="button button-ghost" id="restart-attempt" type="button">New Case</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Side rail ─────────────────────────────────────────── -->
+        <aside class="rail" aria-label="Interview state">
+          <section class="card">
+            <header class="card-head">
+              <p class="eyebrow">Interview progress</p>
+              <span class="counter" id="stage-counter">1/4</span>
+            </header>
+
+            <ol class="stepper" id="stepper"></ol>
+
+            <p class="card-note">
+              Leo only discloses what your question or reasoning has earned.
+            </p>
+
+            <div class="assessed">
+              <p class="micro-label">Assessed on</p>
+              <ul class="tag-list" id="skills-list"></ul>
+            </div>
+          </section>
+
+          <section class="card">
+            <header class="card-head">
+              <p class="eyebrow">Evidence released</p>
+              <span class="counter" id="facts-counter">0</span>
+            </header>
+            <div class="facts" id="facts"></div>
+          </section>
+
+          <section class="card card-summary hidden" id="scorecard">
+            <header class="card-head">
+              <p class="eyebrow">Practice summary</p>
+              <span class="status-chip" id="scorecard-status"></span>
+            </header>
+            <div id="scorecard-content"></div>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+    <dialog class="case-complete-dialog" id="case-complete-dialog" style="border: none; border-radius: var(--r-xl); background: var(--bg-surface, var(--surface)); color: var(--ink-primary, var(--ink)); padding: 32px 28px; max-width: 460px; width: calc(100% - 32px); box-shadow: var(--shadow-xl); text-align: center; margin: auto;">
+      <div class="case-complete-body" style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--brand-tint); color: var(--brand-primary); display: grid; place-items: center; font-size: 26px; border: 1px solid var(--line-base);">
+          🎯
+        </div>
+        <div>
+          <h2 style="font-size: 1.35rem; font-weight: 800; margin: 0 0 6px; letter-spacing: -0.02em;">Practice Complete!</h2>
+          <p style="font-size: 0.875rem; color: var(--ink-muted, var(--ink-3)); margin: 0; line-height: 1.5;">Your case performance has been evaluated against top 1% MBB benchmarks. Your 10x Masterclass Debrief Report is ready.</p>
+        </div>
+        <div style="width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+          <a class="btn btn-primary" id="dialog-debrief-btn" href="#" style="width: 100%; justify-content: center; font-size: 0.9375rem; padding: 10px 18px; background: var(--brand-primary); color: #fff;">
+            <span>View Full 10x Debrief Report</span> <span class="arrow">→</span>
+          </a>
+          <a class="btn btn-secondary btn-sm" href="/cases" style="width: 100%; justify-content: center;">
+            <span>Return to Case Library</span>
+          </a>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="voice-dialog" id="voice-consent" aria-labelledby="voice-consent-title">
+      <form method="dialog" class="voice-dialog-body">
+        <div class="voice-dialog-header">
+          <span class="voice-icon-badge">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="23"></line>
+              <line x1="8" y1="23" x2="16" y2="23"></line>
+            </svg>
+          </span>
+          <div>
+            <p class="eyebrow">Voice practice</p>
+            <h2 id="voice-consent-title">Speak with Leo</h2>
+          </div>
+        </div>
+        <p>Leo will use your microphone to listen to your voice and conduct the case in real time. Chat stays available whenever you prefer to type.</p>
+        <div class="voice-dialog-actions">
+          <button class="button button-ghost" id="voice-cancel" value="cancel" type="submit">Keep chatting</button>
+          <button class="button button-solid" id="voice-start" value="start" type="button">Start voice</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- ── Templates ─────────────────────────────────────────────── -->
+    <template id="message-template">
+      <article class="message">
+        <span class="avatar" aria-hidden="true">
+          <svg viewBox="0 0 32 32" class="avatar-glyph" fill="none">
+            <rect width="32" height="32" rx="8" fill="var(--brand-primary)"/>
+            <path d="M9 8.5C9 7.67 9.67 7 10.5 7H13V19H22.5C23.33 19 24 19.67 24 20.5V23C24 23.83 23.33 24.5 22.5 24.5H10.5C9.67 24.5 9 23.83 9 23V8.5Z" fill="#ffffff"/>
+            <path d="M18.5 7.5L23.5 12.5L18.5 17.5L13.5 12.5Z" fill="var(--gold-primary)"/>
+          </svg>
+        </span>
+        <div class="message-body">
+          <p class="message-role"></p>
+          <div class="bubble"><p class="message-content"></p></div>
+        </div>
+      </article>
+    </template>
+
+    <template id="typing-template">
+      <article class="message interviewer is-typing">
+        <span class="avatar" aria-hidden="true">
+          <svg viewBox="0 0 32 32" class="avatar-glyph" fill="none">
+            <rect width="32" height="32" rx="8" fill="var(--brand-primary)"/>
+            <path d="M9 8.5C9 7.67 9.67 7 10.5 7H13V19H22.5C23.33 19 24 19.67 24 20.5V23C24 23.83 23.33 24.5 22.5 24.5H10.5C9.67 24.5 9 23.83 9 23V8.5Z" fill="#ffffff"/>
+            <path d="M18.5 7.5L23.5 12.5L18.5 17.5L13.5 12.5Z" fill="var(--gold-primary)"/>
+          </svg>
+        </span>
+        <div class="message-body">
+          <p class="message-role">Leo</p>
+          <div class="bubble">
+            <span class="typing" aria-label="Leo is thinking">
+              <i></i><i></i><i></i>
+            </span>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="/static/theme.js"></script>
+    <script src="/static/app.js"></script>
+    <script type="module" src="/static/voice.js"></script>
+  </body>
+</html>

@@ -1,0 +1,34 @@
+schema_version: conversation-policy-v1
+mode: realistic
+
+principles:
+  - Speak naturally and test the candidate's understanding of digital product adoption, pedagogy, and change management.
+  - Follow candidate-led structuring covering user experience, student constraints, faculty incentives, and rollout governance.
+  - Challenge recommendations that propose simply mandating attendance or rewriting the core academic syllabus.
+  - "Keep the hidden diagnosis private: do not disclose that completed students perform well until candidate tests learning outcomes vs delivery format."
+  - Ensure final recommendations address both technical/product usability and faculty organizational alignment.
+
+phase_policy:
+  clarification:
+    interviewer_goal: Confirm candidate understands Orbit's vocational network, 38% completion rate, uneven faculty adoption, and 12-month redesign goal.
+    reveal_levels: [broad_context, sharp_question]
+    expected_candidate_behaviours:
+      - Inquire about vocational program format (classroom, lab, employer placement).
+      - Clarify pilot scope and adoption baseline metrics.
+      - Establish time horizon and success metrics (completion and employability).
+
+  drill_down:
+    interviewer_goal: Guide candidate to recognize that content efficacy is strong but lecture format fails mobile students, while faculty lack incentive to adapt.
+    reveal_levels: [broad_context, sharp_question, hypothesis_backed]
+    expected_candidate_behaviours:
+      - Test whether curriculum quality is the problem (learning outcome comparison).
+      - Analyze student access constraints (smartphones, data connectivity, fragmented time).
+      - Dissect faculty workload friction, timetable integration, and compensation metrics.
+
+  synthesis:
+    interviewer_goal: Evaluate top-down 12-month scaling roadmap covering modular curriculum redesign, faculty champions, and phased rollout.
+    reveal_levels: [synthesis_support]
+    expected_candidate_behaviours:
+      - Deliver a clear 3-pillar digital transformation recommendation.
+      - Formulate specific micro-learning and faculty incentive structures.
+      - Outline a wave-based pilot validation and 100-day execution plan.

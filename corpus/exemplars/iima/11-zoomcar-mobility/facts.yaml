@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: fleet.size
+  domain: company
+  release_level: broad_context
+  content: Platform operates 8,000 peer-to-peer host cars in 10 metro cities.
+- id: occupancy.metrics
+  domain: operations
+  release_level: sharp_question
+  content: Weekend booking demand is 92%, but total available fleet utilization is only 58%.
+- id: downtime.cause
+  domain: operations
+  release_level: hypothesis_backed
+  content: Over 1,750 vehicles (22% of fleet) are grounded in local workshops for accident repairs, averaging 24 days downtime
+    per incident.
+  dependencies:
+  - occupancy.metrics
+- id: insurance.gap
+  domain: financials
+  release_level: hypothesis_backed
+  content: "Insurance claim deductibles and unapproved cosmetic body damages cost the platform \u20B94,800 per active car\
+    \ monthly."
+  dependencies:
+  - downtime.cause
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Negative EBITDA is driven by 22% fleet grounding in workshops with 24-day repair delays and unrecovered accident
+    damage costs from reckless driving.
+- id: recommendation.telematics
+  domain: recommendation
+  release_level: synthesis_support
+  content: Install IoT speed-limit and harsh-braking telematics that levy real-time security deposit fines for reckless driving.
+- id: recommendation.fast_repair
+  domain: recommendation
+  release_level: synthesis_support
+  content: Create pre-approved cashless network of express body-shops with guaranteed 5-day repair SLAs.
+- id: recommendation.host_insurance
+  domain: recommendation
+  release_level: synthesis_support
+  content: Package comprehensive zero-depreciation insurance policy co-funded by borrower trip damage fees.

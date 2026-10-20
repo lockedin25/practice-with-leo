@@ -1,0 +1,42 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: marketplace.scale
+  domain: company
+  release_level: broad_context
+  content: Platform processes 500,000 monthly bookings across cleaning, beauty, and appliance repairs in 15 metros.
+- id: partner.churn
+  domain: operations
+  release_level: sharp_question
+  content: Annual partner churn is 48%; average technician tenure on platform is only 4.2 months.
+- id: disintermediation.rate
+  domain: customers
+  release_level: hypothesis_backed
+  content: Over 35% of repeat service bookings in cleaning and AC servicing occur directly offline between customer and technician.
+  dependencies:
+  - partner.churn
+- id: partner.economics
+  domain: economics
+  release_level: hypothesis_backed
+  content: "Technicians pay 22% commission, \u20B915,000 upfront for branded kits, and wait 7 days for payouts, making direct\
+    \ offline cash jobs far more lucrative."
+  dependencies:
+  - disintermediation.rate
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: Partner churn and margin leakage stem from offline disintermediation driven by heavy 22% commissions and kit debt;
+    platform lacks ongoing repeat-booking stickiness (insurance, instant payout, warranty protection).
+- id: recommendation.loyalty
+  domain: recommendation
+  release_level: synthesis_support
+  content: Introduce tiered commission structure dropping from 20% on job 1 to 8% on repeat customer bookings with the same
+    technician.
+- id: recommendation.value
+  domain: recommendation
+  release_level: synthesis_support
+  content: Bundle free health insurance, zero-cost kit financing, and instant daily payout for high-retention technicians.
+- id: recommendation.warranty
+  domain: recommendation
+  release_level: synthesis_support
+  content: "Offer \u20B910,000 damage protection and 30-day rework warranty to customers booking through the platform only."

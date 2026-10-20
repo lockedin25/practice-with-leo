@@ -1,0 +1,497 @@
+schema_version: "evaluation-rubric-v2"
+metadata:
+  title: "MBB Behavioral Rubric & Automated Detection Engine Schema"
+  description: >-
+    Authoritative behavioral markers, counter-markers, scoring calibrations,
+    and diagnostic heuristic rules for automated evaluation of management
+    consulting case interview performance across McKinsey, BCG, and Bain standards.
+  last_updated: "2026-08-24"
+  supported_case_types:
+    - profitability
+    - market_entry
+    - growth_strategy
+    - pricing_strategy
+    - mergers_and_acquisitions
+    - unconventional_and_abstract
+
+scoring_scale:
+  bands:
+    below_bar:
+      numeric_range: [1.0, 2.4]
+      label: "Below Bar (Developing / Critical Gaps)"
+      description: >-
+        Candidate exhibits structural gaps, generic framework recitation,
+        data fishing without hypotheses, unverified arithmetic, or passive
+        interviewer dependency. Would result in a decisive 'No Hire'.
+    meets_bar:
+      numeric_range: [2.5, 3.7]
+      label: "Meets Bar (Solid / Standard Pass)"
+      description: >-
+        Candidate demonstrates solid casing competence, structured issue trees,
+        accurate math, and logical synthesis. Minor lapses in industry customization,
+        proactive commercial intuition, or partner-level executive presence.
+    top_1_percent_mbb:
+      numeric_range: [3.8, 5.0]
+      label: "Top 1% MBB Distinction (Exceptional / Partner-Ready)"
+      description: >-
+        Candidate demonstrates elite consulting craft: MECE-by-construction custom trees,
+        ex-ante hypothesis-driven prioritization, rapid sanity-checked arithmetic,
+        insightful 'so-what' business acumen, and an unprompted, top-down 4-part synthesis.
+
+global_evaluation_principles:
+  - principle_id: "EP-01"
+    name: "MECE by Construction"
+    rule: "Structures must be mutually exclusive and collectively exhaustive via mathematical formulas, process chains, or exhaustive segmentations with explicit catch-alls, not arbitrary brainstormed lists."
+  - principle_id: "EP-02"
+    name: "Hypothesis-First Inversion"
+    rule: "Never request data without explicitly stating a testable commercial hypothesis explaining why the metric matters and what decision it informs."
+  - principle_id: "EP-03"
+    name: "Pyramid Principle & Top-Down Communication"
+    rule: "Always lead with the definitive conclusion or recommendation ('Answer First'), followed by structured supporting pillars, risks, and next steps."
+  - principle_id: "EP-04"
+    name: "Commercial Sanity Checking & 'So What?'"
+    rule: "Every calculation must be preceded by an explicit algebraic formula and immediately followed by a commercial interpretation tied back to the core decision."
+  - principle_id: "EP-05"
+    name: "Zero Framework Dumping"
+    rule: "Generic textbook frameworks (4Ps, 3Cs, Porter's Five Forces recited verbatim) are penalized unless deeply tailored to the specific client, business model, and value chain."
+
+stages:
+  - stage_id: "stage_1_preliminary_questions"
+    stage_name: "Preliminary Questions & Context Groking"
+    stage_weight: 0.15
+    stage_objective: >-
+      Clarify and align on the quantified objective, business model, monetization mechanics,
+      and critical context while avoiding premature data fishing.
+    sub_dimensions:
+      - id: "prelim.objective_and_scope"
+        name: "Objective & Scope Quantification"
+        weight: 0.35
+        focus: >-
+          Verifying the client's core goal, target metrics, time horizon,
+          geographical scope, and any non-negotiable strategic constraints.
+        markers:
+          - "Paraphrases the core decision question in candidate's own words with precision."
+          - "Confirms quantified financial targets (e.g., '$50M EBIT in 3 years' vs 'increase profits')."
+          - "Inquires about timeline/urgency and explicit investment or hurdle rate constraints."
+          - "Confirms geographical scope, business unit boundaries, or regulatory constraints."
+        counter_markers:
+          - "Blindly repeats the case prompt verbatim without synthesis or interpretation."
+          - "Proceeds to structure without confirming if profit target is revenue-driven, margin-driven, or absolute EBITDA."
+          - "Assumes timeline or hurdle rate without clarifying."
+          - "Fails to ask if there are client-imposed constraints (e.g., no layoffs, maintain brand prestige)."
+        scoring_criteria:
+          below_bar: "Structures immediately without clarifying ambiguous objectives or constraints."
+          meets_bar: "Confirms main target and scope but misses subtle constraint nuances (e.g., time horizon or brand boundaries)."
+          top_1_percent_mbb: "Crisply nails quantified objective, investment constraints, timeline, and client boundary conditions in under 90 seconds."
+
+      - id: "prelim.business_model_and_value_chain"
+        name: "Business Model & Monetization Groking"
+        weight: 0.35
+        focus: >-
+          Establishing how the client creates, delivers, and captures value:
+          revenue streams, pricing mechanism, customer segments, and cost structure.
+        markers:
+          - "Identifies specific monetization mechanism (e.g., subscription vs usage-based, margin on GMV, direct sales vs dealer network)."
+          - "Clarifies customer archetypes and revenue breakdown by segment/product."
+          - "Maps the operational value chain (e.g., R&D -> Sourcing -> Manufacturing -> Distribution -> Retail -> Aftersales)."
+          - "Asks whether the problem is company-specific or an industry-wide macroeconomic trend."
+        counter_markers:
+          - "Treats complex B2B businesses as generic B2C retail companies."
+          - "Fails to understand who actually pays (e.g., confusing advertiser, merchant, and end-user in marketplace models)."
+          - "Does not check if competitors are experiencing the same issue."
+          - "Asks elementary questions that were already explicitly stated in the prompt."
+        scoring_criteria:
+          below_bar: "Displays fundamental misunderstanding of the client's business model and operating mechanics."
+          meets_bar: "Understands the business model and asks basic industry vs company-specific questions."
+          top_1_percent_mbb: "Rapidly deduces the client's unique value capture engine, maps revenue/cost drivers, and checks industry benchmark parity."
+
+      - id: "prelim.clarification_vs_data_fishing"
+        name: "Clarification vs Premature Data Fishing"
+        weight: 0.30
+        focus: >-
+          Distinguishing qualitative context clarification from premature quantitative
+          data extraction that belongs in the issue tree phase.
+        markers:
+          - "Keeps preliminary questions concise, focused, and grouped into logical themes."
+          - "Explicitly bounds preliminary questions: 'Before I take a minute to structure, I have 3 quick clarifying questions on context...'"
+          - "Politely pauses after clarifying context to request structuring time."
+        counter_markers:
+          - "Prematurely asks for specific cost numbers, historical volumes, or competitor balance sheets before presenting a tree."
+          - "Asks a rambling, unorganized laundry list of 10+ disjointed questions."
+          - "Attempts to solve the entire case during the opening clarification phase."
+        scoring_criteria:
+          below_bar: "Fishes for numerical solutions before establishing a structure; asks aimless questions."
+          meets_bar: "Asks relevant context questions but occasionally drifts into premature data requests."
+          top_1_percent_mbb: "Maintains disciplined separation between scoping and data analysis; frames 2-3 high-yield context questions with flawless economy of words."
+
+  - stage_id: "stage_2_issue_tree_structuring"
+    stage_name: "Issue Tree Structuring & MECE Decomposition"
+    stage_weight: 0.25
+    stage_objective: >-
+      Construct a logically airtight, customized, MECE issue tree decomposing the problem
+      down to root-cause drivers tailored to the client's specific business and industry.
+    sub_dimensions:
+      - id: "structuring.mece_by_construction"
+        name: "MECE by Construction"
+        weight: 0.35
+        focus: >-
+          Ensuring zero overlaps and zero gaps through mathematical formulas,
+          process flows, customer life cycles, or exhaustive segmentation.
+        markers:
+          - "Constructs Level 1 splits using mathematical identities (e.g., Profit = Revenue - Costs, Revenue = Volume x Price, Volume = Market Size x Market Share)."
+          - "Sub-segments Level 2 into exhaustive branches (e.g., Fixed vs Variable costs, Inbound vs In-plant vs Outbound logistics)."
+          - "Applies explicit catch-all buckets ('Other non-operating income') to guarantee mathematical completeness."
+          - "Maintains uniform hierarchical abstraction across all parallel branches."
+        counter_markers:
+          - "Overlapping buckets (e.g., placing 'Marketing costs' alongside 'Fixed costs' and 'Digital advertising')."
+          - "Gaps in decomposition (e.g., analyzing Revenue = Price x Units while ignoring product mix shifts or discounts/returns)."
+          - "Mixed hierarchical levels (e.g., placing 'Raw Material Inflation' directly under 'Total Profit' next to 'Revenue')."
+          - "Brainstormed list of bullet points masquerading as a structured tree."
+        scoring_criteria:
+          below_bar: "Tree contains blatant overlaps, large logical gaps, mixed hierarchy levels, or unstructured lists."
+          meets_bar: "Tree is MECE at Level 1 and mostly MECE at Level 2, with minor non-fatal overlaps."
+          top_1_percent_mbb: "Flawless MECE-by-construction across 3+ levels of depth; mathematical identities with explicit catch-alls."
+
+      - id: "structuring.industry_and_business_tailoring"
+        name: "Industry & Business Model Customization"
+        weight: 0.35
+        focus: >-
+          Tailoring the structure to the client's specific industry economics,
+          avoiding generic textbook frameworks (escapes the 'Framework Trap').
+        markers:
+          - "Incorporates industry-specific KPI formulas (e.g., Airlines: ASK, RPK, Load Factor, Yield; SaaS: ARR, Net Retention, CAC, Payback; Banking: NIM, CASA, GNPA, Cost-to-Income; Retail: Sales/sq ft, Same-Store Sales, Shrinkage)."
+          - "Maps branches directly to the client's operational value chain."
+          - "Actively prunes standard theoretical branches that are irrelevant to the client's problem."
+        counter_markers:
+          - "Recites generic '4Ps' (Product, Price, Place, Promotion) or '3Cs' (Customer, Company, Competitors) verbatim without case context."
+          - "Uses identical generic cost buckets (Fixed vs Variable) for a SaaS company and a heavy steel manufacturing plant."
+          - "Includes irrelevant branches (e.g., evaluating M&A regulatory antitrust for a pure internal cost-cutting case)."
+        scoring_criteria:
+          below_bar: "Regurgitates textbook frameworks with zero adaptation to the client's industry."
+          meets_bar: "Adapts standard frameworks with some industry terms, but retains generic branch labels."
+          top_1_percent_mbb: "Structures bespoke trees grounded in exact industry unit economics and operating value chains; zero framework jargon."
+
+      - id: "structuring.depth_and_granularity"
+        name: "Decomposition Depth & Root Driver Isolation"
+        weight: 0.15
+        focus: >-
+          Drilling down at least 3 levels deep to reach actionable, isolatable operational drivers.
+        markers:
+          - "Decomposes high-level line items down to granular operational levers (e.g., Fuel Cost = Flight Hours x Fuel Burn Rate/Hour x Fuel Price/Gallon x (1 - Hedged %))."
+          - "Reaches root drivers that can be empirically verified with concrete data."
+        counter_markers:
+          - "Halts decomposition at Level 1 (e.g., 'Profits = Revenue - Costs' with no sub-branches)."
+          - "Branches remain abstract concepts (e.g., 'Improve brand equity') rather than measurable operational variables."
+        scoring_criteria:
+          below_bar: "Stops at superficial Level 1 or Level 2 abstractions."
+          meets_bar: "Decomposes key branches to Level 2/3 but leaves secondary branches shallow."
+          top_1_percent_mbb: "Consistently decomposes all core branches 3-4 levels deep down to atomic, measurable operational levers."
+
+      - id: "structuring.communication_and_signposting"
+        name: "Structure Communication & Signposting"
+        weight: 0.15
+        focus: >-
+          Delivering the structure top-down, establishing an executive roadmap,
+          and guiding the interviewer visually and verbally.
+        markers:
+          - "Signposts the overall layout before detailing branches: 'I have broken this problem into 3 primary pillars...'"
+          - "Walks through the structure top-down, left-to-right, maintaining clear verbal hierarchy."
+          - "Concludes the walk-through with a clear pivot to the priority branch and initial hypothesis."
+        counter_markers:
+          - "Delivers an unstructured stream of consciousness without signposting."
+          - "Gets lost in the details of sub-branch 1c before explaining the high-level Level 1 buckets."
+          - "Ends structure walk-through passively: 'So... yeah, that's my tree. What do you think?'"
+        scoring_criteria:
+          below_bar: "Disorganized, hard-to-follow verbal delivery; rambles without signposts."
+          meets_bar: "Clear structure walk-through, but mechanical or slightly long-winded."
+          top_1_percent_mbb: "Masterclass executive delivery: crisp roadmap, explicit signposting, effortless transitions, concluding with immediate hypothesis."
+
+  - stage_id: "stage_3_hypothesis_and_branch_exploration"
+    stage_name: "Hypothesis-Driven Problem Solving & Agility"
+    stage_weight: 0.25
+    stage_objective: >-
+      Drive an efficient, ex-ante hypothesis-led investigation, prioritizing high-leverage branches,
+      validating findings, and pivoting seamlessly based on interviewer feedback and hints.
+    sub_dimensions:
+      - id: "hypothesis.ex_ante_articulation"
+        name: "Ex-Ante Hypothesis Articulation"
+        weight: 0.35
+        focus: >-
+          Formulating and stating explicit commercial hypotheses prior to requesting data.
+        markers:
+          - "States a testable hypothesis before requesting any quantitative data: 'Given the industry context of raw material inflation, my primary hypothesis is that margin decline is driven by COGS rather than SG&A...'"
+          - "Explains *why* the hypothesis is formed based on prior facts, benchmarks, or economic logic."
+          - "Frames data requests as falsification tests: 'To test this hypothesis, I would like to look at the breakdown of unit variable costs over the last 24 months.'"
+        counter_markers:
+          - "Data fishing: 'Can you give me all the cost numbers?' or 'What are the revenues?' without stating why."
+          - "Passive waiting for the interviewer to suggest where to look next."
+          - "Treating the case as a 20-questions guessing game."
+        scoring_criteria:
+          below_bar: "Asks for raw data without hypotheses; expects interviewer to steer the investigation."
+          meets_bar: "States hypotheses occasionally or when prompted; data requests are mostly purposeful."
+          top_1_percent_mbb: "100% hypothesis-led throughout; every single data request is framed as a rigorous hypothesis validation test."
+
+      - id: "hypothesis.80_20_prioritization"
+        name: "80/20 High-Leverage Branch Prioritization"
+        weight: 0.30
+        focus: >-
+          Attacking the largest, highest-impact levers first rather than exploring linearly.
+        markers:
+          - "Identifies and articulates the highest-leverage branch based on economic scale: 'Since fuel accounts for 35% of airline operating costs compared to 5% for catering, I want to prioritize fuel efficiency.'"
+          - "Explicitly deprioritizes immaterial buckets to preserve analytical bandwidth."
+          - "Calculates or estimates magnitude of impact before drilling into details."
+        counter_markers:
+          - "Explores branches sequentially from left to right regardless of economic materiality."
+          - "Spends 10 minutes analyzing a cost head that represents 2% of the client's cost base."
+          - "Refuses to move on from a dead-end branch."
+        scoring_criteria:
+          below_bar: "Explores branches arbitrarily with zero sense of economic materiality."
+          meets_bar: "Prioritizes main branches, but spends occasional time on low-impact details."
+          top_1_percent_mbb: "Relentlessly applies 80/20 prioritization; quantifies lever impact upfront and eliminates noise."
+
+      - id: "hypothesis.interviewer_nudge_and_pivot_agility"
+        name: "Interviewer Hint Responsiveness & Agility"
+        weight: 0.20
+        focus: >-
+          Catching subtle interviewer hints, redirecting inquiries gracefully,
+          and adapting hypotheses when evidence contradicts initial assumptions.
+        markers:
+          - "Immediately picks up on interviewer steering ('That's interesting, but what about the European market?') and pivots smoothly."
+          - "Acknowledges disproven hypotheses without defensiveness and updates the mental model: 'The data disproves my hypothesis on pricing; this confirms volume is the sole driver. Let's pivot to capacity utilization.'"
+          - "Seamlessly climbs down the nudge ladder upon subtle prompts."
+        counter_markers:
+          - "Ignores explicit interviewer hints and stubbornly continues down dead-end branches."
+          - "Argues with interviewer data or becomes defensive when a hypothesis is refuted."
+          - "Requires heavy coaching (Step 3/4 of the nudge ladder) to notice obvious trends."
+        scoring_criteria:
+          below_bar: "Oblivious to hints, resistant to pivots, or defensive about incorrect hypotheses."
+          meets_bar: "Responds to direct interviewer guidance, but misses subtle conversational cues."
+          top_1_percent_mbb: "Instantly picks up the faintest interviewer nuance, reframes hypotheses in real time, and demonstrates peer-level intellectual agility."
+
+      - id: "hypothesis.breadth_vs_depth_navigation"
+        name: "Systematic Elimination & Closing Loops"
+        weight: 0.15
+        focus: >-
+          Navigating across the issue tree, explicitly closing investigated branches,
+          and synthesizing intermediate milestones.
+        markers:
+          - "Summarizes intermediate findings before transitioning: 'We have ruled out external market contraction. Now let us explore internal execution.'"
+          - "Explicitly checks off branches on their tree to maintain full situational awareness."
+        counter_markers:
+          - "Abandons branches halfway without reaching a definitive conclusion."
+          - "Circles back to re-examine previously settled data points."
+        scoring_criteria:
+          below_bar: "Disjointed, erratic jumping between unrelated branches; loops back to settled items."
+          meets_bar: "Completes branch investigations, but transitions are abrupt without intermediate summaries."
+          top_1_percent_mbb: "Flawless branch discipline; closes analytical loops with crisp intermediate takeaways before pivoting."
+
+  - stage_id: "stage_4_data_gathering_and_arithmetic"
+    stage_name: "Quantitative Analysis & Commercial Numeracy"
+    stage_weight: 0.15
+    stage_objective: >-
+      Execute mental arithmetic and quantitative evaluations with zero errors, structured tabular tracking,
+      explicit formula articulation, commercial sanity checking, and strategic 'so-what' synthesis.
+    sub_dimensions:
+      - id: "quantitative.formula_and_unit_discipline"
+        name: "Formula & Unit Discipline"
+        weight: 0.30
+        focus: >-
+          Stating algebraic formulas, variables, and explicit units before executing calculations.
+        markers:
+          - "Articulates the exact formula aloud before touching the numbers: 'Break-even volume = Fixed Costs / (Price per unit - Variable cost per unit)'."
+          - "Tracks units rigorously throughout (e.g., '$M / year', 'kilo-tonnes', 'cents / passenger-kilometer')."
+          - "Clarifies base numbers, compounding periods, and percentage bases (e.g., margin on cost vs margin on price)."
+        counter_markers:
+          - "Dives into raw arithmetic without stating the underlying formula."
+          - "Loses or confuses units (e.g., dropping millions, confusing percentages with basis points, mixing annual and monthly figures)."
+          - "Confuses markup on cost with gross margin on revenue."
+        scoring_criteria:
+          below_bar: "Calculates blindly without formulas; severe unit confusion; drops magnitude orders."
+          meets_bar: "States formulas and handles basic units correctly, but may need a second to align complex multi-variable units."
+          top_1_percent_mbb: "Crystal-clear mathematical discipline: states exact formulas, tracks dimensional units impeccably, flawless clarity."
+
+      - id: "quantitative.speed_and_accuracy"
+        name: "Calculation Speed & Mental Math Precision"
+        weight: 0.25
+        focus: >-
+          Fast, accurate execution of percentages, weighted averages, break-even thresholds,
+          and compound growth calculations.
+        markers:
+          - "Executes multi-step arithmetic cleanly without computational errors."
+          - "Leverages mental math shortcuts (e.g., factoring, fraction equivalents, rounding with later adjustment)."
+          - "Maintains organized, clean tabular notes for multi-scenario or matrix calculations."
+        counter_markers:
+          - "Makes repeated arithmetic slips (e.g., 15% of 80 = 14)."
+          - "Takes prolonged awkward silences (>60 seconds) without speaking or explaining the calculation steps."
+          - "Produces messy scratch work that causes self-inflicted confusion."
+        scoring_criteria:
+          below_bar: "Frequent arithmetic errors; struggles with basic percentages; prolonged silence."
+          meets_bar: "Accurate calculations, but slow or requiring self-correction on complex steps."
+          top_1_percent_mbb: "Lightning-fast, 100% accurate arithmetic; explains calculation logic aloud seamlessly while writing."
+
+      - id: "quantitative.commercial_sanity_checking"
+        name: "Commercial Sanity Checking & Magnitude Intuition"
+        weight: 0.25
+        focus: >-
+          Evaluating calculated figures against real-world business realities,
+          industry benchmarks, and order-of-magnitude common sense.
+        markers:
+          - "Immediately sanity-checks results: 'A market share of 85% in year 1 seems unrealistic for a new entrant; let us test a more conservative 15% penetration.'"
+          - "Spots contradictory or impossible numbers (e.g., capacity utilization > 100%, negative churn, gross margin > 100%)."
+          - "Proactively benchmarks computed metrics against known industry standards."
+        counter_markers:
+          - "Accepts absurd mathematical outputs without blinking (e.g., concluding an airline can sell tickets for $0.02 or CAC is $50,000 for a $10 app)."
+          - "Treats calculated numbers as abstract math rather than real business dollars and customer behavior."
+        scoring_criteria:
+          below_bar: "Zero commercial intuition; reports absurd numbers without questioning them."
+          meets_bar: "Accepts reasonable numbers, but misses subtle business anomalies until prompted."
+          top_1_percent_mbb: "Unprompted commercial reality check on every single output; contextualizes numbers against industry benchmarks immediately."
+
+      - id: "quantitative.so_what_interpretation"
+        name: "Strategic 'So What?' Interpretation"
+        weight: 0.20
+        focus: >-
+          Connecting quantitative outputs directly back to the strategic business decision.
+        markers:
+          - "Instantly bridges math to decision: 'This 12% margin gap equates to $24M in lost EBITDA, meaning cost-cutting alone cannot close the $50M target—we must also grow volume.'"
+          - "Identifies sensitivity drivers: 'The business model is highly sensitive to customer acquisition cost; a 10% increase in CAC delays payback by 8 months.'"
+        counter_markers:
+          - "Reports raw number and stops speaking: 'The answer is $4.8M.' (Leaves the interviewer to ask 'So what?')."
+          - "Fails to connect mathematical findings to the client's overall investment or strategic decision."
+        scoring_criteria:
+          below_bar: "Reports bare numbers with zero interpretation or strategic context."
+          meets_bar: "States what the number means, but requires minor probing to tie it into the broader recommendation."
+          top_1_percent_mbb: "Delivers an immediate, punchy 'so-what' analysis; identifies sensitivity levers and strategic implications without prompting."
+
+  - stage_id: "stage_5_synthesis_and_closing_recommendation"
+    stage_name: "Executive Synthesis & Recommendation"
+    stage_weight: 0.20
+    stage_objective: >-
+      Deliver an executive-ready, top-down (Pyramid Principle), 4-part closing recommendation:
+      Direct Answer, 2-3 Quantified Supporting Pillars, Key Risks & Mitigations, and 100-Day Action Plan.
+    sub_dimensions:
+      - id: "synthesis.pyramid_principle_answer_first"
+        name: "Pyramid Principle & Answer-First Architecture"
+        weight: 0.35
+        focus: >-
+          Opening immediately with a definitive, unambiguous recommendation
+          before providing supporting arguments.
+        markers:
+          - "Opens with an unambiguous, direct answer: 'We recommend that Client X enter the Indian EV battery market via a joint venture, targeting $75M in EBITDA by Year 3.'"
+          - "Avoids wishy-washy language ('It depends', 'Maybe we should look further')."
+          - "Structures supporting points into 2-3 distinct, prioritized pillars."
+        counter_markers:
+          - "Chronological recap: 'First we looked at revenue, then we analyzed costs, then we did some math, and finally...'"
+          - "Presents a 'menu of options' without committing to a clear strategic choice."
+          - "Buries the recommendation at the end of a 3-minute rambling monologue."
+        scoring_criteria:
+          below_bar: "Chronological narrative of the case; vague, non-committal, or buried recommendation."
+          meets_bar: "Answer-first, but includes minor chronological narrative or excessive preamble."
+          top_1_percent_mbb: "Flawless Pyramid Principle: definitive, authoritative answer in the first 10 seconds, backed by structured pillars."
+
+      - id: "synthesis.4_part_closing_structure"
+        name: "4-Part Closing Structure Completeness"
+        weight: 0.30
+        focus: >-
+          Delivering all 4 required components: (1) Recommendation, (2) 2-3 Supporting Pillars,
+          (3) Key Implementation Risks & Trade-offs with Mitigations, (4) Next Steps / 100-Day Plan.
+        markers:
+          - "Part 1 (Recommendation): Clear, actionable, quantified strategic stance."
+          - "Part 2 (Supporting Pillars): 2-3 mutually exclusive pillars with specific numbers from the case."
+          - "Part 3 (Risks & Mitigations): 2 high-impact risks paired with concrete, realistic mitigations."
+          - "Part 4 (Next Steps / 100-Day Plan): Immediate, high-priority workstreams for Day 1 to Day 100."
+        counter_markers:
+          - "Omits risks entirely, presenting an unrealistically rosy picture."
+          - "Lists generic risks ('Competition might react') with no practical mitigation."
+          - "Leaves out next steps, or suggests vague generalities ('Do more research')."
+        scoring_criteria:
+          below_bar: "Misses 2 or more structural components (e.g., no risks, no next steps, unquantified pillars)."
+          meets_bar: "Covers all 4 parts, but risks or next steps lack specificity."
+          top_1_percent_mbb: "Executes all 4 parts with surgical precision: quantified pillars, paired risk-mitigation vectors, and a 100-day tactical roadmap."
+
+      - id: "synthesis.quantification_and_commercial_grounding"
+        name: "Quantification & Commercial Grounding"
+        weight: 0.20
+        focus: >-
+          Embedding precise financial values, volumes, timelines, and ROI metrics
+          uncovered during the case into the closing recommendation.
+        markers:
+          - "Directly cites the key quantitative findings: '$18M cost reduction across procurement (40%) and logistics (60%)'."
+          - "Frames recommendations in terms of shareholder value, margin percentage expansion, or payback period."
+        counter_markers:
+          - "Purely qualitative synthesis with zero numbers cited."
+          - "Misquotes or hallucinates figures derived during the interview."
+        scoring_criteria:
+          below_bar: "Vague, qualitative generalities with zero quantitative backing."
+          meets_bar: "Cites 1-2 numbers from the case, but omits financial scale or timeline metrics."
+          top_1_percent_mbb: "Seamlessly weaves all critical financial figures, EBITDA impacts, and time horizons into a cohesive investment thesis."
+
+      - id: "synthesis.partner_readiness_and_executive_presence"
+        name: "Partner-Readiness & Executive Presence"
+        weight: 0.15
+        focus: >-
+          Information density, conciseness (under 2 minutes), poise, commercial authority,
+          and confident delivery suitable for a Fortune 500 Boardroom.
+        markers:
+          - "Delivers entire synthesis in 90-120 seconds with high information density."
+          - "Projects calm, authoritative commercial judgment."
+          - "Maintains steady pacing without verbal fillers ('um', 'like', 'sort of')."
+        counter_markers:
+          - "Rambles for 3+ minutes, repeating points."
+          - "Hesitant, apologetic, or overly casual tone."
+          - "Overwhelms the listener with minutiae instead of high-level board-level strategic insight."
+        scoring_criteria:
+          below_bar: "Rambling, uncertain, filled with verbal crutches; low executive presence."
+          meets_bar: "Professional and clear, but slightly verbose or lacks boardroom gravitas."
+          top_1_percent_mbb: "Boardroom-grade executive delivery: high density, crisp, commanding, natural consulting authority."
+
+penalty_matrix:
+  instant_red_flags:
+    - code: "FLAG_FRAMEWORK_DUMPING"
+      severity: "CRITICAL"
+      penalty_deduction: 1.5
+      description: "Reciting generic academic frameworks (4Ps, 3Cs, Porter's 5 Forces) verbatim without tailoring to the client's industry."
+      remediation: "Ground the structure directly in the industry value chain and business model unit economics."
+    - code: "FLAG_UNPROMPTED_DATA_FISHING"
+      severity: "CRITICAL"
+      penalty_deduction: 1.2
+      description: "Asking for specific operational/financial numbers during preliminary questions before presenting a structured issue tree."
+      remediation: "Restrict preliminary questions strictly to objective clarification, business model groking, and scope."
+    - code: "FLAG_NAKED_CALCULATION"
+      severity: "HIGH"
+      penalty_deduction: 0.8
+      description: "Reporting a raw mathematical calculation result without providing the 'so what' strategic interpretation."
+      remediation: "Always follow calculations with: 'This means that [impact on hypothesis/decision], so we should [next strategic step].'"
+    - code: "FLAG_MENU_OF_OPTIONS_SYNTHESIS"
+      severity: "HIGH"
+      penalty_deduction: 1.0
+      description: "Delivering a closing synthesis that lists multiple possible paths without committing to a single prioritized recommendation."
+      remediation: "Take a definitive stand. State the single highest-value path, then use other options as contingency plans."
+    - code: "FLAG_DEFENSIVE_PIVOT_RESISTANCE"
+      severity: "CRITICAL"
+      penalty_deduction: 1.5
+      description: "Arguing with the interviewer or stubbornly staying on a disproven branch despite clear counter-evidence or hints."
+      remediation: "Acknowledge disproven data immediately, thank the interviewer for the insight, and pivot dynamically."
+    - code: "FLAG_ARITHMETIC_HALLUCINATION"
+      severity: "HIGH"
+      penalty_deduction: 1.0
+      description: "Inventing numbers, misquoting earlier case facts by >50%, or asserting false arithmetic conclusions without calculation."
+      remediation: "Maintain neat tabular notes; explicitly write down numbers and verify before speaking."
+
+distinction_triggers:
+  top_1_percent_cues:
+    - code: "DISTINCTION_BESPOKE_UNIT_ECONOMICS"
+      bonus_weight: 0.4
+      description: "Spontaneously constructing an issue tree grounded in the exact operational unit economics of the client's niche industry."
+    - code: "DISTINCTION_EX_ANTE_HYPOTHESIS_PRECISION"
+      bonus_weight: 0.4
+      description: "Framing every single data inquiry as an explicit ex-ante hypothesis falsification test with economic justification."
+    - code: "DISTINCTION_COMMERCIAL_SANITY_BENCHMARK"
+      bonus_weight: 0.3
+      description: "Immediately sanity-checking calculated metrics against realistic real-world industry benchmarks unprompted."
+    - code: "DISTINCTION_TACTICAL_100_DAY_ROADMAP"
+      bonus_weight: 0.3
+      description: "Delivering a closing recommendation featuring a realistic, Phased 100-day execution plan with governance and workstream allocation."
+    - code: "DISTINCTION_NUDGE_LADDER_MASTERY"
+      bonus_weight: 0.3
+      description: "Catching the faintest conversational nuance from the interviewer and instantly pivoting with zero friction."

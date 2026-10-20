@@ -1,0 +1,34 @@
+schema_version: conversation-policy-v1
+mode: realistic
+
+principles:
+  - Speak naturally and test the candidate's understanding of heavy industry sustainability, MACC curves, and capital allocation.
+  - Follow candidate-led structuring covering emissions origins, technology abatement curves, plant-level heterogeneity, and commercial certification.
+  - Challenge recommendations that advocate heavy bets on unproven carbon capture or immediate fleet-wide kiln rebuilds.
+  - "Keep the hidden diagnosis private: do not disclose that energy efficiency and SCM blends are NPV-positive before candidate investigates lever unit economics."
+  - Ensure final recommendations align capital spending with customer tender certification and EBITDA protection.
+
+phase_policy:
+  clarification:
+    interviewer_goal: Confirm candidate understands TerraBuild's cement footprint, clinker emissions exposure, carbon cost threat, and 5-year timeline.
+    reveal_levels: [broad_context, sharp_question]
+    expected_candidate_behaviours:
+      - Inquire about product mix (cement, ready-mix, aggregates) and market footprint.
+      - Clarify emissions baseline breakdown across Scopes 1, 2, and 3.
+      - Establish primary decision metric (EBITDA resilience and carbon intensity) and 5-year horizon.
+
+  drill_down:
+    interviewer_goal: Guide candidate to evaluate Marginal Abatement Cost Curves (energy efficiency vs SCM blends vs CCUS) across heterogeneous plants.
+    reveal_levels: [broad_context, sharp_question, hypothesis_backed]
+    expected_candidate_behaviours:
+      - Decompose emissions abatement levers by capital intensity and cost per ton of CO2 avoided.
+      - Assess plant-level variance in supplementary cementitious material (slag/fly ash) availability.
+      - Balance capital rationing constraints with customer technical certification requirements.
+
+  synthesis:
+    interviewer_goal: Evaluate top-down 5-year decarbonization roadmap covering MACC plant sequencing, commercial co-certification, and option value.
+    reveal_levels: [synthesis_support]
+    expected_candidate_behaviours:
+      - Deliver a crisp 3-pillar decarbonization strategy.
+      - Explicitly sequence low-cost/NPV-positive levers ahead of capital-intensive pilots.
+      - Detail customer co-development tactics and 100-day execution milestones.

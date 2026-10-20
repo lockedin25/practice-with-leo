@@ -1,0 +1,72 @@
+schema_version: reservoir-v1
+case_id: 10-solar-module-manufacturing-v1
+title: Solar PV Module ALMM Manufacturing
+school: IIM-C
+status: approved
+rights_status: original
+category: market_entry
+industry: energy_and_renewables
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is an Indian conglomerate evaluating a \u20B93,500 Cr investment in a 5 GW vertically integrated solar\
+    \ cell and module manufacturing plant in Gujarat under the government's ALMM and PLI policy regime."
+  objective: Evaluate capital expenditure, technological cell efficiency (TOPCon vs HJT), and domestic content requirement
+    economics to achieve a 15% equity IRR.
+  opening_requirements:
+  - Name Solar PV Module ALMM Manufacturing and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Levelized Module Manufacturing Cost ($/Wp) and Project IRR (%)) and time horizon (three years).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Levelized Module Manufacturing Cost ($/Wp) and Project IRR (%)
+  decision_question: Should the conglomerate invest in 5 GW solar PV manufacturing, and which cell technology architecture
+    should be adopted?
+  time_horizon: three years
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Technological obsolescence risk vs policy protection. Government ALMM non-tariff barriers and 40% Basic
+    Customs Duty (BCD) protect domestic manufacturers from cheap Chinese imports, but legacy PERC cell technology is obsolete;
+    investing in N-type TOPCon with 24.5% efficiency secures Tier-1 utility developer demand.
+  what_the_case_wanted_to_test: Solar PV value chain (polysilicon -> wafer -> cell -> module), technology transitions (PERC
+    to TOPCon to HJT), PLI subsidy eligibility, and tariff protection economics.
+  pivotal_insight: "Module assembly alone has thin 5% margins; backward integration into solar cell manufacturing captures\
+    \ the PLI government subsidy (\u20B91,200 Cr) and achieves 16.5% equity IRR under TOPCon technology."
+  common_traps:
+  - Investing in older P-type PERC cell lines which Chinese manufacturers are dumping at loss.
+  - Building pure module assembly without cell integration, failing ALMM domestic content rules.
+  - Assuming imported Chinese wafer prices will remain permanently cheap.
+  takeaway_lesson: In state-subsidized clean-tech manufacturing, standalone assembly is vulnerable to policy shifts; capturing
+    government incentives requires deep backward integration into advanced technology nodes.
+  suggested_readings:
+  - knowledge_base/industries/11_energy_and_renewables.md
+  - knowledge_base/case_types/market_entry.md
+  - knowledge_base/methodology/02_issue_tree_structuring.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

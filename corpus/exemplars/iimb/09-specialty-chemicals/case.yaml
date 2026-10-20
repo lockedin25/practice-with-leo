@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 09-specialty-chemicals-v1
+title: Agrochem Backward Integration M&A
+school: IIM-B
+status: approved
+rights_status: original
+category: mergers_and_acquisitions
+industry: heavy_manufacturing_and_steel
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a leading Indian specialty agrochemical formulation exporter ($400M revenue). Severe Chinese supply
+    chain shutdowns of key starting materials (KSMs) caused plant shutdowns and customer delivery defaults.
+  objective: Evaluate acquiring a domestic continuous-flow chemical synthesis target vs long-term contract manufacturing to
+    secure raw material sovereignty.
+  opening_requirements:
+  - Name Agrochem Backward Integration M&A and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Value creation versus standalone, supply reliability, and payback) and time horizon (three years).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Value creation versus standalone, supply reliability, and payback
+  decision_question: Should the agrochem exporter acquire the domestic KSM target or pursue multi-vendor contracts?
+  time_horizon: three years
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "Supply security vs environmental regulatory compliance risk. Acquiring the target secures 80% of critical\
+    \ intermediate KSM requirements, but the target's manufacturing plant requires \u20B965 Cr in effluent treatment (ETP)\
+    \ capex to meet zero-liquid-discharge (ZLD) norms."
+  what_the_case_wanted_to_test: Specialty chemical value chain, backward integration economics, environmental pollution control
+    capex, and China+1 supply security.
+  pivotal_insight: "The acquisition is highly strategic for supply sovereignty, but the buyer must haircut the purchase price\
+    \ to account for \u20B965 Cr in mandatory Zero Liquid Discharge (ZLD) pollution capex required by environmental regulators."
+  common_traps:
+  - Ignoring environmental pollution control compliance in chemical manufacturing.
+  - Assuming global spot chemical prices will remain at peak historical crisis levels.
+  - Failing to retain the target's key chemical synthesis process patents and R&D chemists.
+  takeaway_lesson: In chemical M&A, backward integration provides essential supply sovereignty, but valuation must strictly
+    deduct regulatory environmental remediation capex (ETP/ZLD) before signing.
+  suggested_readings:
+  - knowledge_base/industries/14_heavy_manufacturing_and_steel.md
+  - knowledge_base/case_types/mergers_and_acquisitions.md
+  - knowledge_base/methodology/04_data_gathering_and_notes.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

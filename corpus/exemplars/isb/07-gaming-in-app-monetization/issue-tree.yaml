@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.gaming-gst-pivot
+  label: Restructure real-money gaming platform economics under 28% GST.
+nodes:
+- id: tax-incidence-impact
+  type: branch
+  label: 28% Face-Value GST Tax Burden & NGR
+  status: valid_branch
+  evidence: []
+  conclusion: "Tax jumped from \u20B98 Cr to \u20B9112 Cr/mo, threatening viability if fully absorbed as pure cash."
+- id: player-liquidity-and-churn
+  type: branch
+  label: Player Wallet Depletion & Table Matchmaking
+  status: valid_branch
+  evidence: []
+  conclusion: Direct tax deduction dropped player sessions from 14 to 4, collapsing liquidity.
+- id: gameplay-credit-mechanics
+  type: branch
+  label: Non-Withdrawable Bonus Credits & Rake Velocity
+  status: valid_branch
+  evidence: []
+  conclusion: GST cashback in gameplay chips preserves 88% of depositors and increases rake velocity by 34%.
+- id: diagnosis
+  type: diagnosis
+  label: Table Liquidity Collapse & Gameplay Credit Shield
+  status: hidden_target
+  evidence:
+  - tax-incidence-impact
+  - player-liquidity-and-churn
+  - gameplay-credit-mechanics
+  conclusion: Passing 28% GST killed player liquidity; refunding GST as non-withdrawable gameplay chips preserves table velocity,
+    funded by targeted VIP rake adjustments.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Gaming Tax & Liquidity Strategy
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Issue 100% GST refund as gameplay bonus chips, tier platform rake by table stakes, and streamline withdrawal
+    TDS automation.
+edges:
+- from: objective.gaming-gst-pivot
+  to: tax-incidence-impact
+  relation: investigate
+- from: objective.gaming-gst-pivot
+  to: player-liquidity-and-churn
+  relation: investigate
+- from: objective.gaming-gst-pivot
+  to: gameplay-credit-mechanics
+  relation: investigate
+- from: tax-incidence-impact
+  to: diagnosis
+  relation: supports
+- from: player-liquidity-and-churn
+  to: diagnosis
+  relation: supports
+- from: gameplay-credit-mechanics
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: tax-first
+  sequence:
+  - tax-incidence-impact
+  - player-liquidity-and-churn
+  - gameplay-credit-mechanics
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from GST tax math to player liquidity velocity.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate what happens to player bankrolls when 28% is deducted immediately on deposit.
+  - Clarify that players need table liquidity to keep playing.
+  - Redirect toward non-withdrawable gameplay bonus credits and rake optimization.

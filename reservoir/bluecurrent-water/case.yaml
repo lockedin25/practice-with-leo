@@ -1,0 +1,76 @@
+schema_version: reservoir-v1
+case_id: bluecurrent-water-v1
+title: BlueCurrent Water
+status: approved
+rights_status: original
+category: public_sector_strategy
+industry: water_utility
+difficulty: intermediate
+supported_durations: [30]
+skills_tested: [clarification, operations, stakeholder management, implementation, synthesis]
+
+candidate_opening:
+  context: >-
+    BlueCurrent supplies water to a rapidly growing Indian city. Non-revenue
+    water has reached 42 percent, service complaints are rising, and the city cannot raise tariffs this year.
+  objective: >-
+    Recommend a practical programme to improve service and financial sustainability over an eighteen-month horizon without raising tariffs.
+  opening_requirements:
+    - Name the municipal client and operating scope (4M residents).
+    - Confirm the 42% Non-Revenue Water (NRW) challenge and political tariff freeze.
+    - Confirm the 18-month time horizon and service reliability metrics.
+    - Ask clarifying questions regarding loss breakdown, zoning, and metering infrastructure.
+
+objective_function:
+  primary_metric: non-revenue water reduction and service reliability
+  decision_question: Where should BlueCurrent focus first to reduce water loss without a tariff increase?
+  time_horizon: eighteen months
+  expected_candidate_output:
+    - Decomposition of NRW into physical vs apparent/commercial losses.
+    - Prioritized intervention plan (DMA zoning, meter calibration, regularisation).
+    - Stakeholder and political risk mitigation.
+    - 100-day execution milestones.
+  design_principle: >-
+    Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+
+case_essence:
+  core_mechanism: >-
+    NRW decomposition into physical leakage vs commercial/apparent losses. Physical losses are concentrated
+    in a few aged high-pressure zones; commercial losses stem from uncalibrated bulk commercial meters
+    and unregularised informal connections. Citywide household replacement would exhaust capital; district
+    metering and commercial regularisation yield immediate cash flow.
+  what_the_case_wanted_to_test: >-
+    80/20 capital allocation in public infrastructure, decomposing losses into technical (physical) vs
+    non-technical (commercial) drivers, and balancing fiscal sustainability with political tariff constraints.
+  pivotal_insight: >-
+    DMA (District Metered Area) zoning with night-flow analysis isolates 80% of physical leaks in 20% of pipes;
+    calibrating large commercial meters yields instant cash flow without tariff hikes.
+  common_traps:
+    - Advocating a generic citywide pipe replacement program that exceeds municipal borrowing limits and takes 5+ years to deliver initial savings.
+    - Assuming raising retail tariffs is the primary lever, ignoring political feasibility and 42% unbilled leakage.
+    - Cracking down punitively on informal community taps rather than offering structured communal billing and regularisation.
+  takeaway_lesson: >-
+    In municipal utilities facing tariff freezes, prioritize non-technical revenue recovery (meter calibration and billing regularisation)
+    and targeted pressure management to self-fund physical network rehabilitation.
+  suggested_readings:
+    - knowledge_base/industries/11_energy_and_renewables.md
+    - knowledge_base/case_types/unconventional_and_abstract.md
+    - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+    - clarification
+    - drill_down
+    - synthesis
+
+reservoir_files:
+  - facts.yaml
+  - issue-tree.yaml
+  - conversation-policy.yaml
+  - validation.md

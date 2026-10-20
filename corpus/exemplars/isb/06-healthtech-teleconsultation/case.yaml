@@ -1,0 +1,72 @@
+schema_version: reservoir-v1
+case_id: 06-healthtech-teleconsultation-v1
+title: Digital Healthcare Teleconsultation
+school: ISB
+status: approved
+rights_status: original
+category: growth_strategy
+industry: pharma_and_healthcare
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is a digital healthcare platform in India with 15M registered app users. It offers free and \u20B9\
+    99 teleconsultations with general physicians, but 90% of users churn after a single session."
+  objective: Design a recurring chronic disease management subscription model (diabetes, hypertension) to monetize user traffic.
+  opening_requirements:
+  - Name Digital Healthcare Teleconsultation and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Customer Lifetime Value (LTV) to CAC Ratio and 90-Day Retention (%)) and time horizon (twelve
+    months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Customer Lifetime Value (LTV) to CAC Ratio and 90-Day Retention (%)
+  decision_question: How should the teleconsultation app pivot from transactional one-off doctor chats to recurring chronic
+    care subscriptions?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "Transactional acute care trap. One-off teleconsults for cough/cold have zero recurring retention and high\
+    \ doctor payout costs (\u20B9250/call), while managing chronic conditions (diabetes/hypertension) requires monthly medicine\
+    \ deliveries, diagnostic testing, and continuous dietary coaching."
+  what_the_case_wanted_to_test: Digital health unit economics, acute vs chronic care retention, care plan subscription bundling
+    (teleconsult + diagnostics + pharmacy), and insurance integration.
+  pivotal_insight: "Acute cough/cold users have 5% annual retention; chronic diabetic patients generate \u20B918,000 annual\
+    \ spend across continuous glucose monitoring, lab tests, and monthly prescription refills with 72% retention."
+  common_traps:
+  - "Raising one-off GP consultation fees from \u20B999 to \u20B9500, destroying user acquisition."
+  - Hiring thousands of full-time doctors onto the payroll without guaranteed demand.
+  - Ignoring medicine delivery and lab test cross-selling.
+  takeaway_lesson: In digital health, standalone teleconsultation is a low-margin customer acquisition funnel; profitability
+    is captured by bundling recurring pharmacy refills and chronic condition monitoring.
+  suggested_readings:
+  - knowledge_base/industries/03_pharma_and_healthcare.md
+  - knowledge_base/case_types/growth_strategy.md
+  - knowledge_base/methodology/01_preliminary_questions.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

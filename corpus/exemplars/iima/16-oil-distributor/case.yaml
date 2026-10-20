@@ -1,0 +1,69 @@
+schema_version: reservoir-v1
+case_id: 16-oil-distributor-v1
+title: Automotive Lubricants Distributor
+school: IIM-A
+status: approved
+rights_status: original
+category: profitability
+industry: energy_and_renewables
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a regional distributor of automotive lubricants and engine oils in North India. Working capital
+    is exhausted and net margins have fallen from 4.5% to 1.2% over two years.
+  objective: Diagnose the margin compression and working capital lockup, and propose channel distribution reforms.
+  opening_requirements:
+  - Name Automotive Lubricants Distributor and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Net margin and Days Sales Outstanding (DSO)) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Net margin and Days Sales Outstanding (DSO)
+  decision_question: Why did lubricant distribution margins collapse and how should retail credit and inventory be restructured?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Over-extension of unsecured 90-day trade credit to unorganized independent auto mechanics and garages to
+    chase sales targets, coupled with slow-moving specialty SKU proliferation that tied up working capital.
+  what_the_case_wanted_to_test: Wholesale distribution economics, working capital financing, channel credit risk, and SKU
+    velocity Pareto analysis.
+  pivotal_insight: Top 20% high-velocity motorcycle oil SKUs generate 80% of profits on cash terms; bottom 50% niche industrial
+    SKUs are sold on 90-day credit to unvetted garages who default.
+  common_traps:
+  - Assuming oil marketing company (OMC) supplier wholesale prices increased.
+  - Cutting sales team incentives without fixing garage credit terms.
+  - Blaming synthetic vs mineral oil technology transitions.
+  takeaway_lesson: In route-to-market wholesale distribution, revenue growth driven by loose retailer credit terms destroys
+    distributor equity through working capital lockup and bad debt write-offs.
+  suggested_readings:
+  - knowledge_base/industries/11_energy_and_renewables.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

@@ -1,0 +1,45 @@
+schema_version: reservoir-facts-v1
+facts:
+- id: bpo.baseline
+  domain: company
+  release_level: broad_context
+  content: Client employs 40,000 agents generating $650M revenue, billed on an hourly FTE rate ($22-$26/hr).
+- id: ai.performance
+  domain: operations
+  release_level: sharp_question
+  content: GenAI voice agents achieve 74% containment resolution on routine Tier-1 inquiries (billing, flight status, returns)
+    with sub-600ms latency.
+- id: contract.cannibalization
+  domain: financials
+  release_level: hypothesis_backed
+  content: Under FTE billing, deploying AI reduces billable agent hours by 45%, shrinking client account revenue by $180M
+    if contracts remain hourly.
+  dependencies:
+  - ai.performance
+- id: outcome.pricing
+  domain: economics
+  release_level: hypothesis_backed
+  content: Pricing at $1.85 per AI-resolved interaction (vs $6.50 human cost) delivers 68% gross margin to the BPO while saving
+    the enterprise client 35% overall.
+  dependencies:
+  - contract.cannibalization
+- id: diagnosis.hidden
+  domain: diagnosis
+  release_level: interviewer_only
+  provenance: source_derived
+  content: FTE billing creates suicidal incentives against AI deployment; BPO must transition commercial contracts to 'Pay-Per-Resolution'
+    ($1.85/call), allowing AI Tier-1 automation to expand gross margin from 28% to 52% while reducing client costs.
+- id: recommendation.outcome_contracts
+  domain: recommendation
+  release_level: synthesis_support
+  content: Transition top-20 enterprise clients to gain-share 'Pay-Per-Resolution' contracts with guaranteed CSAT SLAs.
+- id: recommendation.hybrid_orchestration
+  domain: recommendation
+  release_level: synthesis_support
+  content: Deploy an AI voice agent frontend for Tier-1 routing with seamless sub-second human handoff for emotionally escalated
+    calls.
+- id: recommendation.agent_copilot
+  domain: recommendation
+  release_level: synthesis_support
+  content: Equip remaining human Tier-2 agents with real-time AI assistive copilots (live CRM knowledge retrieval and auto-summarization)
+    to cut handle time by 30%.

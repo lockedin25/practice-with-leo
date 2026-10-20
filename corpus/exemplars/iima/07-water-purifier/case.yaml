@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 07-water-purifier-v1
+title: Water Purifier Manufacturer
+school: IIM-A
+status: approved
+rights_status: original
+category: profitability
+industry: fmcg_and_cpg
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: "Your client is an Indian water purifier brand. It launched an IoT subscription rental model (pay \u20B9499/month)\
+    \ which attracted 100,000 subscribers, but company free cash flow turned deeply negative."
+  objective: Diagnose the cash flow deficit in the rental subscription model and recommend a profitable subscription structure.
+  opening_requirements:
+  - Name Water Purifier Manufacturer and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Subscriber Unit Contribution & Cash Payback Period) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Subscriber Unit Contribution & Cash Payback Period
+  decision_question: Why did the IoT water purifier subscription model burn cash and how can payback and filter servicing
+    economics be fixed?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "High upfront manufacturing capex (\u20B99,000/machine) and high early churn (32% cancel within 6 months)\
+    \ leaving hardware unamortized, coupled with unauthorized third-party counterfeit filter replacement."
+  what_the_case_wanted_to_test: Hardware-as-a-Service (HaaS) unit economics, churn amortization hurdles, working capital capex
+    recovery, and consumable lock-in.
+  pivotal_insight: "Hardware costs \u20B99k to manufacture but subscribers churn after 6 months generating only \u20B93k in\
+    \ revenue, while reverse logistics and refurbishing costs destroy residual asset value."
+  common_traps:
+  - Assuming IoT cloud server hosting costs caused the cash drain.
+  - Blaming marketing customer acquisition spend rather than unrecovered hardware capex from early churn.
+  - Assuming outright sales model had the same problem as rental subscriptions.
+  takeaway_lesson: Hardware-as-a-Service models collapse if upfront device capex is amortized over long horizons without minimum
+    contract lock-ins or upfront security deposits.
+  suggested_readings:
+  - knowledge_base/industries/05_fmcg_and_cpg.md
+  - knowledge_base/case_types/pricing_strategy.md
+  - knowledge_base/methodology/04_data_gathering_and_notes.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Progress · Leo MBB Prep</title>
+    <meta name="description" content="Your Leo case interview practice history, performance profile, and 10x debrief reports." />
+    <link rel="icon" type="image/svg+xml" href="/static/logo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/tokens.css" />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="stylesheet" href="/static/admin.css" />
+    <link rel="stylesheet" href="/static/profile.css" />
+  </head>
+  <body class="profile-body">
+    <!-- ── Unified Navigation ──────────────────────────────────── -->
+    <header class="navbar">
+      <div class="nav-inner shell">
+        <a class="brand" href="/" aria-label="Leo Home">
+          <svg class="brand-icon" viewBox="0 0 32 32" width="28" height="28" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="profLeoGrad" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="var(--brand-primary)"/>
+                <stop offset="100%" stop-color="var(--brand-deep)"/>
+              </linearGradient>
+              <linearGradient id="profGoldGrad" x1="10" y1="8" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="var(--gold-soft)"/>
+                <stop offset="100%" stop-color="var(--gold-primary)"/>
+              </linearGradient>
+            </defs>
+            <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#profLeoGrad)" stroke="var(--line-base)" stroke-width="1"/>
+            <path d="M9 8.5C9 7.67 9.67 7 10.5 7H13V19H22.5C23.33 19 24 19.67 24 20.5V23C24 23.83 23.33 24.5 22.5 24.5H10.5C9.67 24.5 9 23.83 9 23V8.5Z" fill="#ffffff" fill-opacity="0.9"/>
+            <path d="M18.5 7.5L23.5 12.5L18.5 17.5L13.5 12.5Z" fill="url(#profGoldGrad)"/>
+          </svg>
+          <span class="brand-name">Leo</span>
+          <span class="brand-badge">MBB Prep</span>
+        </a>
+
+        <nav class="nav-links" aria-label="Primary Navigation">
+          <a href="/" class="nav-link">Home</a>
+          <a href="/cases" class="nav-link">Case Library</a>
+          <a href="/practice" class="nav-link">Practice Room</a>
+          <a href="/profile" class="nav-link active" aria-current="page">Your Progress</a>
+        </nav>
+
+        <div class="nav-actions">
+          <button class="icon-button" id="theme-toggle" type="button" aria-label="Switch colour theme">
+            <svg viewBox="0 0 24 24" class="icon icon-sun" aria-hidden="true">
+              <circle cx="12" cy="12" r="4.2" />
+              <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6l-1.4 1.4M7 17l-1.4 1.4" />
+            </svg>
+            <svg viewBox="0 0 24 24" class="icon icon-moon" aria-hidden="true">
+              <path d="M20 14.1A8.2 8.2 0 1 1 9.9 4a6.6 6.6 0 0 0 10.1 10.1Z" />
+            </svg>
+          </button>
+
+          <div class="user-menu hidden" id="user-menu">
+            <button class="user-chip" id="user-chip" type="button" aria-haspopup="true" aria-expanded="false" title="Your Account">
+              <span class="user-avatar" id="user-avatar" aria-hidden="true"></span>
+              <span class="user-name-label" id="user-name-label">Profile</span>
+              <svg viewBox="0 0 24 24" class="icon user-caret" aria-hidden="true"><path d="M7 10l5 5 5-5" /></svg>
+            </button>
+            <div class="user-sheet hidden" id="user-sheet">
+              <p class="user-sheet-name" id="user-name"></p>
+              <p class="user-sheet-email" id="user-email"></p>
+              <a class="user-sheet-item" href="/profile"><strong>Your Progress &amp; History</strong></a>
+              <a class="user-sheet-item" href="/cases">Case Library (69 Cases)</a>
+              <a class="user-sheet-item" href="/practice">Practice Room</a>
+              <a class="user-sheet-item hidden" id="admin-link" href="/admin">Admin Console</a>
+              <button class="user-sheet-item sign-out-btn" id="sign-out" type="button">Sign Out</button>
+            </div>
+          </div>
+
+          <a class="btn btn-secondary btn-sm" id="auth-signin-link" href="/login?next=/profile">Sign in</a>
+          <a href="/cases" class="btn btn-primary btn-sm">Browse Cases <span class="arrow">→</span></a>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── Main Content ───────────────────────────────────────── -->
+    <main class="profile shell" style="padding-top: 32px; padding-bottom: 64px;">
+      <!-- Profile Header Banner -->
+      <header class="profile-head" style="margin-bottom: 24px;">
+        <div class="profile-identity-wrap" style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+          <div class="profile-avatar-large" id="profile-avatar-large" style="width: 56px; height: 56px; border-radius: 50%; background: var(--brand-tint) center / cover no-repeat; color: var(--brand-primary); font-size: 1.5rem; font-weight: 800; display: grid; place-items: center; border: 2px solid var(--brand-tint-2);">
+            ?
+          </div>
+          <div>
+            <p class="eyebrow" style="margin-bottom: 2px;"><span class="eyebrow-mark" aria-hidden="true"></span> Candidate Performance Profile</p>
+            <h1 id="profile-title" style="margin: 0 0 4px; font-size: clamp(24px, 3.5vw, 32px);">Your progress, in focus.</h1>
+            <p class="muted" id="profile-subtitle" style="margin: 0; font-size: 14px;">Loading your case history…</p>
+          </div>
+        </div>
+        <div class="profile-head-actions" style="display: flex; gap: 10px; margin-top: 12px;">
+          <a class="btn btn-secondary btn-sm" href="/cases">Browse 69 Cases</a>
+          <a class="btn btn-primary btn-sm" href="/practice">Practice Room <span class="arrow">→</span></a>
+        </div>
+      </header>
+
+      <!-- Metric Summary Tiles -->
+      <section class="tiles" id="summary-tiles" aria-label="Practice summary"></section>
+
+      <!-- Competency Breakdown & Focus Areas Grid -->
+      <section class="profile-grid">
+        <article class="card profile-performance">
+          <header class="card-head">
+            <div>
+              <p class="eyebrow">BCG Competency Profile</p>
+              <p class="card-subtitle">Average score across 5 MBB dimensions (1.0–5.0 scale).</p>
+            </div>
+            <span class="counter" id="assessed-count">0</span>
+          </header>
+          <div class="profile-empty hidden" id="performance-empty">Finish a case to unlock evidence-based development feedback.</div>
+          <div class="skill-bars" id="performance-bars"></div>
+        </article>
+
+        <article class="card profile-overview-card">
+          <header class="card-head">
+            <div>
+              <p class="eyebrow">Strengths &amp; Development Focus</p>
+              <p class="card-subtitle">Synthesized from verbatim feedback across your case attempts.</p>
+            </div>
+          </header>
+          <div class="profile-overview-body" id="profile-overview">
+            <div class="profile-pillar">
+              <p class="pillar-label pillar-label-strong">Key Strengths</p>
+              <ul class="pillar-list" id="strength-list"></ul>
+            </div>
+            <div class="profile-pillar">
+              <p class="pillar-label pillar-label-focus">Priority Development Areas</p>
+              <ul class="pillar-list" id="development-list"></ul>
+            </div>
+          </div>
+          <div class="profile-empty hidden" id="development-empty">Feedback themes will populate as you complete more cases.</div>
+        </article>
+      </section>
+
+      <!-- Practice History Table -->
+      <section class="card table-card profile-history-card" style="margin-top: 24px;">
+        <header class="card-head" style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <p class="eyebrow">Practice History &amp; 10x Debrief Reports</p>
+            <p class="card-subtitle">Every completed attempt is linked to its full 10x Masterclass Debrief Report.</p>
+          </div>
+          <span class="counter" id="history-count">0</span>
+        </header>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Case &amp; School</th>
+                <th>Mode</th>
+                <th>Stage</th>
+                <th class="numeric">Turns</th>
+                <th class="numeric">Score (out of 5)</th>
+                <th>MBB Rating</th>
+                <th>Attempted</th>
+                <th style="text-align: right;">Report &amp; Actions</th>
+              </tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <!-- ── Transcript & Summary Drawer ────────────────────────── -->
+    <div class="drawer-veil hidden" id="drawer-veil"></div>
+    <aside class="drawer hidden" id="drawer" aria-label="Practice transcript" tabindex="-1">
+      <header class="drawer-head">
+        <div>
+          <p class="eyebrow">Attempt Summary &amp; Transcript</p>
+          <h2 class="drawer-title" id="drawer-title">Attempt</h2>
+          <div class="drawer-meta" id="drawer-meta" style="margin-top: 6px;"></div>
+        </div>
+        <button class="drawer-close" id="drawer-close" type="button" aria-label="Close transcript">
+          <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"><path d="M6.6 6.6l10.8 10.8M17.4 6.6L6.6 17.4" /></svg>
+        </button>
+      </header>
+      <div class="drawer-cta" id="drawer-cta-wrap" style="padding: 12px 20px; background: var(--brand-tint); border-bottom: 1px solid var(--line-base); display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 13px; font-weight: 600; color: var(--brand-deep);">Full 10x Masterclass Report available</span>
+        <a class="btn btn-primary btn-sm" id="drawer-debrief-btn" href="#" style="background: var(--brand-primary); color: #fff;">Open Full Debrief →</a>
+      </div>
+      <div class="drawer-body" id="drawer-body"></div>
+    </aside>
+
+    <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+    <template id="message-template">
+      <article class="message">
+        <span class="avatar" aria-hidden="true">
+          <svg viewBox="0 0 32 32" class="avatar-glyph" fill="none">
+            <rect width="32" height="32" rx="8" fill="var(--brand-primary)"/>
+            <path d="M9 8.5C9 7.67 9.67 7 10.5 7H13V19H22.5C23.33 19 24 19.67 24 20.5V23C24 23.83 23.33 24.5 22.5 24.5H10.5C9.67 24.5 9 23.83 9 23V8.5Z" fill="#ffffff"/>
+            <path d="M18.5 7.5L23.5 12.5L18.5 17.5L13.5 12.5Z" fill="var(--gold-primary)"/>
+          </svg>
+        </span>
+        <div class="message-body">
+          <p class="message-role"></p>
+          <div class="bubble"><p class="message-content"></p></div>
+        </div>
+      </article>
+    </template>
+
+    <script src="/static/theme.js"></script>
+    <script src="/static/profile.js"></script>
+  </body>
+</html>

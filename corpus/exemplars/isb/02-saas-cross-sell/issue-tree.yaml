@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.saas-nrr
+  label: Accelerate enterprise SaaS Net Revenue Retention from 102% to 125%+.
+nodes:
+- id: nrr-decomposition
+  type: branch
+  label: Gross Churn vs Net Expansion Breakdown
+  status: valid_branch
+  evidence: []
+  conclusion: Gross churn is low (6%); failure is lack of account expansion and upsell.
+- id: multi-product-friction
+  type: branch
+  label: Product Architecture & Integration Hurdles
+  status: valid_branch
+  evidence: []
+  conclusion: Separate logins and fragmented contracts restrict secondary module adoption to 14%.
+- id: incentive-alignment
+  type: branch
+  label: Sales Compensation & Customer Success Quotas
+  status: valid_branch
+  evidence: []
+  conclusion: Sales team is incentivized 100% on new logos with zero rewards for expansion.
+- id: diagnosis
+  type: diagnosis
+  label: Fragmented Product Silos & Misaligned Compensation
+  status: hidden_target
+  evidence:
+  - nrr-decomposition
+  - multi-product-friction
+  - incentive-alignment
+  conclusion: NRR stalled because secondary products operate as disconnected tools requiring separate contracts, and commercial
+    teams are not compensated for account expansion.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Enterprise NRR Acceleration Plan
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Unify product suite on single SSO platform, build dedicated expansion account management team, and enable in-app
+    product-led upgrades.
+edges:
+- from: objective.saas-nrr
+  to: nrr-decomposition
+  relation: investigate
+- from: objective.saas-nrr
+  to: multi-product-friction
+  relation: investigate
+- from: objective.saas-nrr
+  to: incentive-alignment
+  relation: investigate
+- from: nrr-decomposition
+  to: diagnosis
+  relation: supports
+- from: multi-product-friction
+  to: diagnosis
+  relation: supports
+- from: incentive-alignment
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: metrics-first
+  sequence:
+  - nrr-decomposition
+  - multi-product-friction
+  - incentive-alignment
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate to unbundle NRR into gross retention vs expansion revenue.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to compare Gross Retention (94%) with Net Retention (102%).
+  - Clarify that customers are not churning, but not spending more over time.
+  - Redirect toward multi-product adoption and sales incentive structures.

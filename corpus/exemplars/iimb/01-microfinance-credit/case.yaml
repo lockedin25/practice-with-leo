@@ -1,0 +1,70 @@
+schema_version: reservoir-v1
+case_id: 01-microfinance-credit-v1
+title: Microfinance Portfolio Risk
+school: IIM-B
+status: approved
+rights_status: original
+category: operations
+industry: banking_and_financial_services
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a leading Indian Microfinance Institution (MFI) with 2.5M women borrowers across Joint Liability
+    Groups (JLGs). Collection efficiency in a flood-affected agricultural state plunged from 98.5% to 74%.
+  objective: Diagnose default contagion across JLGs and recommend a field collection and loan restructuring strategy.
+  opening_requirements:
+  - Name Microfinance Portfolio Risk and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Portfolio at Risk (PAR 30) and Collection Efficiency (%)) and time horizon (six months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Portfolio at Risk (PAR 30) and Collection Efficiency (%)
+  decision_question: How can the MFI halt group default contagion and restore loan collection efficiency?
+  time_horizon: six months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Social collateral collapse in Joint Liability Groups where mutual guarantee peer pressure broke down due
+    to widespread flood crop damage, leading to collective strategic default when center meetings were suspended.
+  what_the_case_wanted_to_test: Microfinance JLG group dynamics, peer monitoring collapse under systemic covariate shocks,
+    and field collection restructuring.
+  pivotal_insight: Individual borrowers who had cash refused to pay because peer group members were insolvent; once group
+    center meetings stopped, moral hazard spread to non-affected neighboring villages.
+  common_traps:
+  - Deploying aggressive coercive collection agents, which violates RBI microfinance fair practices code and causes political
+    backlash.
+  - Writing off the entire portfolio without distinguishing flooded vs non-affected borrowers.
+  - Assuming flood insurance covered all micro-borrowers.
+  takeaway_lesson: In group microfinance, covariate natural disasters destroy peer guarantees; recovery requires unbundling
+    joint liability into individual emergency moratoriums and resuming weekly center meetings.
+  suggested_readings:
+  - knowledge_base/industries/04_banking_and_financial_services.md
+  - knowledge_base/case_types/unconventional_and_abstract.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

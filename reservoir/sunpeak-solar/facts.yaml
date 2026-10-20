@@ -1,0 +1,110 @@
+schema_version: reservoir-facts-v1
+facts:
+  - id: company.offer
+    domain: company
+    release_level: broad_context
+    content: "SunPeak designs, installs, and maintains rooftop solar systems for small factories, warehouses, and retail sites."
+    candidate_purpose: "Establish client business model and target commercial B2B customer segments."
+    question_examples:
+      - "What is SunPeak's product offering and who are its target clients?"
+      - "What services are included in SunPeak's solar installations?"
+
+  - id: funnel
+    domain: financials
+    release_level: sharp_question
+    content: "Lead qualification is strong and installation capacity is available; the sharpest drop occurs after customers receive a final cash quote."
+    candidate_purpose: "Isolate conversion drop-off point to post-quote proposal stage."
+    question_examples:
+      - "Where in the sales funnel is conversion breaking down?"
+      - "Are leads poorly qualified or is the drop-off occurring after the site survey and quote?"
+
+  - id: customer.cashflow
+    domain: customers
+    release_level: hypothesis_backed
+    content: "Most prospects agree that solar lowers lifetime energy cost, but owners compare the upfront payment with near-term working-capital needs."
+    dependencies: [funnel]
+    candidate_purpose: "Identify buyer psychology: working-capital preservation over long-term NPV."
+    question_examples:
+      - "What feedback do SME business owners provide when rejecting quotes?"
+      - "Do customers doubt solar savings or are they cash-flow constrained?"
+
+  - id: price.position
+    domain: commercial
+    release_level: sharp_question
+    content: "SunPeak's upfront price is close to competitors, but its quote presents equipment, installation, and maintenance as one large capital amount."
+    candidate_purpose: "Highlight quote packaging defect: large lump-sum capex presentation."
+    question_examples:
+      - "How does SunPeak's pricing compare to competitors?"
+      - "How is the pricing quote structured and presented to the client?"
+
+  - id: economics.loan
+    domain: economics
+    release_level: hypothesis_backed
+    content: "With a five-year financing product, monthly loan payments can be lower than expected electricity savings for many high-usage customers, while SunPeak's gross margin remains positive."
+    dependencies: [price.position]
+    candidate_purpose: "Demonstrate cash-positive unit economics of a 5-year financed monthly offer."
+    question_examples:
+      - "What would customer economics look like under a 5-year loan or EMI structure?"
+      - "Can monthly financing payments be lower than monthly grid electricity savings?"
+
+  - id: economics.segment
+    domain: economics
+    release_level: hypothesis_backed
+    content: "Low-usage retail sites have longer payback periods and are less attractive financing candidates than factories and cold-storage warehouses."
+    dependencies: [economics.loan]
+    candidate_purpose: "Segment prioritization: high-usage C&I vs low-usage retail."
+    question_examples:
+      - "How do payback periods and energy savings vary across client segments?"
+      - "Which client segments have the strongest repayment capacity?"
+
+  - id: operations.install
+    domain: operations
+    release_level: broad_context
+    content: "Installation crews have spare capacity, but site surveys and credit documentation currently create a two-week handoff delay."
+    candidate_purpose: "Identify operational friction in credit documentation and survey handoff."
+    question_examples:
+      - "What is the turnaround time from survey to contract signing?"
+      - "Does SunPeak have available installation capacity to support higher volume?"
+
+  - id: competition
+    domain: market
+    release_level: sharp_question
+    content: "A fast-growing competitor wins more factory accounts by quoting a monthly energy plan, though its contracts transfer some performance risk to the provider."
+    candidate_purpose: "Benchmark against competitor monthly OPEX pricing model."
+    question_examples:
+      - "What pricing models are winning competitors using in the market?"
+      - "How do competitor monthly energy plans work?"
+
+  - id: risk.credit
+    domain: risk
+    release_level: hypothesis_backed
+    content: "SunPeak should not finance every prospect itself because small-business defaults can erase installation margin without disciplined underwriting and lender partnership."
+    candidate_purpose: "Warn against balance-sheet credit risk; require external lending partner."
+    question_examples:
+      - "Should SunPeak finance installations on its own balance sheet?"
+      - "What are the credit default risks for SME financing?"
+
+  - id: diagnosis.hidden
+    domain: diagnosis
+    release_level: interviewer_only
+    provenance: source_derived
+    content: "The 9% conversion bottleneck is caused by quoting large upfront lump-sum CAPEX to cash-constrained SME factory owners who prioritize working capital over 10-year NPV; because monthly electricity savings exceed 5-year debt service for high-usage customers, SunPeak must shift from lump-sum cash quotes to a financed monthly OPEX payment model partnered with non-recourse lenders."
+    candidate_purpose: "Never disclose directly. Benchmark for evaluator answer-key comparison and interviewer recovery."
+
+  - id: recommendation.offer
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Offer a financed monthly-payment option beside the cash quote, showing expected savings, payback, and service terms in a simple comparison."
+    candidate_purpose: "Pillar 1: Financed monthly OPEX pricing model with side-by-side comparison."
+
+  - id: recommendation.focus
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Prioritise high-usage segments where savings and repayment capacity are strongest, rather than subsidising low-value installations."
+    candidate_purpose: "Pillar 2: Segment prioritization of high-load industrial clients."
+
+  - id: recommendation.process
+    domain: recommendation
+    release_level: synthesis_support
+    content: "Integrate lender pre-approval into the site-survey flow so qualified prospects do not lose momentum after the quote."
+    candidate_purpose: "Pillar 3: Streamlined lender pre-approval integrated into survey workflow."

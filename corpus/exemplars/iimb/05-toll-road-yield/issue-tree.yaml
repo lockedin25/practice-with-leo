@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.toll-recovery
+  label: Recover toll revenue yield and halt commercial vehicle bypass diversion.
+nodes:
+- id: traffic-mix-breakdown
+  type: branch
+  label: Traffic Volume by Vehicle Category
+  status: valid_branch
+  evidence: []
+  conclusion: Car traffic is on target; high-revenue commercial multi-axle trucks dropped 22%.
+- id: leakage-and-bypass-routes
+  type: branch
+  label: Bypass Diversion & Alternate Route Economics
+  status: valid_branch
+  evidence: []
+  conclusion: "2,400 daily trucks use un-tolled SH-42 rural bypass to avoid the \u20B9850 toll."
+- id: enforcement-and-wim
+  type: branch
+  label: Weigh-in-Motion Overload Penalty Dynamics
+  status: valid_branch
+  evidence: []
+  conclusion: 10x WIM overload penalties strongly incentivize trucks to take the longer rural bypass.
+- id: diagnosis
+  type: diagnosis
+  label: Overload Penalty Avoidance & Bypass Leakage
+  status: hidden_target
+  evidence:
+  - traffic-mix-breakdown
+  - leakage-and-bypass-routes
+  - enforcement-and-wim
+  conclusion: "Toll revenue shortfall is driven by commercial trucks diverting to an un-tolled rural bypass road to evade\
+    \ \u20B9850 toll fees and strict Weigh-in-Motion overloading fines."
+- id: actions
+  type: recommendation
+  label: 3-Pillar Toll Yield Recovery Plan
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Install check-posts on bypass road, rationalize WIM penalty tiers, and offer monthly commercial fleet FASTag
+    discounts.
+edges:
+- from: objective.toll-recovery
+  to: traffic-mix-breakdown
+  relation: investigate
+- from: objective.toll-recovery
+  to: leakage-and-bypass-routes
+  relation: investigate
+- from: objective.toll-recovery
+  to: enforcement-and-wim
+  relation: investigate
+- from: traffic-mix-breakdown
+  to: diagnosis
+  relation: supports
+- from: leakage-and-bypass-routes
+  to: diagnosis
+  relation: supports
+- from: enforcement-and-wim
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: traffic-first
+  sequence:
+  - traffic-mix-breakdown
+  - leakage-and-bypass-routes
+  - enforcement-and-wim
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from vehicle category revenue breakdown to bypass route analysis.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate which vehicle category accounts for the revenue drop.
+  - Clarify that overall regional industrial freight is growing.
+  - Redirect toward alternate routes and truck weigh-in-motion avoidance.

@@ -1,0 +1,69 @@
+schema_version: reservoir-v1
+case_id: 20-steel-producer-v1
+title: Secondary Steel Induction Mill
+school: IIM-A
+status: approved
+rights_status: original
+category: profitability
+industry: heavy_manufacturing_and_steel
+difficulty: intermediate
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a secondary steel billet and TMT bar manufacturer in Central India using induction furnaces. EBITDA
+    margin dropped from 11% to 3% over twelve months.
+  objective: Diagnose power and raw material cost inflation and recommend an energy and raw material optimization plan.
+  opening_requirements:
+  - Name Secondary Steel Induction Mill and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (EBITDA per metric ton of TMT steel) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: EBITDA per metric ton of TMT steel
+  decision_question: Why did steel mill EBITDA margin collapse and how can furnace yield and power costs be optimized?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: "Power tariff hikes (from \u20B95.8 to \u20B97.6/kWh) combined with variable sponge iron (DRI) metallization\
+    \ quality (dropping from 84% to 76%), which increased furnace melting electricity consumption by 32% per ton."
+  what_the_case_wanted_to_test: Secondary steel metallurgy, specific power consumption (kWh/ton), sponge iron metallization
+    grade variance, and captive power plant economics.
+  pivotal_insight: Lower-grade sponge iron with high gangue/unreduced iron requires significantly more electricity and flux
+    to melt, multiplying the impact of rising grid power tariffs.
+  common_traps:
+  - Assuming TMT bar selling price crashed without checking domestic infrastructure demand.
+  - Blaming rolling mill labor costs which represent <5% of steel cost.
+  - Proposing closing induction furnaces to build an expensive blast furnace.
+  takeaway_lesson: In electro-intensive heavy manufacturing, using cheaper low-grade raw materials often backfires by dramatically
+    inflating specific energy consumption per unit of finished product.
+  suggested_readings:
+  - knowledge_base/industries/14_heavy_manufacturing_and_steel.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

@@ -1,0 +1,73 @@
+schema_version: reservoir-v1
+case_id: 24-drug-pricing-v1
+title: Specialty Oncology Drug Pricing
+school: IIM-A
+status: approved
+rights_status: original
+category: pricing
+industry: pharma_and_healthcare
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client is a multinational pharmaceutical company launching a breakthrough immunotherapy drug for lung cancer
+    in India. US price is $120,000/year, but Indian out-of-pocket healthcare market requires a localized market access pricing
+    strategy.
+  objective: Design an optimal pricing and patient access program to maximize revenue and patient coverage in India.
+  opening_requirements:
+  - Name Specialty Oncology Drug Pricing and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Commercial Revenue and Patient Access Reach) and time horizon (two years).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Commercial Revenue and Patient Access Reach
+  decision_question: What pricing and patient assistance model should the pharma company adopt for its oncology launch in
+    India?
+  time_horizon: two years
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: High out-of-pocket expenditure (70% non-insured) in India vs US insurance reimbursement; standard global
+    reference pricing creates zero volume, while simple price slashing triggers international gray-market re-export arbitrage
+    and reference price erosion in Europe.
+  what_the_case_wanted_to_test: Tiered healthcare pricing, international reference pricing (IRP) arbitrage protection, Patient
+    Assistance Programs (PAP), and outcome-based risk sharing.
+  pivotal_insight: A headline price cut destroys global reference pricing; the company must maintain a high nominal MRP while
+    implementing an outcome-based Patient Assistance Program ('Buy 2 cycles, get 4 free' with full refund upon disease progression).
+  common_traps:
+  - Recommending selling at generic cost-plus pricing ($2,000/yr), which collapses company reference prices across emerging
+    markets.
+  - Assuming private Indian health insurance will fully cover $120,000 annual therapy.
+  - Ignoring parallel gray-market re-export risks to high-price European markets.
+  takeaway_lesson: In global specialty pharmaceuticals, expanding access into emerging markets without eroding global reference
+    prices requires innovative Patient Assistance Programs and outcome-linked risk sharing.
+  suggested_readings:
+  - knowledge_base/industries/03_pharma_and_healthcare.md
+  - knowledge_base/case_types/pricing_strategy.md
+  - knowledge_base/methodology/04_data_gathering_and_notes.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

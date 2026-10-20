@@ -1,0 +1,79 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.oil-distributor-margin
+  label: Restore lubricant distributor net margin and cash flow.
+nodes:
+- id: gross-margin-vs-overhead
+  type: branch
+  label: Wholesale Gross Margins vs Operating Costs
+  status: valid_branch
+  evidence: []
+  conclusion: Supplier margins are steady; bank overdraft interest and bad debts eroded profit.
+- id: working-capital-and-dso
+  type: branch
+  label: Receivables DSO & Garage Credit Risk
+  status: valid_branch
+  evidence: []
+  conclusion: DSO blew out to 88 days due to unsecured credit to unorganized repair garages.
+- id: inventory-and-sku-velocity
+  type: branch
+  label: SKU Velocity & Warehouse Holding Costs
+  status: valid_branch
+  evidence: []
+  conclusion: "Bottom 250 SKUs turn <2x/year, trapping \u20B98 Cr in dead inventory."
+- id: diagnosis
+  type: diagnosis
+  label: Garage Credit Default & SKU Proliferation
+  status: hidden_target
+  evidence:
+  - gross-margin-vs-overhead
+  - working-capital-and-dso
+  - inventory-and-sku-velocity
+  conclusion: Profitability collapsed due to loose 90-day credit to high-risk garages and carrying 250 slow-moving specialty
+    SKUs.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Distribution Restructuring Plan
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Enforce cash-and-carry for garages, rationalize slow-moving SKUs, and shift dealer credit to fintech invoice
+    financing.
+edges:
+- from: objective.oil-distributor-margin
+  to: gross-margin-vs-overhead
+  relation: investigate
+- from: objective.oil-distributor-margin
+  to: working-capital-and-dso
+  relation: investigate
+- from: objective.oil-distributor-margin
+  to: inventory-and-sku-velocity
+  relation: investigate
+- from: gross-margin-vs-overhead
+  to: diagnosis
+  relation: supports
+- from: working-capital-and-dso
+  to: diagnosis
+  relation: supports
+- from: inventory-and-sku-velocity
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: working-capital-first
+  sequence:
+  - gross-margin-vs-overhead
+  - working-capital-and-dso
+  - inventory-and-sku-velocity
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate from profitability statement to working capital and receivables.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to check the growth in Days Sales Outstanding (DSO).
+  - Clarify that OMC oil prices did not increase.
+  - Redirect toward dealer credit terms and inventory SKU velocity.

@@ -1,0 +1,71 @@
+schema_version: reservoir-v1
+case_id: 06-petrochemical-cracker-yield-v1
+title: Petrochemical Cracker Feedstock Yield
+school: IIM-C
+status: approved
+rights_status: original
+category: operations
+industry: energy_and_renewables
+difficulty: advanced
+supported_durations:
+- 30
+skills_tested:
+- clarification
+- tailored structure
+- unit economics
+- hypothesis drilling
+- synthesis
+candidate_opening:
+  context: Your client operates a world-scale dual-feed (naphtha and ethane) steam cracker producing 1.5M MT of ethylene in
+    Western India. Cracker operating cash margins fluctuated wildly from +$350/MT to -$80/MT over eighteen months.
+  objective: Develop a dynamic feedstock optimization and crack-spread hedging model to stabilize and maximize cracker EBITDA.
+  opening_requirements:
+  - Name Petrochemical Cracker Feedstock Yield and its core operating model.
+  - Confirm the core performance challenge or strategic mandate.
+  - Confirm primary metric (Cracker Cash Margin per MT of Ethylene ($/MT)) and time horizon (twelve months).
+  - Ask clarifying questions before structuring the issue tree.
+objective_function:
+  primary_metric: Cracker Cash Margin per MT of Ethylene ($/MT)
+  decision_question: How should the petrochemical cracker dynamically balance naphtha vs ethane feedstocks across variable
+    commodity price cycles?
+  time_horizon: twelve months
+  expected_candidate_output:
+  - Root cause diagnosis supported by unit economics and data.
+  - Prioritized 3-pillar actionable recommendation.
+  - Key operational and commercial risks with mitigations.
+  - 100-day execution milestones.
+  design_principle: Reward first-principles problem structuring and hypothesis testing over memorized framework dumping.
+case_essence:
+  core_mechanism: Feedstock flexibility and co-product value capture. Ethane cracking produces high ethylene yield (80%) with
+    minimal co-products; naphtha cracking produces lower ethylene (32%) but rich co-products (propylene, butadiene, benzene)
+    whose value depends on crude oil and downstream polymer spreads.
+  what_the_case_wanted_to_test: Chemical process economics, dual-feed steam cracker flexibility, crack-spread hedging (Brent
+    crude vs Henry Hub gas), and co-product price realization.
+  pivotal_insight: When crude oil is expensive relative to natural gas, ethane cracking is superior; but when downstream butadiene/benzene
+    chemical spreads surge, naphtha cracking generates higher total margin despite lower ethylene yield.
+  common_traps:
+  - Assuming ethylene yield percentage is the only metric that matters.
+  - Locking 100% of feedstock into long-term ethane contracts without flexibility.
+  - Ignoring the logistics cost of cryogenic refrigerated ethane shipping.
+  takeaway_lesson: In dual-feed petrochemical refining, profitability is governed by the relative spread between crude-derived
+    naphtha and gas-derived ethane; plants must maintain real-time LP model feedstock switching agility.
+  suggested_readings:
+  - knowledge_base/industries/11_energy_and_renewables.md
+  - knowledge_base/case_types/profitability.md
+  - knowledge_base/methodology/03_hypothesis_driven_drilling.md
+session_contract:
+  mode: realistic
+  live_fact_invention: disabled
+  scratchpad: disabled
+  quantitative_drills: disabled
+  transcript_visibility: post_case_only
+  reasoning_graph_visibility: post_case_only
+  current_phases:
+  - clarification
+  - drill_down
+  - synthesis
+reservoir_files:
+- facts.yaml
+- issue-tree.yaml
+- conversation-policy.yaml
+- validation.md

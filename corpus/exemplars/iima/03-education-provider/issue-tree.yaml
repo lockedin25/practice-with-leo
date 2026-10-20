@@ -1,0 +1,74 @@
+schema_version: issue-tree-v1
+visibility: post_case_only
+root:
+  id: objective.testprep-profit
+  label: Restore test prep institute operating profit margin.
+nodes:
+- id: revenue-and-enrollment
+  type: branch
+  label: Tuition Fees & Enrollment Scale
+  status: valid_branch
+  evidence: []
+  conclusion: Enrollment grew 12%, ruling out demand contraction.
+- id: faculty-cost-structure
+  type: branch
+  label: Faculty Compensation & Bidding War
+  status: valid_branch
+  evidence: []
+  conclusion: Faculty payroll surged 52% YoY to 68% of revenue due to defensive retention bidding.
+- id: curriculum-ip
+  type: branch
+  label: Teaching IP & Dependency on Star Talent
+  status: valid_branch
+  evidence: []
+  conclusion: Brand is over-dependent on individual teachers due to non-standardized curriculum.
+- id: diagnosis
+  type: diagnosis
+  label: Star Faculty Poaching & Payroll Escalation
+  status: hidden_target
+  evidence:
+  - faculty-cost-structure
+  - curriculum-ip
+  conclusion: Profit collapsed due to faculty costs surging from 42% to 68% of revenue amid poaching wars, enabled by lack
+    of institutionalized curriculum IP.
+- id: actions
+  type: recommendation
+  label: 3-Pillar Talent & IP Transformation
+  status: synthesis
+  evidence:
+  - diagnosis
+  conclusion: Standardize curriculum IP, introduce vesting retention contracts, and build internal faculty training pipeline.
+edges:
+- from: objective.testprep-profit
+  to: revenue-and-enrollment
+  relation: investigate
+- from: objective.testprep-profit
+  to: faculty-cost-structure
+  relation: investigate
+- from: objective.testprep-profit
+  to: curriculum-ip
+  relation: investigate
+- from: faculty-cost-structure
+  to: diagnosis
+  relation: supports
+- from: curriculum-ip
+  to: diagnosis
+  relation: supports
+- from: diagnosis
+  to: actions
+  relation: determines
+acceptable_routes:
+- id: talent-first
+  sequence:
+  - revenue-and-enrollment
+  - faculty-cost-structure
+  - curriculum-ip
+  - diagnosis
+  - actions
+  interviewer_behaviour: Guide candidate to investigate cost inflation before analyzing teaching IP.
+recovery_policy:
+  maximum_unproductive_follow_ups: 2
+  recovery_order:
+  - Ask candidate to check the single largest line item in operating costs.
+  - Clarify that student fees and enrollments grew normally.
+  - Redirect toward faculty salary dynamics and edtech poaching competition.
